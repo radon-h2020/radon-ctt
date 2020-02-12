@@ -10,7 +10,7 @@ def download_result_by_id(result_id):  # noqa: E501
 
      # noqa: E501
 
-    :param result_id: Id of result to download
+    :param result_id: ID of the result to download
     :type result_id: int
 
     :rtype: file
@@ -23,7 +23,7 @@ def get_result_by_id(result_id):  # noqa: E501
 
      # noqa: E501
 
-    :param result_id: Id of Result to return
+    :param result_id: ID of the result to return
     :type result_id: int
 
     :rtype: Result

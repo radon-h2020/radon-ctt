@@ -7,7 +7,7 @@ from openapi_server import util
 
 
 def create_testartifact(post_testartifacts=None):  # noqa: E501
-    """Creates a testartifact
+    """Creates a test artifact
 
      # noqa: E501
 
@@ -22,11 +22,11 @@ def create_testartifact(post_testartifacts=None):  # noqa: E501
 
 
 def download_testartifact_by_id(testartifact_id):  # noqa: E501
-    """Downloads the generated testartifact
+    """Downloads the generated test artifact
 
      # noqa: E501
 
-    :param testartifact_id: Id of testartifact to download
+    :param testartifact_id: ID of the test artifact to download
     :type testartifact_id: int
 
     :rtype: file
@@ -35,11 +35,11 @@ def download_testartifact_by_id(testartifact_id):  # noqa: E501
 
 
 def get_testartifact_by_id(testartifact_id):  # noqa: E501
-    """Retrieve a testartifact
+    """Retrieve a test artifact
 
      # noqa: E501
 
-    :param testartifact_id: Id of testartifact to return
+    :param testartifact_id: ID of the test artifact to return
     :type testartifact_id: int
 
     :rtype: Testartifact
@@ -48,7 +48,7 @@ def get_testartifact_by_id(testartifact_id):  # noqa: E501
 
 
 def get_testartifacts():  # noqa: E501
-    """Get all testartifacts
+    """Get all test artifacts
 
      # noqa: E501
 

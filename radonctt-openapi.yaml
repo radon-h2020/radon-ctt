@@ -120,7 +120,7 @@ components:
           example: 'https://github.com/UST-CTT/radon-ctt-sockshop-example.git'
           type: string
         servicetemplate_location:
-          example: 'radon-ctt/servicetemplate.yml'
+          example: radon-ctt/servicetemplate.yml
           type: string
       required:
         - servicetemplate_location
@@ -278,20 +278,24 @@ components:
           type: string
       type: object
 info:
-  description: |
-    This is the Radon CTT API.
-  title: Radon CTT API
+  title: RADON CTT Server API
   version: 1.0.0-oas3
+  description: >-
+    This is API of the RADON Continuous Testing Tool (CTT) Server:
+    <a href="https://github.com/radon-h2020/radon-ctt">https://github.com/radon-h2020/radon-ctt<a/>
+  license:
+    name: 'Apache License, Version 2.0'
+    url: 'https://opensource.org/licenses/Apache-2.0'
 openapi: 3.0.0
 paths:
-  '/deployment/{deploymentId}':
+  '/deployment/{deployment_id}':
     get:
       operationId: get_deployment_by_id
       parameters:
-        - description: Id of deployment to return
+        - description: ID of the deployment to return
           explode: false
           in: path
-          name: deploymentId
+          name: deployment_id
           required: true
           schema:
             format: int64
@@ -331,19 +335,19 @@ paths:
         $ref: '#/components/requestBodies/POSTDeployments'
       responses:
         '201':
-          description: Successfull operation
+          description: Successful operation
       summary: Creates a deployment
       tags:
         - Deployments
       x-openapi-router-controller: openapi_server.controllers.deployments_controller
-  '/executor/{executorId}':
+  '/executor/{executor_id}':
     get:
       operationId: get_executor_by_id
       parameters:
-        - description: Id of executor to return
+        - description: ID of the executor to return
           explode: false
           in: path
-          name: executorId
+          name: executor_id
           required: true
           schema:
             format: int64
@@ -356,7 +360,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/Executor'
           description: Success
-      summary: Retrieve a executor
+      summary: Retrieve an executor
       tags:
         - Executors
       x-openapi-router-controller: openapi_server.controllers.executors_controller
@@ -388,14 +392,14 @@ paths:
       tags:
         - Executors
       x-openapi-router-controller: openapi_server.controllers.executors_controller
-  '/project/{projectId}':
+  '/project/{project_id}':
     delete:
       operationId: delete_project
       parameters:
-        - description: Id of project to delete
+        - description: ID of the project to delete
           explode: false
           in: path
-          name: projectId
+          name: project_id
           required: true
           schema:
             format: int64
@@ -411,10 +415,10 @@ paths:
     get:
       operationId: get_project_by_id
       parameters:
-        - description: Id of project to return
+        - description: ID of the project to return
           explode: false
           in: path
-          name: projectId
+          name: project_id
           required: true
           schema:
             format: int64
@@ -444,7 +448,7 @@ paths:
                 type: array
                 x-content-type: application/json
           description: Success
-      summary: Get a list of projects
+      summary: Get a list of all projects
       tags:
         - Projects
       x-openapi-router-controller: openapi_server.controllers.projects_controller
@@ -459,14 +463,14 @@ paths:
       tags:
         - Projects
       x-openapi-router-controller: openapi_server.controllers.projects_controller
-  '/result/{resultId}':
+  '/result/{result_id}':
     get:
       operationId: get_result_by_id
       parameters:
-        - description: Id of Result to return
+        - description: ID of the result to return
           explode: false
           in: path
-          name: resultId
+          name: result_id
           required: true
           schema:
             format: int64
@@ -483,14 +487,14 @@ paths:
       tags:
         - Results
       x-openapi-router-controller: openapi_server.controllers.results_controller
-  '/result/{resultId}/download':
+  '/result/{result_id}/download':
     get:
       operationId: download_result_by_id
       parameters:
-        - description: Id of result to download
+        - description: ID of the result to download
           explode: false
           in: path
-          name: resultId
+          name: result_id
           required: true
           schema:
             format: int64
@@ -526,14 +530,14 @@ paths:
       tags:
         - Results
       x-openapi-router-controller: openapi_server.controllers.results_controller
-  '/testartifact/{testartifactId}':
+  '/testartifact/{testartifact_id}':
     get:
       operationId: get_testartifact_by_id
       parameters:
-        - description: Id of testartifact to return
+        - description: ID of the test artifact to return
           explode: false
           in: path
-          name: testartifactId
+          name: testartifact_id
           required: true
           schema:
             format: int64
@@ -546,18 +550,18 @@ paths:
               schema:
                 $ref: '#/components/schemas/Testartifact'
           description: Success
-      summary: Retrieve a testartifact
+      summary: Retrieve a test artifact
       tags:
         - Testartifacts
       x-openapi-router-controller: openapi_server.controllers.testartifacts_controller
-  '/testartifact/{testartifactId}/download':
+  '/testartifact/{testartifact_id}/download':
     get:
       operationId: download_testartifact_by_id
       parameters:
-        - description: Id of testartifact to download
+        - description: ID of the test artifact to download
           explode: false
           in: path
-          name: testartifactId
+          name: testartifact_id
           required: true
           schema:
             format: int64
@@ -572,7 +576,7 @@ paths:
                 type: string
                 x-content-type: application/json
           description: Success
-      summary: Downloads the generated testartifact
+      summary: Downloads the generated test artifact
       tags:
         - Testartifacts
       x-openapi-router-controller: openapi_server.controllers.testartifacts_controller
@@ -589,7 +593,7 @@ paths:
                 type: array
                 x-content-type: application/json
           description: Success
-      summary: Get all testartifacts
+      summary: Get all test artifacts
       tags:
         - Testartifacts
       x-openapi-router-controller: openapi_server.controllers.testartifacts_controller
@@ -600,7 +604,7 @@ paths:
       responses:
         '201':
           description: Success
-      summary: Creates a testartifact
+      summary: Creates a test artifact
       tags:
         - Testartifacts
       x-openapi-router-controller: openapi_server.controllers.testartifacts_controller

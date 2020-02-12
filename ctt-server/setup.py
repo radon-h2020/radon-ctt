@@ -22,10 +22,10 @@ REQUIRES = [
 setup(
     name=NAME,
     version=VERSION,
-    description="Radon CTT API",
+    description="RADON CTT Server API",
     author_email="",
     url="",
-    keywords=["OpenAPI", "Radon CTT API"],
+    keywords=["OpenAPI", "RADON CTT Server API"],
     install_requires=REQUIRES,
     packages=find_packages(),
     package_data={'': ['openapi/openapi.yaml']},
@@ -33,7 +33,7 @@ setup(
     entry_points={
         'console_scripts': ['openapi_server=openapi_server.__main__:main']},
     long_description="""\
-    This is the Radon CTT API. 
+    This is API of the RADON Continuous Testing Tool (CTT) Server: &lt;a href&#x3D;\&quot;https://github.com/radon-h2020/radon-ctt\&quot;&gt;https://github.com/radon-h2020/radon-ctt&lt;a/&gt;
     """
 )
 
