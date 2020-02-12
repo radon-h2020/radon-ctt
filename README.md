@@ -15,7 +15,7 @@ This README is currently tailored to Unix-like systems (Linux, MacOS).
 For CTT users, the following software must be installed: 
 
 1. Python3
-1. Python Virtual Environment
+1. Python Virtual Environment (`virtualenv`)
 
 For CTT developers, the following additional software must be installed: 
 1. Docker 
@@ -46,6 +46,3 @@ The CTT Server's REST API is defined in the file `radonctt-openapi.yaml`.
       1. Edit the file in the editor
       1. File -> Save as YAML -> `radonctt-openapi.yaml`
 1. For regenerating the CTT server stub, execute `generate_python_flask_stubs.sh` 
-
-
-
