@@ -135,4 +135,7 @@ dmypy.json
 ctt-server/bin/
 ctt-server/include/
 ctt-server/lib/
+ctt-server/local/
+ctt-server/pip-selfcheck.json
+ctt-server/share/
 .idea/
