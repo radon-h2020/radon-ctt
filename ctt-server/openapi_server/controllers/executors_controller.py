@@ -22,11 +22,11 @@ def create_executor(post_executors=None):  # noqa: E501
 
 
 def get_executor_by_id(executor_id):  # noqa: E501
-    """Retrieve a executor
+    """Retrieve an executor
 
      # noqa: E501
 
-    :param executor_id: Id of executor to return
+    :param executor_id: ID of the executor to return
     :type executor_id: int
 
     :rtype: Executor

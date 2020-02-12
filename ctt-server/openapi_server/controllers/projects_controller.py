@@ -26,7 +26,7 @@ def delete_project(project_id):  # noqa: E501
 
      # noqa: E501
 
-    :param project_id: Id of project to delete
+    :param project_id: ID of the project to delete
     :type project_id: int
 
     :rtype: None
@@ -39,7 +39,7 @@ def get_project_by_id(project_id):  # noqa: E501
 
      # noqa: E501
 
-    :param project_id: Id of project to return
+    :param project_id: ID of the project to return
     :type project_id: int
 
     :rtype: Project
@@ -48,7 +48,7 @@ def get_project_by_id(project_id):  # noqa: E501
 
 
 def get_projects():  # noqa: E501
-    """Get a list of projects
+    """Get a list of all projects
 
      # noqa: E501
 

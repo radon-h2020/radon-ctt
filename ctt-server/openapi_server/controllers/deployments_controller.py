@@ -26,7 +26,7 @@ def get_deployment_by_id(deployment_id):  # noqa: E501
 
      # noqa: E501
 
-    :param deployment_id: Id of deployment to return
+    :param deployment_id: ID of the deployment to return
     :type deployment_id: int
 
     :rtype: Deployment
