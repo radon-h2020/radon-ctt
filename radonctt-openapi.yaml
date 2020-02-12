@@ -307,7 +307,7 @@ paths:
       summary: Retrieve a deployment
       tags:
         - Deployments
-      x-openapi-router-controller: swagger_server.controllers.deployments_controller
+      x-openapi-router-controller: openapi_server.controllers.deployments_controller
   /deployments:
     get:
       operationId: get_deployments
@@ -324,7 +324,7 @@ paths:
       summary: Get all deployments
       tags:
         - Deployments
-      x-openapi-router-controller: swagger_server.controllers.deployments_controller
+      x-openapi-router-controller: openapi_server.controllers.deployments_controller
     post:
       operationId: create_deployment
       requestBody:
@@ -335,7 +335,7 @@ paths:
       summary: Creates a deployment
       tags:
         - Deployments
-      x-openapi-router-controller: swagger_server.controllers.deployments_controller
+      x-openapi-router-controller: openapi_server.controllers.deployments_controller
   '/executor/{executorId}':
     get:
       operationId: get_executor_by_id
@@ -359,7 +359,7 @@ paths:
       summary: Retrieve a executor
       tags:
         - Executors
-      x-openapi-router-controller: swagger_server.controllers.executors_controller
+      x-openapi-router-controller: openapi_server.controllers.executors_controller
   /executors:
     get:
       operationId: get_executors
@@ -376,7 +376,7 @@ paths:
       summary: Get all executors
       tags:
         - Executors
-      x-openapi-router-controller: swagger_server.controllers.executors_controller
+      x-openapi-router-controller: openapi_server.controllers.executors_controller
     post:
       operationId: create_executor
       requestBody:
@@ -387,7 +387,7 @@ paths:
       summary: Creates an executor
       tags:
         - Executors
-      x-openapi-router-controller: swagger_server.controllers.executors_controller
+      x-openapi-router-controller: openapi_server.controllers.executors_controller
   '/project/{projectId}':
     delete:
       operationId: delete_project
@@ -407,7 +407,7 @@ paths:
       summary: Delete a project
       tags:
         - Projects
-      x-openapi-router-controller: swagger_server.controllers.projects_controller
+      x-openapi-router-controller: openapi_server.controllers.projects_controller
     get:
       operationId: get_project_by_id
       parameters:
@@ -430,7 +430,7 @@ paths:
       summary: Retrieve a project
       tags:
         - Projects
-      x-openapi-router-controller: swagger_server.controllers.projects_controller
+      x-openapi-router-controller: openapi_server.controllers.projects_controller
   /projects:
     get:
       operationId: get_projects
@@ -447,7 +447,7 @@ paths:
       summary: Get a list of projects
       tags:
         - Projects
-      x-openapi-router-controller: swagger_server.controllers.projects_controller
+      x-openapi-router-controller: openapi_server.controllers.projects_controller
     post:
       operationId: create_project
       requestBody:
@@ -458,7 +458,7 @@ paths:
       summary: Creates a project
       tags:
         - Projects
-      x-openapi-router-controller: swagger_server.controllers.projects_controller
+      x-openapi-router-controller: openapi_server.controllers.projects_controller
   '/result/{resultId}':
     get:
       operationId: get_result_by_id
@@ -482,7 +482,7 @@ paths:
       summary: Retrieve a result
       tags:
         - Results
-      x-openapi-router-controller: swagger_server.controllers.results_controller
+      x-openapi-router-controller: openapi_server.controllers.results_controller
   '/result/{resultId}/download':
     get:
       operationId: download_result_by_id
@@ -508,7 +508,7 @@ paths:
       summary: Downloads the generated results
       tags:
         - Results
-      x-openapi-router-controller: swagger_server.controllers.results_controller
+      x-openapi-router-controller: openapi_server.controllers.results_controller
   /results:
     get:
       operationId: get_results
@@ -525,7 +525,7 @@ paths:
       summary: Get all results
       tags:
         - Results
-      x-openapi-router-controller: swagger_server.controllers.results_controller
+      x-openapi-router-controller: openapi_server.controllers.results_controller
   '/testartifact/{testartifactId}':
     get:
       operationId: get_testartifact_by_id
@@ -549,7 +549,7 @@ paths:
       summary: Retrieve a testartifact
       tags:
         - Testartifacts
-      x-openapi-router-controller: swagger_server.controllers.testartifacts_controller
+      x-openapi-router-controller: openapi_server.controllers.testartifacts_controller
   '/testartifact/{testartifactId}/download':
     get:
       operationId: download_testartifact_by_id
@@ -575,7 +575,7 @@ paths:
       summary: Downloads the generated testartifact
       tags:
         - Testartifacts
-      x-openapi-router-controller: swagger_server.controllers.testartifacts_controller
+      x-openapi-router-controller: openapi_server.controllers.testartifacts_controller
   /testartifacts:
     get:
       operationId: get_testartifacts
@@ -592,7 +592,7 @@ paths:
       summary: Get all testartifacts
       tags:
         - Testartifacts
-      x-openapi-router-controller: swagger_server.controllers.testartifacts_controller
+      x-openapi-router-controller: openapi_server.controllers.testartifacts_controller
     post:
       operationId: create_testartifact
       requestBody:
@@ -603,7 +603,7 @@ paths:
       summary: Creates a testartifact
       tags:
         - Testartifacts
-      x-openapi-router-controller: swagger_server.controllers.testartifacts_controller
+      x-openapi-router-controller: openapi_server.controllers.testartifacts_controller
 servers:
   - url: /RadonCTT
 tags:

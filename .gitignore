@@ -131,3 +131,7 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+
+ctt-server/bin/
+ctt-server/include/
+ctt-server/lib/
