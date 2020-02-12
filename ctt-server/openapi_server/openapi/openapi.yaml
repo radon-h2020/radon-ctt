@@ -1,0 +1,624 @@
+openapi: 3.0.0
+info:
+  description: |
+    This is the Radon CTT API.
+  title: Radon CTT API
+  version: 1.0.0-oas3
+servers:
+- url: /RadonCTT
+tags:
+- name: Projects
+- name: Testartifacts
+- name: Deployments
+- name: Executors
+- name: Results
+paths:
+  /deployment/{deploymentId}:
+    get:
+      operationId: get_deployment_by_id
+      parameters:
+      - description: Id of deployment to return
+        explode: false
+        in: path
+        name: deploymentId
+        required: true
+        schema:
+          format: int64
+          type: integer
+        style: simple
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Deployment'
+          description: Success
+      summary: Retrieve a deployment
+      tags:
+      - Deployments
+      x-openapi-router-controller: openapi_server.controllers.deployments_controller
+  /deployments:
+    get:
+      operationId: get_deployments
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/Deployment'
+                type: array
+                x-content-type: application/json
+          description: Success
+      summary: Get all deployments
+      tags:
+      - Deployments
+      x-openapi-router-controller: openapi_server.controllers.deployments_controller
+    post:
+      operationId: create_deployment
+      requestBody:
+        $ref: '#/components/requestBodies/POSTDeployments'
+      responses:
+        "201":
+          description: Successfull operation
+      summary: Creates a deployment
+      tags:
+      - Deployments
+      x-openapi-router-controller: openapi_server.controllers.deployments_controller
+  /executor/{executorId}:
+    get:
+      operationId: get_executor_by_id
+      parameters:
+      - description: Id of executor to return
+        explode: false
+        in: path
+        name: executorId
+        required: true
+        schema:
+          format: int64
+          type: integer
+        style: simple
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Executor'
+          description: Success
+      summary: Retrieve a executor
+      tags:
+      - Executors
+      x-openapi-router-controller: openapi_server.controllers.executors_controller
+  /executors:
+    get:
+      operationId: get_executors
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/Executor'
+                type: array
+                x-content-type: application/json
+          description: Success
+      summary: Get all executors
+      tags:
+      - Executors
+      x-openapi-router-controller: openapi_server.controllers.executors_controller
+    post:
+      operationId: create_executor
+      requestBody:
+        $ref: '#/components/requestBodies/POSTExecutors'
+      responses:
+        "201":
+          description: Success
+      summary: Creates an executor
+      tags:
+      - Executors
+      x-openapi-router-controller: openapi_server.controllers.executors_controller
+  /project/{projectId}:
+    delete:
+      operationId: delete_project
+      parameters:
+      - description: Id of project to delete
+        explode: false
+        in: path
+        name: projectId
+        required: true
+        schema:
+          format: int64
+          type: integer
+        style: simple
+      responses:
+        "200":
+          description: Success
+      summary: Delete a project
+      tags:
+      - Projects
+      x-openapi-router-controller: openapi_server.controllers.projects_controller
+    get:
+      operationId: get_project_by_id
+      parameters:
+      - description: Id of project to return
+        explode: false
+        in: path
+        name: projectId
+        required: true
+        schema:
+          format: int64
+          type: integer
+        style: simple
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Project'
+          description: Success
+      summary: Retrieve a project
+      tags:
+      - Projects
+      x-openapi-router-controller: openapi_server.controllers.projects_controller
+  /projects:
+    get:
+      operationId: get_projects
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/Project'
+                type: array
+                x-content-type: application/json
+          description: Success
+      summary: Get a list of projects
+      tags:
+      - Projects
+      x-openapi-router-controller: openapi_server.controllers.projects_controller
+    post:
+      operationId: create_project
+      requestBody:
+        $ref: '#/components/requestBodies/POSTProjects'
+      responses:
+        "201":
+          description: Success
+      summary: Creates a project
+      tags:
+      - Projects
+      x-openapi-router-controller: openapi_server.controllers.projects_controller
+  /result/{resultId}:
+    get:
+      operationId: get_result_by_id
+      parameters:
+      - description: Id of Result to return
+        explode: false
+        in: path
+        name: resultId
+        required: true
+        schema:
+          format: int64
+          type: integer
+        style: simple
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Result'
+          description: Success
+      summary: Retrieve a result
+      tags:
+      - Results
+      x-openapi-router-controller: openapi_server.controllers.results_controller
+  /result/{resultId}/download:
+    get:
+      operationId: download_result_by_id
+      parameters:
+      - description: Id of result to download
+        explode: false
+        in: path
+        name: resultId
+        required: true
+        schema:
+          format: int64
+          type: integer
+        style: simple
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                format: binary
+                type: string
+                x-content-type: application/json
+          description: Success
+      summary: Downloads the generated results
+      tags:
+      - Results
+      x-openapi-router-controller: openapi_server.controllers.results_controller
+  /results:
+    get:
+      operationId: get_results
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/Result'
+                type: array
+                x-content-type: application/json
+          description: Success
+      summary: Get all results
+      tags:
+      - Results
+      x-openapi-router-controller: openapi_server.controllers.results_controller
+  /testartifact/{testartifactId}:
+    get:
+      operationId: get_testartifact_by_id
+      parameters:
+      - description: Id of testartifact to return
+        explode: false
+        in: path
+        name: testartifactId
+        required: true
+        schema:
+          format: int64
+          type: integer
+        style: simple
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Testartifact'
+          description: Success
+      summary: Retrieve a testartifact
+      tags:
+      - Testartifacts
+      x-openapi-router-controller: openapi_server.controllers.testartifacts_controller
+  /testartifact/{testartifactId}/download:
+    get:
+      operationId: download_testartifact_by_id
+      parameters:
+      - description: Id of testartifact to download
+        explode: false
+        in: path
+        name: testartifactId
+        required: true
+        schema:
+          format: int64
+          type: integer
+        style: simple
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                format: binary
+                type: string
+                x-content-type: application/json
+          description: Success
+      summary: Downloads the generated testartifact
+      tags:
+      - Testartifacts
+      x-openapi-router-controller: openapi_server.controllers.testartifacts_controller
+  /testartifacts:
+    get:
+      operationId: get_testartifacts
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/Testartifact'
+                type: array
+                x-content-type: application/json
+          description: Success
+      summary: Get all testartifacts
+      tags:
+      - Testartifacts
+      x-openapi-router-controller: openapi_server.controllers.testartifacts_controller
+    post:
+      operationId: create_testartifact
+      requestBody:
+        $ref: '#/components/requestBodies/POSTTestartifacts'
+      responses:
+        "201":
+          description: Success
+      summary: Creates a testartifact
+      tags:
+      - Testartifacts
+      x-openapi-router-controller: openapi_server.controllers.testartifacts_controller
+components:
+  requestBodies:
+    POSTDeployments:
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/POSTDeployments'
+    POSTExecutors:
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/POSTExecutors'
+    POSTProjects:
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/POSTProjects'
+    POSTTestartifacts:
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/POSTTestartifacts'
+  schemas:
+    Deployment:
+      example:
+        id: 0
+        projectId: 6
+        status: status
+        testartifactId: 1
+      properties:
+        id:
+          format: int64
+          readOnly: true
+          type: integer
+        projectId:
+          format: int64
+          readOnly: true
+          type: integer
+        status:
+          type: string
+        testartifactId:
+          format: int64
+          readOnly: true
+          type: integer
+      type: object
+    Executor:
+      example:
+        deploymentId: 1
+        id: 0
+        projectId: 6
+        status: status
+      properties:
+        deploymentId:
+          format: int64
+          readOnly: true
+          type: integer
+        id:
+          format: int64
+          readOnly: true
+          type: integer
+        projectId:
+          format: int64
+          readOnly: true
+          type: integer
+        status:
+          type: string
+      type: object
+    NodeTest:
+      example:
+        artifactPath: artifactPath
+        id: 2
+        node: node
+        policyTestId: 9
+        projectId: 7
+        status: status
+      properties:
+        artifactPath:
+          type: string
+        id:
+          format: int64
+          readOnly: true
+          type: integer
+        node:
+          type: string
+        policyTestId:
+          format: int64
+          readOnly: true
+          type: integer
+        projectId:
+          format: int64
+          readOnly: true
+          type: integer
+        status:
+          type: string
+      type: object
+    POSTDeployments:
+      example:
+        testartifactId: 1
+      properties:
+        testartifactId:
+          example: 1
+          format: int64
+          type: integer
+      required:
+      - testartifactId
+      type: object
+    POSTExecutors:
+      example:
+        deploymentId: 1
+      properties:
+        deploymentId:
+          example: 1
+          format: int64
+          type: integer
+      required:
+      - deploymentId
+      type: object
+    POSTProjects:
+      example:
+        servicetemplate_location: radon-ctt/servicetemplate.yml
+        file: ""
+        repository_url: https://github.com/UST-CTT/radon-ctt-sockshop-example.git
+      properties:
+        file:
+          format: binary
+          type: string
+        repository_url:
+          example: https://github.com/UST-CTT/radon-ctt-sockshop-example.git
+          type: string
+        servicetemplate_location:
+          example: radon-ctt/servicetemplate.yml
+          type: string
+      required:
+      - servicetemplate_location
+      type: object
+    POSTTestartifacts:
+      example:
+        projectId: 1
+      properties:
+        projectId:
+          example: 1
+          format: int64
+          type: integer
+      required:
+      - projectId
+      type: object
+    PolicyTest:
+      example:
+        id: 1
+        nodeTests:
+        - artifactPath: artifactPath
+          id: 2
+          node: node
+          policyTestId: 9
+          projectId: 7
+          status: status
+        - artifactPath: artifactPath
+          id: 2
+          node: node
+          policyTestId: 9
+          projectId: 7
+          status: status
+        policy: policy
+        projectId: 5
+        status: status
+        testartifactId: 5
+      properties:
+        id:
+          format: int64
+          readOnly: true
+          type: integer
+        nodeTests:
+          items:
+            $ref: '#/components/schemas/NodeTest'
+          type: array
+        policy:
+          type: string
+        projectId:
+          format: int64
+          readOnly: true
+          type: integer
+        status:
+          type: string
+        testartifactId:
+          format: int64
+          readOnly: true
+          type: integer
+      type: object
+    Project:
+      example:
+        id: 0
+        projectPath: projectPath
+        repositoryUrl: repositoryUrl
+        servicetemplateLocation: servicetemplateLocation
+        status: status
+      properties:
+        id:
+          format: int64
+          readOnly: true
+          type: integer
+        projectPath:
+          type: string
+        repositoryUrl:
+          type: string
+        servicetemplateLocation:
+          type: string
+        status:
+          type: string
+      type: object
+    Result:
+      example:
+        id: 0
+        projectId: 6
+        resultPath: resultPath
+        testartifactId: 1
+      properties:
+        id:
+          format: int64
+          readOnly: true
+          type: integer
+        projectId:
+          format: int64
+          readOnly: true
+          type: integer
+        resultPath:
+          type: string
+        testartifactId:
+          format: int64
+          readOnly: true
+          type: integer
+      type: object
+    Testartifact:
+      example:
+        id: 0
+        policyTests:
+        - id: 1
+          nodeTests:
+          - artifactPath: artifactPath
+            id: 2
+            node: node
+            policyTestId: 9
+            projectId: 7
+            status: status
+          - artifactPath: artifactPath
+            id: 2
+            node: node
+            policyTestId: 9
+            projectId: 7
+            status: status
+          policy: policy
+          projectId: 5
+          status: status
+          testartifactId: 5
+        - id: 1
+          nodeTests:
+          - artifactPath: artifactPath
+            id: 2
+            node: node
+            policyTestId: 9
+            projectId: 7
+            status: status
+          - artifactPath: artifactPath
+            id: 2
+            node: node
+            policyTestId: 9
+            projectId: 7
+            status: status
+          policy: policy
+          projectId: 5
+          status: status
+          testartifactId: 5
+        projectId: 6
+        status: status
+      properties:
+        id:
+          format: int64
+          readOnly: true
+          type: integer
+        policyTests:
+          items:
+            $ref: '#/components/schemas/PolicyTest'
+          type: array
+        projectId:
+          format: int64
+          readOnly: true
+          type: integer
+        status:
+          type: string
+      type: object
