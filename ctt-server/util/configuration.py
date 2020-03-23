@@ -1,1 +1,1 @@
-StoragePath = '/tmp/'
+BasePath = '/tmp/RadonCTT'

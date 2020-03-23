@@ -1,9 +1,15 @@
-from flask import app
+import os
+
 from sqlalchemy import create_engine
 from sqlalchemy.orm import scoped_session, sessionmaker
 from sqlalchemy.ext.declarative import declarative_base
 
-engine = create_engine('sqlite://')
+from util.configuration import BasePath
+
+if not os.path.exists(BasePath):
+    os.makedirs(BasePath)
+
+engine = create_engine('sqlite:///' + os.path.join(BasePath, 'radon-ctt.db'))
 db_session = scoped_session(sessionmaker(autocommit=False,
                                          autoflush=False,
                                          bind=engine))
