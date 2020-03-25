@@ -28,7 +28,6 @@ class Project(Base):
         self.name = name
         self.repository_url = repository_url
         self.storage_path = storage_path
-        self.fq_storage_path = os.path.join(BasePath, self.storage_path)
 
         if not os.path.exists(self.fq_storage_path):
             os.makedirs(self.fq_storage_path)
@@ -41,6 +40,14 @@ class Project(Base):
 
     def __repr__(self):
         return '<Project %r, %r, %r, %r>' % (self.uuid, self.name, self.repository_url, self.storage_path)
+
+    @property
+    def commit_hash(self):
+        return git.Repo(self.fq_storage_path).head.commit.hexsha
+
+    @property
+    def fq_storage_path(self):
+        return os.path.join(BasePath, self.storage_path)
 
     @classmethod
     def create_project(cls, name, repository_url):
@@ -67,7 +74,7 @@ class Project(Base):
 
     @classmethod
     def get_project_by_uuid(cls, uuid):
-        Project.query.filter_by(uuid=uuid).first()
+        return Project.query.filter_by(uuid=uuid).first()
 
     @classmethod
     def exists(cls, name):
@@ -82,4 +89,6 @@ class Project(Base):
         if project_to_delete:
             # TODO: Delete depending items?!
             Project.delete(project_to_delete)
+            db_session.commit()
 
+        return project_to_delete

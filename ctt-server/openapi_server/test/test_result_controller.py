@@ -6,59 +6,53 @@ import unittest
 from flask import json
 from six import BytesIO
 
-from openapi_server.models.deployment import Deployment  # noqa: E501
-from openapi_server.models.post_deployments import POSTDeployments  # noqa: E501
+from openapi_server.models.result import Result  # noqa: E501
 from openapi_server.test import BaseTestCase
 
 
-class TestDeploymentsController(BaseTestCase):
-    """DeploymentsController integration test stubs"""
+class TestResultController(BaseTestCase):
+    """ResultController integration test stubs"""
 
-    def test_create_deployment(self):
-        """Test case for create_deployment
+    def test_download_result_by_uuid(self):
+        """Test case for download_result_by_uuid
 
-        Creates a deployment
-        """
-        post_deployments = {
-  "testartifactId" : 1
-}
-        headers = { 
-            'Content-Type': 'application/json',
-        }
-        response = self.client.open(
-            '/RadonCTT/deployments',
-            method='POST',
-            headers=headers,
-            data=json.dumps(post_deployments),
-            content_type='application/json')
-        self.assert200(response,
-                       'Response body is : ' + response.data.decode('utf-8'))
-
-    def test_get_deployment_by_id(self):
-        """Test case for get_deployment_by_id
-
-        Retrieve a deployment
+        Downloads the generated results
         """
         headers = { 
             'Accept': 'application/json',
         }
         response = self.client.open(
-            '/RadonCTT/deployment/{deployment_id}'.format(deployment_id=56),
+            '/RadonCTT/result/{result_uuid}/download'.format(result_uuid='result_uuid_example'),
             method='GET',
             headers=headers)
         self.assert200(response,
                        'Response body is : ' + response.data.decode('utf-8'))
 
-    def test_get_deployments(self):
-        """Test case for get_deployments
+    def test_get_result_by_uuid(self):
+        """Test case for get_result_by_uuid
 
-        Get all deployments
+        Retrieve a result
         """
         headers = { 
             'Accept': 'application/json',
         }
         response = self.client.open(
-            '/RadonCTT/deployments',
+            '/RadonCTT/result/{result_uuid}'.format(result_uuid='result_uuid_example'),
+            method='GET',
+            headers=headers)
+        self.assert200(response,
+                       'Response body is : ' + response.data.decode('utf-8'))
+
+    def test_get_results(self):
+        """Test case for get_results
+
+        Get all results
+        """
+        headers = { 
+            'Accept': 'application/json',
+        }
+        response = self.client.open(
+            '/RadonCTT/result',
             method='GET',
             headers=headers)
         self.assert200(response,

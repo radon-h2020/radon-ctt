@@ -3,7 +3,7 @@
 import connexion
 
 from openapi_server import encoder
-from db_orm.database import init_db, db_session
+from db_orm.database import init_db
 
 
 def main():

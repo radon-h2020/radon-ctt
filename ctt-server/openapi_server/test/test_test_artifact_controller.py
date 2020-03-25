@@ -6,59 +6,61 @@ import unittest
 from flask import json
 from six import BytesIO
 
-from openapi_server.models.post_testartifacts import POSTTestartifacts  # noqa: E501
-from openapi_server.models.testartifact import Testartifact  # noqa: E501
+from openapi_server.models.post_test_artifact import POSTTestArtifact  # noqa: E501
+from openapi_server.models.test_artifact import TestArtifact  # noqa: E501
 from openapi_server.test import BaseTestCase
 
 
-class TestTestartifactsController(BaseTestCase):
-    """TestartifactsController integration test stubs"""
+class TestTestArtifactController(BaseTestCase):
+    """TestArtifactController integration test stubs"""
 
     def test_create_testartifact(self):
         """Test case for create_testartifact
 
-        Creates a testartifact
+        Creates a test artifact
         """
-        post_testartifacts = {
-  "projectId" : 1
+        post_test_artifact = {
+  "project_uuid" : "ac9431bd-1a1c-4d6f-a98f-cc97401b5e47",
+  "sut_tosca_path" : "radon-ctt/sut_tosca.yml",
+  "ti_tosca_path" : "radon-ctt/ti_tosca.yml"
 }
         headers = { 
             'Content-Type': 'application/json',
         }
         response = self.client.open(
-            '/RadonCTT/testartifacts',
+            '/RadonCTT/testartifact',
             method='POST',
             headers=headers,
-            data=json.dumps(post_testartifacts),
+            data=json.dumps(post_test_artifact),
             content_type='application/json')
         self.assert200(response,
                        'Response body is : ' + response.data.decode('utf-8'))
 
-    def test_download_testartifact_by_id(self):
-        """Test case for download_testartifact_by_id
+    def test_download_testartifact_by_uuid(self):
+        """Test case for download_testartifact_by_uuid
 
-        Downloads the generated testartifact
+        Downloads the generated test artifact
         """
         headers = { 
             'Accept': 'application/json',
         }
         response = self.client.open(
-            '/RadonCTT/testartifact/{testartifact_id}/download'.format(testartifact_id=56),
+            '/RadonCTT/testartifact/{testartifact_uuid}/download'.format(testartifact_uuid='testartifact_uuid_example'),
             method='GET',
             headers=headers)
         self.assert200(response,
                        'Response body is : ' + response.data.decode('utf-8'))
 
-    def test_get_testartifact_by_id(self):
-        """Test case for get_testartifact_by_id
+    def test_get_testartifact_by_uuid(self):
+        """Test case for get_testartifact_by_uuid
 
-        Retrieve a testartifact
+        Retrieve a test artifact
         """
         headers = { 
             'Accept': 'application/json',
         }
         response = self.client.open(
-            '/RadonCTT/testartifact/{testartifact_id}'.format(testartifact_id=56),
+            '/RadonCTT/testartifact/{testartifact_uuid}'.format(testartifact_uuid='testartifact_uuid_example'),
             method='GET',
             headers=headers)
         self.assert200(response,
@@ -67,13 +69,13 @@ class TestTestartifactsController(BaseTestCase):
     def test_get_testartifacts(self):
         """Test case for get_testartifacts
 
-        Get all testartifacts
+        Get all test artifacts
         """
         headers = { 
             'Accept': 'application/json',
         }
         response = self.client.open(
-            '/RadonCTT/testartifacts',
+            '/RadonCTT/testartifact',
             method='GET',
             headers=headers)
         self.assert200(response,
