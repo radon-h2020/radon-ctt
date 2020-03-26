@@ -1,11 +1,13 @@
 import uuid
 import os
+
+from sqlalchemy import Column, String, ForeignKey
+from sqlalchemy.orm import relationship, backref
+from shutil import copytree, ignore_patterns
+
 from util.configuration import BasePath
 from db_orm.database import Base, db_session
-from sqlalchemy import Column, String, ForeignKey
 from models.project import Project
-from shutil import copytree, ignore_patterns
-from sqlalchemy.orm import relationship, backref
 
 
 class TestArtifact(Base):

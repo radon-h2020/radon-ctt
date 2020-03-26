@@ -23,11 +23,24 @@ def create_testartifact(post_test_artifact=None):  # noqa: E501
     :rtype: None
     """
     if connexion.request.is_json:
-        post_testartifact = POSTTestArtifact.from_dict(connexion.request.get_json())  # noqa: E501
-
+        post_test_artifact = POSTTestArtifact.from_dict(connexion.request.get_json())  # noqa: E501
     created_testartifacts = TestArtifactImpl.create_testartifact(
-        post_testartifact.project_uuid, post_testartifact.sut_tosca_path, post_testartifact.ti_tosca_path)
+        post_test_artifact.project_uuid, post_test_artifact.sut_tosca_path, post_test_artifact.ti_tosca_path)
     return testartifact_schema.dump(created_testartifacts)
+
+
+def delete_testartifact_by_uuid(testartifact_uuid):  # noqa: E501
+    """Delete a test artifact
+
+    Deletes the test artifact with the given UUID and all elements depending on it # noqa: E501
+
+    :param testartifact_uuid: UUID of the test artifact to delete
+    :type testartifact_uuid: str
+
+    :rtype: TestArtifact
+    """
+    deleted_testartifact = TestArtifactImpl.delete_project_by_uuid(testartifact_uuid)
+    return testartifact_schema.dump(deleted_testartifact)
 
 
 def download_testartifact_by_uuid(testartifact_uuid):  # noqa: E501

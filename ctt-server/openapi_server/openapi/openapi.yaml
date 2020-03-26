@@ -45,6 +45,30 @@ paths:
       - Deployment
       x-openapi-router-controller: openapi_server.controllers.deployment_controller
   /deployment/{deployment_uuid}:
+    delete:
+      description: Deletes the test artifact with the given UUID and all elements
+        depending on it
+      operationId: delete_deployment_by_uuid
+      parameters:
+      - description: UUID of the deployment to delete
+        explode: false
+        in: path
+        name: deployment_uuid
+        required: true
+        schema:
+          type: string
+        style: simple
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Deployment'
+          description: Successful deletion of the deployment
+      summary: Delete a deployment
+      tags:
+      - Deployment
+      x-openapi-router-controller: openapi_server.controllers.deployment_controller
     get:
       operationId: get_deployment_by_uuid
       parameters:
@@ -96,6 +120,30 @@ paths:
       - Execution
       x-openapi-router-controller: openapi_server.controllers.execution_controller
   /execution/{execution_uuid}:
+    delete:
+      description: Deletes the execution with the given UUID and all elements depending
+        on it
+      operationId: delete_execution_by_uuid
+      parameters:
+      - description: UUID of the execution to delete
+        explode: false
+        in: path
+        name: execution_uuid
+        required: true
+        schema:
+          type: string
+        style: simple
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Execution'
+          description: Successful deletion of the execution
+      summary: Delete an execution
+      tags:
+      - Execution
+      x-openapi-router-controller: openapi_server.controllers.execution_controller
     get:
       operationId: get_execution_by_uuid
       parameters:
@@ -205,6 +253,29 @@ paths:
       - Result
       x-openapi-router-controller: openapi_server.controllers.result_controller
   /result/{result_uuid}:
+    delete:
+      description: Deletes the result with the given UUID on it
+      operationId: delete_result_by_uuid
+      parameters:
+      - description: UUID of the result to delete
+        explode: false
+        in: path
+        name: result_uuid
+        required: true
+        schema:
+          type: string
+        style: simple
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Result'
+          description: Successful deletion of the result
+      summary: Delete a result
+      tags:
+      - Result
+      x-openapi-router-controller: openapi_server.controllers.result_controller
     get:
       operationId: get_result_by_uuid
       parameters:
@@ -281,6 +352,30 @@ paths:
       - TestArtifact
       x-openapi-router-controller: openapi_server.controllers.test_artifact_controller
   /testartifact/{testartifact_uuid}:
+    delete:
+      description: Deletes the test artifact with the given UUID and all elements
+        depending on it
+      operationId: delete_testartifact_by_uuid
+      parameters:
+      - description: UUID of the test artifact to delete
+        explode: false
+        in: path
+        name: testartifact_uuid
+        required: true
+        schema:
+          type: string
+        style: simple
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TestArtifact'
+          description: Successful deletion of the test artifact
+      summary: Delete a test artifact
+      tags:
+      - TestArtifact
+      x-openapi-router-controller: openapi_server.controllers.test_artifact_controller
     get:
       operationId: get_testartifact_by_uuid
       parameters:

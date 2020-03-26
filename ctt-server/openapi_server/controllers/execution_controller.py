@@ -29,6 +29,19 @@ def create_execution(post_execution=None):  # noqa: E501
     return execution_schema.dump(created_execution)
 
 
+def delete_execution_by_uuid(execution_uuid):  # noqa: E501
+    """Delete an execution
+
+    Deletes the execution with the given UUID and all elements depending on it # noqa: E501
+
+    :param execution_uuid: UUID of the execution to delete
+    :type execution_uuid: str
+
+    :rtype: Execution
+    """
+    return 'do some magic!'
+
+
 def get_execution_by_uuid(execution_uuid):  # noqa: E501
     """Retrieve an execution
 

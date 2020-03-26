@@ -24,9 +24,21 @@ def create_deployment(post_deployment=None):  # noqa: E501
     """
     if connexion.request.is_json:
         post_deployment = POSTDeployment.from_dict(connexion.request.get_json())  # noqa: E501
-
     created_deployment = DeploymentImpl.create_deployment(post_deployment.testartifact_uuid)
     return deployment_schema.dump(created_deployment)
+
+
+def delete_deployment_by_uuid(deployment_uuid):  # noqa: E501
+    """Delete a deployment
+
+    Deletes the test artifact with the given UUID and all elements depending on it # noqa: E501
+
+    :param deployment_uuid: UUID of the deployment to delete
+    :type deployment_uuid: str
+
+    :rtype: Deployment
+    """
+    return 'do some magic!'
 
 
 def get_deployment_by_uuid(deployment_uuid):  # noqa: E501
@@ -39,7 +51,6 @@ def get_deployment_by_uuid(deployment_uuid):  # noqa: E501
 
     :rtype: Deployment
     """
-
     deployment = DeploymentImpl.get_deployment_by_uuid(deployment_uuid)
     return deployment_schema.dump(deployment)
 
@@ -52,6 +63,5 @@ def get_deployments():  # noqa: E501
 
     :rtype: List[Deployment]
     """
-
     deployments = DeploymentImpl.get_deployments()
     return deployment_schema_many.dump(deployments)

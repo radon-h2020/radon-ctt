@@ -1,9 +1,12 @@
 import uuid
 import os
-from util.configuration import BasePath
-from db_orm.database import Base, db_session
+
 from sqlalchemy import Column, String, ForeignKey
+from sqlalchemy.orm import relationship, backref
+
+from db_orm.database import Base, db_session
 from models.execution import Execution
+from util.configuration import BasePath
 
 
 class Result(Base):
@@ -15,7 +18,8 @@ class Result(Base):
 
     uuid = Column(String, primary_key=True)
     storage_path = Column(String, nullable=False)
-    execution_uuid = Column(String, ForeignKey('execution.uuid'), nullable=False)
+    execution_uuid = Column(String, ForeignKey('execution.uuid', ondelete='CASCADE'), nullable=False)
+    execution = relationship('Execution', backref=backref('Result', passive_deletes=True))
 
     def __init__(self, execution):
         self.uuid = str(uuid.uuid4())
@@ -52,4 +56,12 @@ class Result(Base):
     def get_result_by_uuid(cls, uuid):
         return Result.query.filter_by(uuid=uuid).first()
 
+    @classmethod
+    def delete_result_by_uuid(cls, uuid):
+        result_to_delete = Result.query.filter_by(uuid=uuid)
+        if result_to_delete:
+            # TODO: Delete depending items?!
+            result_to_delete.delete()
+            db_session.commit()
 
+        return result_to_delete

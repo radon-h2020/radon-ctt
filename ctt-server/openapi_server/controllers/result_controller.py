@@ -4,11 +4,24 @@ import six
 from openapi_server.models.result import Result  # noqa: E501
 from openapi_server import util
 
-# from models.result import Result as ResultImpl
+from models.result import Result as ResultImpl
 from util.marhsmallow_schemas import ResultSchema
 
 result_schema = ResultSchema()
 result_schema_many = ResultSchema(many=True)
+
+
+def delete_result_by_uuid(result_uuid):  # noqa: E501
+    """Delete a result
+
+    Deletes the result with the given UUID on it # noqa: E501
+
+    :param result_uuid: UUID of the result to delete
+    :type result_uuid: str
+
+    :rtype: Result
+    """
+    return 'do some magic!'
 
 
 def download_result_by_uuid(result_uuid):  # noqa: E501

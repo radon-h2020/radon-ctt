@@ -1,9 +1,12 @@
 import uuid
 import os
-from util.configuration import BasePath
-from db_orm.database import Base, db_session
+
 from sqlalchemy import Column, String, ForeignKey
+from sqlalchemy.orm import relationship, backref
+
+from db_orm.database import Base, db_session
 from models.deployment import Deployment
+from util.configuration import BasePath
 
 
 class Execution(Base):
@@ -11,6 +14,7 @@ class Execution(Base):
 
     uuid = Column(String, primary_key=True)
     deployment_uuid = Column(String, ForeignKey('deployment.uuid'), nullable=False)
+    deployment = relationship('Deployment', backref=backref('Execution', passive_deletes=True))
 
     def __init__(self, deployment):
         self.uuid = str(uuid.uuid4())

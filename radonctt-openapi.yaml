@@ -1,26 +1,27 @@
 openapi: 3.0.0
 info:
-  description: 'This is API of the RADON Continuous Testing Tool (CTT) Server: <a
-    href="https://github.com/radon-h2020/radon-ctt">https://github.com/radon-h2020/radon-ctt<a/>'
+  description: >-
+    This is API of the RADON Continuous Testing Tool (CTT) Server: <a
+    href="https://github.com/radon-h2020/radon-ctt">https://github.com/radon-h2020/radon-ctt<a/>
   license:
-    name: Apache License, Version 2.0
-    url: https://opensource.org/licenses/Apache-2.0
+    name: 'Apache License, Version 2.0'
+    url: 'https://opensource.org/licenses/Apache-2.0'
   title: RADON CTT Server API
   version: 1.0.0-oas3
 servers:
-- url: /RadonCTT
+  - url: /RadonCTT
 tags:
-- name: Project
-- name: TestArtifact
-- name: Deployment
-- name: Execution
-- name: Result
+  - name: Project
+  - name: TestArtifact
+  - name: Deployment
+  - name: Execution
+  - name: Result
 paths:
   /deployment:
     get:
       operationId: get_deployments
       responses:
-        "200":
+        '200':
           content:
             application/json:
               schema:
@@ -31,33 +32,33 @@ paths:
           description: Success
       summary: Get all deployments
       tags:
-      - Deployment
+        - Deployment
       x-openapi-router-controller: openapi_server.controllers.deployment_controller
     post:
       operationId: create_deployment
       requestBody:
         $ref: '#/components/requestBodies/POSTDeployment'
       responses:
-        "201":
+        '201':
           description: Successful operation
       summary: Creates a deployment
       tags:
-      - Deployment
+        - Deployment
       x-openapi-router-controller: openapi_server.controllers.deployment_controller
-  /deployment/{deployment_uuid}:
+  '/deployment/{deployment_uuid}':
     get:
       operationId: get_deployment_by_uuid
       parameters:
-      - description: UUID of the deployment to return
-        explode: false
-        in: path
-        name: deployment_uuid
-        required: true
-        schema:
-          type: string
-        style: simple
+        - description: UUID of the deployment to return
+          explode: false
+          in: path
+          name: deployment_uuid
+          required: true
+          schema:
+            type: string
+          style: simple
       responses:
-        "200":
+        '200':
           content:
             application/json:
               schema:
@@ -65,13 +66,36 @@ paths:
           description: Success
       summary: Retrieve a deployment
       tags:
-      - Deployment
+        - Deployment
       x-openapi-router-controller: openapi_server.controllers.deployment_controller
+    delete:
+      summary: Delete a deployment
+      description: Deletes the test artifact with the given UUID and all elements depending on it
+      operationId: delete_deployment_by_uuid
+      parameters: 
+        - description: UUID of the deployment to delete
+          explode: false
+          in: path
+          name: deployment_uuid
+          required: true
+          schema:
+            type: string
+          style: simple
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Deployment'
+          description: Successful deletion of the deployment
+      tags:
+        - Deployment
+      x-openapi-router-controller: openapi_server.controllers.deployment_controller      
   /execution:
     get:
       operationId: get_executions
       responses:
-        "200":
+        '200':
           content:
             application/json:
               schema:
@@ -82,33 +106,33 @@ paths:
           description: Success
       summary: Get all executions
       tags:
-      - Execution
+        - Execution
       x-openapi-router-controller: openapi_server.controllers.execution_controller
     post:
       operationId: create_execution
       requestBody:
         $ref: '#/components/requestBodies/POSTExecution'
       responses:
-        "201":
+        '201':
           description: Success
       summary: Creates an execution
       tags:
-      - Execution
+        - Execution
       x-openapi-router-controller: openapi_server.controllers.execution_controller
-  /execution/{execution_uuid}:
+  '/execution/{execution_uuid}':
     get:
       operationId: get_execution_by_uuid
       parameters:
-      - description: UUID of the execution to return
-        explode: false
-        in: path
-        name: execution_uuid
-        required: true
-        schema:
-          type: string
-        style: simple
+        - description: UUID of the execution to return
+          explode: false
+          in: path
+          name: execution_uuid
+          required: true
+          schema:
+            type: string
+          style: simple
       responses:
-        "200":
+        '200':
           content:
             application/json:
               schema:
@@ -116,13 +140,38 @@ paths:
           description: Success
       summary: Retrieve an execution
       tags:
-      - Execution
+        - Execution
+      x-openapi-router-controller: openapi_server.controllers.execution_controller
+    delete:
+      summary: Delete an execution
+      description: >-
+        Deletes the execution with the given UUID and all elements depending
+        on it
+      operationId: delete_execution_by_uuid
+      parameters: 
+        - description: UUID of the execution to delete
+          explode: false
+          in: path
+          name: execution_uuid
+          required: true
+          schema:
+            type: string
+          style: simple
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Execution'
+          description: Successful deletion of the execution
+      tags:
+        - Execution
       x-openapi-router-controller: openapi_server.controllers.execution_controller
   /project:
     get:
       operationId: get_projects
       responses:
-        "200":
+        '200':
           content:
             application/json:
               schema:
@@ -133,51 +182,51 @@ paths:
           description: Success
       summary: Get a list of all projects
       tags:
-      - Project
+        - Project
       x-openapi-router-controller: openapi_server.controllers.project_controller
     post:
       operationId: create_project
       requestBody:
         $ref: '#/components/requestBodies/POSTProject'
       responses:
-        "201":
+        '201':
           description: Success
       summary: Creates a project
       tags:
-      - Project
+        - Project
       x-openapi-router-controller: openapi_server.controllers.project_controller
-  /project/{project_uuid}:
+  '/project/{project_uuid}':
     delete:
       operationId: delete_project
       parameters:
-      - description: UUID of the project to delete
-        explode: false
-        in: path
-        name: project_uuid
-        required: true
-        schema:
-          type: string
-        style: simple
+        - description: UUID of the project to delete
+          explode: false
+          in: path
+          name: project_uuid
+          required: true
+          schema:
+            type: string
+          style: simple
       responses:
-        "200":
+        '200':
           description: Success
       summary: Delete a project
       tags:
-      - Project
+        - Project
       x-openapi-router-controller: openapi_server.controllers.project_controller
     get:
       operationId: get_project_by_uuid
       parameters:
-      - description: UUID of the project to return
-        explode: false
-        in: path
-        name: project_uuid
-        required: true
-        schema:
-          type: string
-        style: simple
+        - description: UUID of the project to return
+          explode: false
+          in: path
+          name: project_uuid
+          required: true
+          schema:
+            type: string
+          style: simple
       responses:
-        "200":
+        '200':
           content:
             application/json:
               schema:
@@ -185,13 +234,13 @@ paths:
           description: Success
       summary: Retrieve a project
       tags:
-      - Project
+        - Project
       x-openapi-router-controller: openapi_server.controllers.project_controller
   /result:
     get:
       operationId: get_results
       responses:
-        "200":
+        '200':
           content:
             application/json:
               schema:
@@ -202,22 +251,22 @@ paths:
           description: Success
       summary: Get all results
       tags:
-      - Result
+        - Result
       x-openapi-router-controller: openapi_server.controllers.result_controller
-  /result/{result_uuid}:
+  '/result/{result_uuid}':
     get:
       operationId: get_result_by_uuid
       parameters:
-      - description: UUID of the result to return
-        explode: false
-        in: path
-        name: result_uuid
-        required: true
-        schema:
-          type: string
-        style: simple
+        - description: UUID of the result to return
+          explode: false
+          in: path
+          name: result_uuid
+          required: true
+          schema:
+            type: string
+          style: simple
       responses:
-        "200":
+        '200':
           content:
             application/json:
               schema:
@@ -225,22 +274,47 @@ paths:
           description: Success
       summary: Retrieve a result
       tags:
-      - Result
+        - Result
       x-openapi-router-controller: openapi_server.controllers.result_controller
-  /result/{result_uuid}/download:
+    delete:
+      summary: Delete a result
+      description: >-
+        Deletes the result with the given UUID
+        on it
+      operationId: delete_result_by_uuid
+      parameters: 
+        - description: UUID of the result to delete
+          explode: false
+          in: path
+          name: result_uuid
+          required: true
+          schema:
+            type: string
+          style: simple
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Result'
+          description: Successful deletion of the result
+      tags:
+        - Result
+      x-openapi-router-controller: openapi_server.controllers.result_controller      
+  '/result/{result_uuid}/download':
     get:
       operationId: download_result_by_uuid
       parameters:
-      - description: UUID of the result to download
-        explode: false
-        in: path
-        name: result_uuid
-        required: true
-        schema:
-          type: string
-        style: simple
+        - description: UUID of the result to download
+          explode: false
+          in: path
+          name: result_uuid
+          required: true
+          schema:
+            type: string
+          style: simple
       responses:
-        "200":
+        '200':
           content:
             application/json:
               schema:
@@ -250,13 +324,13 @@ paths:
           description: Success
       summary: Downloads the generated results
       tags:
-      - Result
+        - Result
       x-openapi-router-controller: openapi_server.controllers.result_controller
   /testartifact:
     get:
       operationId: get_testartifacts
       responses:
-        "200":
+        '200':
           content:
             application/json:
               schema:
@@ -267,33 +341,33 @@ paths:
           description: Success
       summary: Get all test artifacts
       tags:
-      - TestArtifact
+        - TestArtifact
       x-openapi-router-controller: openapi_server.controllers.test_artifact_controller
     post:
       operationId: create_testartifact
       requestBody:
         $ref: '#/components/requestBodies/POSTTestArtifact'
       responses:
-        "201":
+        '201':
           description: Success
       summary: Creates a test artifact
       tags:
-      - TestArtifact
+        - TestArtifact
       x-openapi-router-controller: openapi_server.controllers.test_artifact_controller
-  /testartifact/{testartifact_uuid}:
+  '/testartifact/{testartifact_uuid}':
     get:
       operationId: get_testartifact_by_uuid
       parameters:
-      - description: UUID of the test artifact to return
-        explode: false
-        in: path
-        name: testartifact_uuid
-        required: true
-        schema:
-          type: string
-        style: simple
+        - description: UUID of the test artifact to return
+          explode: false
+          in: path
+          name: testartifact_uuid
+          required: true
+          schema:
+            type: string
+          style: simple
       responses:
-        "200":
+        '200':
           content:
             application/json:
               schema:
@@ -301,22 +375,47 @@ paths:
           description: Success
       summary: Retrieve a test artifact
       tags:
-      - TestArtifact
+        - TestArtifact
       x-openapi-router-controller: openapi_server.controllers.test_artifact_controller
-  /testartifact/{testartifact_uuid}/download:
+    delete:
+      summary: Delete a test artifact
+      description: >-
+        Deletes the test artifact with the given UUID and all elements depending
+        on it
+      operationId: delete_testartifact_by_uuid
+      parameters: 
+        - description: UUID of the test artifact to delete
+          explode: false
+          in: path
+          name: testartifact_uuid
+          required: true
+          schema:
+            type: string
+          style: simple
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TestArtifact'
+          description: Successful deletion of the test artifact
+      tags:
+        - TestArtifact
+      x-openapi-router-controller: openapi_server.controllers.test_artifact_controller
+  '/testartifact/{testartifact_uuid}/download':
     get:
       operationId: download_testartifact_by_uuid
       parameters:
-      - description: UUID of the test artifact to download
-        explode: false
-        in: path
-        name: testartifact_uuid
-        required: true
-        schema:
-          type: string
-        style: simple
+        - description: UUID of the test artifact to download
+          explode: false
+          in: path
+          name: testartifact_uuid
+          required: true
+          schema:
+            type: string
+          style: simple
       responses:
-        "200":
+        '200':
           content:
             application/json:
               schema:
@@ -326,7 +425,7 @@ paths:
           description: Success
       summary: Downloads the generated test artifact
       tags:
-      - TestArtifact
+        - TestArtifact
       x-openapi-router-controller: openapi_server.controllers.test_artifact_controller
 components:
   requestBodies:
@@ -355,7 +454,7 @@ components:
       example:
         uuid: ac9431bd-1a1c-4d6f-a98f-cc97401b5e47
         name: SockShop
-        repository_url: https://github.com/UST-CTT/radon-ctt-sockshop-example.git
+        repository_url: 'https://github.com/UST-CTT/radon-ctt-sockshop-example.git'
       properties:
         uuid:
           readOnly: true
@@ -430,17 +529,17 @@ components:
     POSTProject:
       example:
         name: SockShop
-        repository_url: https://github.com/UST-CTT/radon-ctt-sockshop-example.git
+        repository_url: 'https://github.com/UST-CTT/radon-ctt-sockshop-example.git'
       properties:
         name:
           example: SockShop
           type: string
         repository_url:
-          example: https://github.com/UST-CTT/radon-ctt-sockshop-example.git
+          example: 'https://github.com/UST-CTT/radon-ctt-sockshop-example.git'
           type: string
       required:
-      - name
-      - repository_url
+        - name
+        - repository_url
       type: object
     POSTTestArtifact:
       example:
@@ -458,9 +557,9 @@ components:
           example: radon-ctt/ti_tosca.yml
           type: string
       required:
-      - project_uuid
-      - sut_tosca_path
-      - ti_tosca_path
+        - project_uuid
+        - sut_tosca_path
+        - ti_tosca_path
       type: object
     POSTDeployment:
       example:
@@ -470,7 +569,7 @@ components:
           example: 0036bd60-1ac0-44db-9578-0181792e2ac1
           type: string
       required:
-      - testartifact_uuid
+        - testartifact_uuid
       type: object
     POSTExecution:
       example:
@@ -480,5 +579,6 @@ components:
           example: 1f89586a-8fd8-4766-baed-28b615809b14
           type: string
       required:
-      - deployment_uuid
+        - deployment_uuid
       type: object
+

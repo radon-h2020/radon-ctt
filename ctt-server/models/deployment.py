@@ -1,7 +1,9 @@
 import uuid
-from db_orm.database import Base, db_session
+
 from sqlalchemy import Column, String, ForeignKey
-from models.project import Project
+from sqlalchemy.orm import relationship, backref
+
+from db_orm.database import Base, db_session
 from models.testartifact import TestArtifact
 
 
@@ -12,7 +14,8 @@ class Deployment(Base):
     testartifact_uuid: str
 
     uuid = Column(String, primary_key=True)
-    testartifact_uuid = Column(String, ForeignKey('testartifact.uuid'), nullable=False)
+    testartifact_uuid = Column(String, ForeignKey('testartifact.uuid', ondelete='CASCADE'), nullable=False)
+    testartifact = relationship('TestArtifact', backref=backref('Deployment', passive_deletes=True))
 
     def __init__(self, testartifact):
         self.uuid = str(uuid.uuid4())

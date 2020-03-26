@@ -1,8 +1,10 @@
 import git
 import os
-from util.configuration import BasePath
-from db_orm.database import Base, db_session
+
 from sqlalchemy import Column, String
+
+from db_orm.database import Base, db_session
+from util.configuration import BasePath
 
 
 class Project(Base):
