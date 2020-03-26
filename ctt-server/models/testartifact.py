@@ -1,10 +1,11 @@
 import uuid
 import os
-from util.configuration import BasePath, SUTFile, TIFile
+from util.configuration import BasePath
 from db_orm.database import Base, db_session
 from sqlalchemy import Column, String, ForeignKey
 from models.project import Project
 from shutil import copytree, ignore_patterns
+from sqlalchemy.orm import relationship, backref
 
 
 class TestArtifact(Base):
@@ -22,7 +23,8 @@ class TestArtifact(Base):
     sut_tosca_path = Column(String, nullable=False)
     ti_tosca_path = Column(String, nullable=False)
     storage_path = Column(String, nullable=False)
-    project_uuid = Column(String, ForeignKey('project.uuid'), nullable=False)
+    project_uuid = Column(String, ForeignKey('project.uuid', ondelete='CASCADE'), nullable=False)
+    project = relationship('Project', backref=backref('TestArtifact', passive_deletes=True))
 
     def __init__(self, project, sut_tosca_path, ti_tosca_path):
         self.uuid = str(uuid.uuid4())
@@ -70,7 +72,7 @@ class TestArtifact(Base):
         testartifact_to_delete = TestArtifact.query.filter_by(uuid=uuid)
         if testartifact_to_delete:
             # TODO: Delete depending items?!
-            TestArtifact.delete(testartifact_to_delete)
+            testartifact_to_delete.delete()
             db_session.commit()
 
         return testartifact_to_delete

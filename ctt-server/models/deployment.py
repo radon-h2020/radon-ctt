@@ -57,7 +57,7 @@ class Deployment(Base):
         deployment_to_delete = Deployment.query.filter_by(uuid=uuid)
         if deployment_to_delete:
             # TODO: Delete depending items?!
-            Deployment.delete(deployment_to_delete)
+            deployment_to_delete.delete()
             db_session.commit()
 
         return deployment_to_delete

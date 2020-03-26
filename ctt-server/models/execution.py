@@ -49,7 +49,7 @@ class Execution(Base):
         execution_to_delete = Execution.query.filter_by(uuid=uuid)
         if execution_to_delete:
             # TODO: Delete depending items?!
-            Execution.delete(execution_to_delete)
+            execution_to_delete.delete()
             db_session.commit()
 
         return execution_to_delete

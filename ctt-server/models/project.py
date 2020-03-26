@@ -88,7 +88,7 @@ class Project(Base):
         project_to_delete = Project.query.filter_by(uuid=uuid)
         if project_to_delete:
             # TODO: Delete depending items?!
-            Project.delete(project_to_delete)
+            project_to_delete.delete()
             db_session.commit()
 
         return project_to_delete
