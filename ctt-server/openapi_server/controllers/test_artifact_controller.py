@@ -24,7 +24,7 @@ def create_testartifact(post_test_artifact=None):  # noqa: E501
     """
     if connexion.request.is_json:
         post_test_artifact = POSTTestArtifact.from_dict(connexion.request.get_json())  # noqa: E501
-    created_testartifacts = TestArtifactImpl.create_testartifact(
+    created_testartifacts = TestArtifactImpl.create(
         post_test_artifact.project_uuid, post_test_artifact.sut_tosca_path, post_test_artifact.ti_tosca_path)
     return testartifact_schema.dump(created_testartifacts)
 
@@ -39,7 +39,7 @@ def delete_testartifact_by_uuid(testartifact_uuid):  # noqa: E501
 
     :rtype: TestArtifact
     """
-    deleted_testartifact = TestArtifactImpl.delete_project_by_uuid(testartifact_uuid)
+    deleted_testartifact = TestArtifactImpl.delete_by_uuid(testartifact_uuid)
     return testartifact_schema.dump(deleted_testartifact)
 
 
@@ -66,7 +66,7 @@ def get_testartifact_by_uuid(testartifact_uuid):  # noqa: E501
 
     :rtype: TestArtifact
     """
-    testartifact = TestArtifactImpl.get_testartifact_by_uuid(testartifact_uuid)
+    testartifact = TestArtifactImpl.get_by_uuid(testartifact_uuid)
     return testartifact_schema.dump(testartifact)
 
 
@@ -78,5 +78,5 @@ def get_testartifacts():  # noqa: E501
 
     :rtype: List[TestArtifact]
     """
-    testartifacts = TestArtifactImpl.get_testartifacts()
+    testartifacts = TestArtifactImpl.get_all()
     return testartifact_schema_many.dump(testartifacts)

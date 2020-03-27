@@ -21,7 +21,8 @@ def delete_result_by_uuid(result_uuid):  # noqa: E501
 
     :rtype: Result
     """
-    return 'do some magic!'
+    result = ResultImpl.delete_by_uuid(result_uuid)
+    return result_schema.dump(result)
 
 
 def download_result_by_uuid(result_uuid):  # noqa: E501
@@ -48,7 +49,7 @@ def get_result_by_uuid(result_uuid):  # noqa: E501
 
     :rtype: Result
     """
-    result = ResultImpl.get_result_by_uuid(result_uuid)
+    result = ResultImpl.get_by_uuid(result_uuid)
     return result_schema.dump(result)
 
 
@@ -60,5 +61,5 @@ def get_results():  # noqa: E501
 
     :rtype: List[Result]
     """
-    results = ResultImpl.get_results()
+    results = ResultImpl.get_all()
     return result_schema_many.dump(results)

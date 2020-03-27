@@ -2,15 +2,15 @@ import uuid
 import os
 
 from sqlalchemy import Column, String, ForeignKey
-from sqlalchemy.orm import relationship, backref
-from shutil import copytree, ignore_patterns
+from shutil import copytree, ignore_patterns, rmtree
 
 from util.configuration import BasePath
 from db_orm.database import Base, db_session
 from models.project import Project
+from models.model_interface import AbstractModel
 
 
-class TestArtifact(Base):
+class TestArtifact(Base, AbstractModel):
     __tablename__ = 'testartifact'
 
     uuid: str
@@ -25,8 +25,9 @@ class TestArtifact(Base):
     sut_tosca_path = Column(String, nullable=False)
     ti_tosca_path = Column(String, nullable=False)
     storage_path = Column(String, nullable=False)
-    project_uuid = Column(String, ForeignKey('project.uuid', ondelete='CASCADE'), nullable=False)
-    project = relationship('Project', backref=backref('TestArtifact', passive_deletes=True))
+    project_uuid = Column(String, ForeignKey('project.uuid'), nullable=False)
+
+    parentType = Project
 
     def __init__(self, project, sut_tosca_path, ti_tosca_path):
         self.uuid = str(uuid.uuid4())
@@ -57,24 +58,31 @@ class TestArtifact(Base):
         return os.path.join(BasePath, self.storage_path)
 
     @classmethod
-    def create_testartifact(cls, project_uuid, sut_tosca_path, ti_tosca_path):
-        linked_project = Project.get_project_by_uuid(project_uuid)
+    def get_parent_type(cls):
+        return Project
+
+    @classmethod
+    def create(cls, project_uuid, sut_tosca_path, ti_tosca_path):
+        linked_project = Project.get_by_uuid(project_uuid)
         return TestArtifact(linked_project, sut_tosca_path, ti_tosca_path)
 
     @classmethod
-    def get_testartifacts(cls):
+    def get_all(cls):
         return TestArtifact.query.all()
 
     @classmethod
-    def get_testartifact_by_uuid(cls, uuid):
+    def get_by_uuid(cls, uuid):
         return TestArtifact.query.filter_by(uuid=uuid).first()
 
     @classmethod
-    def delete_testartifact_by_uuid(cls, uuid):
-        testartifact_to_delete = TestArtifact.query.filter_by(uuid=uuid)
-        if testartifact_to_delete:
-            # TODO: Delete depending items?!
-            testartifact_to_delete.delete()
+    def delete_by_uuid(cls, uuid):
+        testartifact = TestArtifact.query.filter_by(uuid=uuid)
+        if testartifact:
+            folder_to_delete = testartifact.first().fq_storage_path
+            from models.deployment import Deployment
+            linked_deployments = Deployment.query.filter_by(testartifact_uuid=uuid)
+            for result in linked_deployments:
+                Deployment.delete_by_uuid(result.uuid)
+            testartifact.delete()
+            rmtree(folder_to_delete)
             db_session.commit()
-
-        return testartifact_to_delete

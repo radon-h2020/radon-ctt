@@ -25,7 +25,7 @@ def create_execution(post_execution=None):  # noqa: E501
     if connexion.request.is_json:
         post_execution = POSTExecution.from_dict(connexion.request.get_json())  # noqa: E501
 
-    created_execution = ExecutionImpl.create_execution(post_execution.deployment_uuid)
+    created_execution = ExecutionImpl.create(post_execution.deployment_uuid)
     return execution_schema.dump(created_execution)
 
 
@@ -39,7 +39,8 @@ def delete_execution_by_uuid(execution_uuid):  # noqa: E501
 
     :rtype: Execution
     """
-    return 'do some magic!'
+    execution = ExecutionImpl.delete_by_uuid(execution_uuid)
+    return execution_schema.dump(execution)
 
 
 def get_execution_by_uuid(execution_uuid):  # noqa: E501
@@ -52,7 +53,7 @@ def get_execution_by_uuid(execution_uuid):  # noqa: E501
 
     :rtype: Execution
     """
-    execution = ExecutionImpl.get_execution_by_uuid(execution_uuid)
+    execution = ExecutionImpl.get_by_uuid(execution_uuid)
     return execution_schema.dump(execution)
 
 
@@ -64,5 +65,5 @@ def get_executions():  # noqa: E501
 
     :rtype: List[Execution]
     """
-    executions = ExecutionImpl.get_executions()
+    executions = ExecutionImpl.get_all()
     return execution_schema_many.dump(executions)

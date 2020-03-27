@@ -2,19 +2,21 @@ import uuid
 import os
 
 from sqlalchemy import Column, String, ForeignKey
-from sqlalchemy.orm import relationship, backref
 
 from db_orm.database import Base, db_session
 from models.deployment import Deployment
+from models.model_interface import AbstractModel
 from util.configuration import BasePath
 
 
-class Execution(Base):
+class Execution(Base, AbstractModel):
     __tablename__ = 'execution'
+
+    uuid: str
+    deployment_uuid: str
 
     uuid = Column(String, primary_key=True)
     deployment_uuid = Column(String, ForeignKey('deployment.uuid'), nullable=False)
-    deployment = relationship('Deployment', backref=backref('Execution', passive_deletes=True))
 
     def __init__(self, deployment):
         self.uuid = str(uuid.uuid4())
@@ -34,26 +36,32 @@ class Execution(Base):
         pass
 
     @classmethod
-    def create_execution(cls, deployment_uuid):
-        linked_deployment = Deployment.get_deployment_by_uuid(deployment_uuid)
+    def get_parent_type(cls):
+        return Deployment
+
+    @classmethod
+    def create(cls, deployment_uuid):
+        linked_deployment = Deployment.get_by_uuid(deployment_uuid)
         execution = Execution(linked_deployment)
         execution.run()
         return execution
 
     @classmethod
-    def get_executions(cls):
+    def get_all(cls):
         return Execution.query.all()
 
     @classmethod
-    def get_execution_by_uuid(cls, uuid):
+    def get_by_uuid(cls, uuid):
         return Execution.query.filter_by(uuid=uuid).first()
 
     @classmethod
-    def delete_execution_by_uuid(cls, uuid):
-        execution_to_delete = Execution.query.filter_by(uuid=uuid)
-        if execution_to_delete:
-            # TODO: Delete depending items?!
-            execution_to_delete.delete()
+    def delete_by_uuid(cls, uuid):
+        execution = Execution.query.filter_by(uuid=uuid)
+        if execution:
+            from models.result import Result
+            linked_results = Result.query.filter_by(execution_uuid=uuid)
+            for result in linked_results:
+                Result.delete_by_uuid(result.uuid)
+            execution.delete()
+            # rmtree(self.fq_storage_path)
             db_session.commit()
-
-        return execution_to_delete

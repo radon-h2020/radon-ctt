@@ -1,21 +1,21 @@
 import uuid
 
+from flask import current_app
 from sqlalchemy import Column, String, ForeignKey
-from sqlalchemy.orm import relationship, backref
 
 from db_orm.database import Base, db_session
 from models.testartifact import TestArtifact
+from models.model_interface import AbstractModel
 
 
-class Deployment(Base):
+class Deployment(Base, AbstractModel):
     __tablename__ = 'deployment'
 
     uuid: str
     testartifact_uuid: str
 
     uuid = Column(String, primary_key=True)
-    testartifact_uuid = Column(String, ForeignKey('testartifact.uuid', ondelete='CASCADE'), nullable=False)
-    testartifact = relationship('TestArtifact', backref=backref('Deployment', passive_deletes=True))
+    testartifact_uuid = Column(String, ForeignKey('testartifact.uuid'), nullable=False)
 
     def __init__(self, testartifact):
         self.uuid = str(uuid.uuid4())
@@ -37,8 +37,12 @@ class Deployment(Base):
         pass
 
     @classmethod
-    def create_deployment(cls, testartifact_uuid):
-        linked_testartifact = TestArtifact.get_testartifact_by_uuid(testartifact_uuid)
+    def get_parent_type(cls):
+        return TestArtifact
+
+    @classmethod
+    def create(cls, testartifact_uuid):
+        linked_testartifact = TestArtifact.get_by_uuid(testartifact_uuid)
 
         deployment = Deployment(linked_testartifact)
         deployment.deploy_sut()
@@ -48,19 +52,22 @@ class Deployment(Base):
         return deployment
 
     @classmethod
-    def get_deployments(cls):
+    def get_all(cls):
         return Deployment.query.all()
 
     @classmethod
-    def get_deployment_by_uuid(cls, uuid):
+    def get_by_uuid(cls, uuid):
         return Deployment.query.filter_by(uuid=uuid).first()
 
     @classmethod
-    def delete_deployment_by_uuid(cls, uuid):
-        deployment_to_delete = Deployment.query.filter_by(uuid=uuid)
-        if deployment_to_delete:
-            # TODO: Delete depending items?!
-            deployment_to_delete.delete()
-            db_session.commit()
+    def delete_by_uuid(cls, uuid):
+        deployment = Deployment.query.filter_by(uuid=uuid)
+        if deployment:
+            from models.execution import Execution
+            linked_executions = Execution.query.filter_by(deployment_uuid=uuid)
+            for result in linked_executions:
+                Execution.delete_by_uuid(result.uuid)
 
-        return deployment_to_delete
+            deployment.delete()
+            # rmtree(self.fq_storage_path)
+            db_session.commit()

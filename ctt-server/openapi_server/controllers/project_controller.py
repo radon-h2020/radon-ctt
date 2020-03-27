@@ -25,7 +25,7 @@ def create_project(post_project=None):  # noqa: E501
     if connexion.request.is_json:
         post_project = POSTProject.from_dict(connexion.request.get_json())  # noqa: E501
 
-    created_project = ProjectImpl.create_project(post_project.name, post_project.repository_url)
+    created_project = ProjectImpl.create(post_project.name, post_project.repository_url)
     return project_schema.dump(created_project)
 
 
@@ -39,7 +39,7 @@ def delete_project(project_uuid):  # noqa: E501
 
     :rtype: None
     """
-    deleted_project = ProjectImpl.delete_project_by_uuid(project_uuid)
+    deleted_project = ProjectImpl.delete_by_uuid(project_uuid)
     return project_schema.dump(deleted_project)
 
 
@@ -53,7 +53,7 @@ def get_project_by_uuid(project_uuid):  # noqa: E501
 
     :rtype: Project
     """
-    project = ProjectImpl.get_project_by_uuid(project_uuid)
+    project = ProjectImpl.get_by_uuid(project_uuid)
     return project_schema.dump(project)
 
 
@@ -65,5 +65,5 @@ def get_projects():  # noqa: E501
 
     :rtype: List[Project]
     """
-    projects = ProjectImpl.get_projects()
+    projects = ProjectImpl.get_all()
     return project_schema_many.dump(projects)

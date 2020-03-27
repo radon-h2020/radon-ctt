@@ -1,15 +1,16 @@
 import uuid
 import os
 
+from shutil import rmtree
 from sqlalchemy import Column, String, ForeignKey
-from sqlalchemy.orm import relationship, backref
 
 from db_orm.database import Base, db_session
 from models.execution import Execution
+from models.model_interface import AbstractModel
 from util.configuration import BasePath
 
 
-class Result(Base):
+class Result(Base, AbstractModel):
     __tablename__ = 'result'
 
     uuid: str
@@ -18,8 +19,7 @@ class Result(Base):
 
     uuid = Column(String, primary_key=True)
     storage_path = Column(String, nullable=False)
-    execution_uuid = Column(String, ForeignKey('execution.uuid', ondelete='CASCADE'), nullable=False)
-    execution = relationship('Execution', backref=backref('Result', passive_deletes=True))
+    execution_uuid = Column(String, ForeignKey('execution.uuid'), nullable=False)
 
     def __init__(self, execution):
         self.uuid = str(uuid.uuid4())
@@ -43,25 +43,28 @@ class Result(Base):
         return self.fq_storage_path
 
     @classmethod
-    def create_result(cls, execution_uuid):
-        linked_execution = Execution.get_execution_by_uuid(execution_uuid)
+    def get_parent_type(cls):
+        return Execution
+
+    @classmethod
+    def create(cls, execution_uuid):
+        linked_execution = Execution.get_by_uuid(execution_uuid)
         result = Result(linked_execution)
         return result
 
     @classmethod
-    def get_results(cls):
+    def get_all(cls):
         return Result.query.all()
 
     @classmethod
-    def get_result_by_uuid(cls, uuid):
+    def get_by_uuid(cls, uuid):
         return Result.query.filter_by(uuid=uuid).first()
 
     @classmethod
-    def delete_result_by_uuid(cls, uuid):
-        result_to_delete = Result.query.filter_by(uuid=uuid)
-        if result_to_delete:
-            # TODO: Delete depending items?!
-            result_to_delete.delete()
+    def delete_by_uuid(cls, uuid):
+        result = Result.query.filter_by(uuid=uuid)
+        if result:
+            result.delete()
+            # rmtree(self.fq_storage_path)
             db_session.commit()
 
-        return result_to_delete

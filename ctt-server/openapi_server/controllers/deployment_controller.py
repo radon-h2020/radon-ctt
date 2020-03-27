@@ -24,7 +24,7 @@ def create_deployment(post_deployment=None):  # noqa: E501
     """
     if connexion.request.is_json:
         post_deployment = POSTDeployment.from_dict(connexion.request.get_json())  # noqa: E501
-    created_deployment = DeploymentImpl.create_deployment(post_deployment.testartifact_uuid)
+    created_deployment = DeploymentImpl.create(post_deployment.testartifact_uuid)
     return deployment_schema.dump(created_deployment)
 
 
@@ -38,7 +38,8 @@ def delete_deployment_by_uuid(deployment_uuid):  # noqa: E501
 
     :rtype: Deployment
     """
-    return 'do some magic!'
+    deployment = DeploymentImpl.delete_by_uuid(deployment_uuid)
+    return deployment_schema.dump(deployment)
 
 
 def get_deployment_by_uuid(deployment_uuid):  # noqa: E501
@@ -51,7 +52,7 @@ def get_deployment_by_uuid(deployment_uuid):  # noqa: E501
 
     :rtype: Deployment
     """
-    deployment = DeploymentImpl.get_deployment_by_uuid(deployment_uuid)
+    deployment = DeploymentImpl.get_by_uuid(deployment_uuid)
     return deployment_schema.dump(deployment)
 
 
@@ -63,5 +64,5 @@ def get_deployments():  # noqa: E501
 
     :rtype: List[Deployment]
     """
-    deployments = DeploymentImpl.get_deployments()
+    deployments = DeploymentImpl.get_all()
     return deployment_schema_many.dump(deployments)
