@@ -1,3 +1,5 @@
+import opera
+import os
 import uuid
 
 from flask import current_app
@@ -5,7 +7,7 @@ from sqlalchemy import Column, String, ForeignKey
 
 from db_orm.database import Base, db_session
 from models.testartifact import TestArtifact
-from models.model_interface import AbstractModel
+from models.abstract_model import AbstractModel
 
 
 class Deployment(Base, AbstractModel):
@@ -31,7 +33,9 @@ class Deployment(Base, AbstractModel):
         return '<Deployment UUID=%r, TA_UUID=%r>' % (self.uuid, self.testartifact_uuid)
 
     def deploy_sut(self):
-        pass
+        test_artifact = TestArtifact.get_by_uuid(self.testartifact_uuid)
+        if test_artifact and os.path.isfile(test_artifact.sut_tosca_path):
+            pass
 
     def deploy_ti(self):
         pass
@@ -56,15 +60,15 @@ class Deployment(Base, AbstractModel):
         return Deployment.query.all()
 
     @classmethod
-    def get_by_uuid(cls, uuid):
-        return Deployment.query.filter_by(uuid=uuid).first()
+    def get_by_uuid(cls, get_uuid):
+        return Deployment.query.filter_by(uuid=get_uuid).first()
 
     @classmethod
-    def delete_by_uuid(cls, uuid):
-        deployment = Deployment.query.filter_by(uuid=uuid)
+    def delete_by_uuid(cls, del_uuid):
+        deployment = Deployment.query.filter_by(uuid=del_uuid)
         if deployment:
             from models.execution import Execution
-            linked_executions = Execution.query.filter_by(deployment_uuid=uuid)
+            linked_executions = Execution.query.filter_by(deployment_uuid=del_uuid)
             for result in linked_executions:
                 Execution.delete_by_uuid(result.uuid)
 

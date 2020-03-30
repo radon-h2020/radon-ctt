@@ -1,9 +1,12 @@
 #!/usr/bin/env python3
 
 import connexion
+import logging
 
 from openapi_server import encoder
 from db_orm.database import init_db
+
+logging.basicConfig(level=logging.INFO)
 
 
 def main():
@@ -14,6 +17,7 @@ def main():
     app.add_api('openapi.yaml',
                 arguments={'title': 'RADON CTT Server API'},
                 pythonic_params=True)
+
     app.run(port=8080)
 
 

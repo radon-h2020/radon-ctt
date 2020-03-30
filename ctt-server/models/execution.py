@@ -5,7 +5,7 @@ from sqlalchemy import Column, String, ForeignKey
 
 from db_orm.database import Base, db_session
 from models.deployment import Deployment
-from models.model_interface import AbstractModel
+from models.abstract_model import AbstractModel
 from util.configuration import BasePath
 
 
@@ -51,15 +51,15 @@ class Execution(Base, AbstractModel):
         return Execution.query.all()
 
     @classmethod
-    def get_by_uuid(cls, uuid):
-        return Execution.query.filter_by(uuid=uuid).first()
+    def get_by_uuid(cls, get_uuid):
+        return Execution.query.filter_by(uuid=get_uuid).first()
 
     @classmethod
-    def delete_by_uuid(cls, uuid):
-        execution = Execution.query.filter_by(uuid=uuid)
+    def delete_by_uuid(cls, del_uuid):
+        execution = Execution.query.filter_by(uuid=del_uuid)
         if execution:
             from models.result import Result
-            linked_results = Result.query.filter_by(execution_uuid=uuid)
+            linked_results = Result.query.filter_by(execution_uuid=del_uuid)
             for result in linked_results:
                 Result.delete_by_uuid(result.uuid)
             execution.delete()

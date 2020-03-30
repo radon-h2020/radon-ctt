@@ -6,7 +6,7 @@ from shutil import rmtree
 from sqlalchemy import Column, String
 
 from db_orm.database import Base, db_session
-from models.model_interface import AbstractModel
+from models.abstract_model import AbstractModel
 from util.configuration import BasePath
 
 
@@ -36,9 +36,10 @@ class Project(Base, AbstractModel):
 
         if not path.exists(self.fq_storage_path):
             makedirs(self.fq_storage_path)
+            current_app.logger.info(f"Created directory path {self.fq_storage_path}")
 
-        git.Git(self.fq_storage_path).\
-            clone(self.repository_url, self.fq_storage_path)
+        current_app.logger.info(f"Cloning repository {self.repository_url} into {self.fq_storage_path}")
+        git.Git(self.fq_storage_path).clone(self.repository_url, self.fq_storage_path)
 
         db_session.add(self)
         db_session.commit()
@@ -72,7 +73,7 @@ class Project(Base, AbstractModel):
         else:
             project = Project.query.filter_by(name=name).first()
             git.Git(path.join(BasePath, project.storage_path)).pull()
-            current_app.logger.info('Project updated: ' + str(project))
+            current_app.logger.info(f"Project {str(project)} updated.")
 
         return project
 
@@ -81,8 +82,8 @@ class Project(Base, AbstractModel):
         return Project.query.all()
 
     @classmethod
-    def get_by_uuid(cls, uuid):
-        return Project.query.filter_by(uuid=uuid).first()
+    def get_by_uuid(cls, get_uuid):
+        return Project.query.filter_by(uuid=get_uuid).first()
 
     @classmethod
     def exists(cls, name):
@@ -92,12 +93,12 @@ class Project(Base, AbstractModel):
             return False
 
     @classmethod
-    def delete_by_uuid(cls, uuid):
-        project = Project.query.filter_by(uuid=uuid)
+    def delete_by_uuid(cls, del_uuid):
+        project = Project.query.filter_by(uuid=del_uuid)
         if project:
             folder_to_delete = project.first().fq_storage_path
             from models.testartifact import TestArtifact
-            linked_testartifacts = TestArtifact.query.filter_by(project_uuid=uuid)
+            linked_testartifacts = TestArtifact.query.filter_by(project_uuid=del_uuid)
             for result in linked_testartifacts:
                 TestArtifact.delete_by_uuid(result.uuid)
             project.delete()
