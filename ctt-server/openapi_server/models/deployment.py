@@ -15,36 +15,26 @@ class Deployment(Model):
     Do not edit the class manually.
     """
 
-    def __init__(self, id=None, project_id=None, status=None, testartifact_id=None):  # noqa: E501
+    def __init__(self, uuid=None, testartifact_uuid=None):  # noqa: E501
         """Deployment - a model defined in OpenAPI
 
-        :param id: The id of this Deployment.  # noqa: E501
-        :type id: int
-        :param project_id: The project_id of this Deployment.  # noqa: E501
-        :type project_id: int
-        :param status: The status of this Deployment.  # noqa: E501
-        :type status: str
-        :param testartifact_id: The testartifact_id of this Deployment.  # noqa: E501
-        :type testartifact_id: int
+        :param uuid: The uuid of this Deployment.  # noqa: E501
+        :type uuid: str
+        :param testartifact_uuid: The testartifact_uuid of this Deployment.  # noqa: E501
+        :type testartifact_uuid: str
         """
         self.openapi_types = {
-            'id': int,
-            'project_id': int,
-            'status': str,
-            'testartifact_id': int
+            'uuid': str,
+            'testartifact_uuid': str
         }
 
         self.attribute_map = {
-            'id': 'id',
-            'project_id': 'projectId',
-            'status': 'status',
-            'testartifact_id': 'testartifactId'
+            'uuid': 'uuid',
+            'testartifact_uuid': 'testartifact_uuid'
         }
 
-        self._id = id
-        self._project_id = project_id
-        self._status = status
-        self._testartifact_id = testartifact_id
+        self._uuid = uuid
+        self._testartifact_uuid = testartifact_uuid
 
     @classmethod
     def from_dict(cls, dikt) -> 'Deployment':
@@ -58,85 +48,43 @@ class Deployment(Model):
         return util.deserialize_model(dikt, cls)
 
     @property
-    def id(self):
-        """Gets the id of this Deployment.
+    def uuid(self):
+        """Gets the uuid of this Deployment.
 
 
-        :return: The id of this Deployment.
-        :rtype: int
-        """
-        return self._id
-
-    @id.setter
-    def id(self, id):
-        """Sets the id of this Deployment.
-
-
-        :param id: The id of this Deployment.
-        :type id: int
-        """
-
-        self._id = id
-
-    @property
-    def project_id(self):
-        """Gets the project_id of this Deployment.
-
-
-        :return: The project_id of this Deployment.
-        :rtype: int
-        """
-        return self._project_id
-
-    @project_id.setter
-    def project_id(self, project_id):
-        """Sets the project_id of this Deployment.
-
-
-        :param project_id: The project_id of this Deployment.
-        :type project_id: int
-        """
-
-        self._project_id = project_id
-
-    @property
-    def status(self):
-        """Gets the status of this Deployment.
-
-
-        :return: The status of this Deployment.
+        :return: The uuid of this Deployment.
         :rtype: str
         """
-        return self._status
+        return self._uuid
 
-    @status.setter
-    def status(self, status):
-        """Sets the status of this Deployment.
+    @uuid.setter
+    def uuid(self, uuid):
+        """Sets the uuid of this Deployment.
 
 
-        :param status: The status of this Deployment.
-        :type status: str
+        :param uuid: The uuid of this Deployment.
+        :type uuid: str
         """
 
-        self._status = status
+        self._uuid = uuid
 
     @property
-    def testartifact_id(self):
-        """Gets the testartifact_id of this Deployment.
+    def testartifact_uuid(self):
+        """Gets the testartifact_uuid of this Deployment.
 
 
-        :return: The testartifact_id of this Deployment.
-        :rtype: int
+        :return: The testartifact_uuid of this Deployment.
+        :rtype: str
         """
-        return self._testartifact_id
+        return self._testartifact_uuid
 
-    @testartifact_id.setter
-    def testartifact_id(self, testartifact_id):
-        """Sets the testartifact_id of this Deployment.
+    @testartifact_uuid.setter
+    def testartifact_uuid(self, testartifact_uuid):
+        """Sets the testartifact_uuid of this Deployment.
 
 
-        :param testartifact_id: The testartifact_id of this Deployment.
-        :type testartifact_id: int
+        :param testartifact_uuid: The testartifact_uuid of this Deployment.
+        :type testartifact_uuid: str
         """
 
-        self._testartifact_id = testartifact_id
+        self._testartifact_uuid = testartifact_uuid

@@ -10,37 +10,13 @@ info:
 servers:
 - url: /RadonCTT
 tags:
-- name: Projects
-- name: Testartifacts
-- name: Deployments
-- name: Executors
-- name: Results
+- name: Project
+- name: TestArtifact
+- name: Deployment
+- name: Execution
+- name: Result
 paths:
-  /deployment/{deployment_id}:
-    get:
-      operationId: get_deployment_by_id
-      parameters:
-      - description: ID of the deployment to return
-        explode: false
-        in: path
-        name: deployment_id
-        required: true
-        schema:
-          format: int64
-          type: integer
-        style: simple
-      responses:
-        "200":
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Deployment'
-          description: Success
-      summary: Retrieve a deployment
-      tags:
-      - Deployments
-      x-openapi-router-controller: openapi_server.controllers.deployments_controller
-  /deployments:
+  /deployment:
     get:
       operationId: get_deployments
       responses:
@@ -55,115 +31,142 @@ paths:
           description: Success
       summary: Get all deployments
       tags:
-      - Deployments
-      x-openapi-router-controller: openapi_server.controllers.deployments_controller
+      - Deployment
+      x-openapi-router-controller: openapi_server.controllers.deployment_controller
     post:
       operationId: create_deployment
       requestBody:
-        $ref: '#/components/requestBodies/POSTDeployments'
+        $ref: '#/components/requestBodies/POSTDeployment'
       responses:
         "201":
           description: Successful operation
       summary: Creates a deployment
       tags:
-      - Deployments
-      x-openapi-router-controller: openapi_server.controllers.deployments_controller
-  /executor/{executor_id}:
-    get:
-      operationId: get_executor_by_id
+      - Deployment
+      x-openapi-router-controller: openapi_server.controllers.deployment_controller
+  /deployment/{deployment_uuid}:
+    delete:
+      description: Deletes the test artifact with the given UUID and all elements
+        depending on it
+      operationId: delete_deployment_by_uuid
       parameters:
-      - description: ID of the executor to return
+      - description: UUID of the deployment to delete
         explode: false
         in: path
-        name: executor_id
+        name: deployment_uuid
         required: true
         schema:
-          format: int64
-          type: integer
+          type: string
         style: simple
       responses:
         "200":
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Executor'
-          description: Success
-      summary: Retrieve an executor
+                $ref: '#/components/schemas/Deployment'
+          description: Successful deletion of the deployment
+      summary: Delete a deployment
       tags:
-      - Executors
-      x-openapi-router-controller: openapi_server.controllers.executors_controller
-  /executors:
+      - Deployment
+      x-openapi-router-controller: openapi_server.controllers.deployment_controller
     get:
-      operationId: get_executors
+      operationId: get_deployment_by_uuid
+      parameters:
+      - description: UUID of the deployment to return
+        explode: false
+        in: path
+        name: deployment_uuid
+        required: true
+        schema:
+          type: string
+        style: simple
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Deployment'
+          description: Success
+      summary: Retrieve a deployment
+      tags:
+      - Deployment
+      x-openapi-router-controller: openapi_server.controllers.deployment_controller
+  /execution:
+    get:
+      operationId: get_executions
       responses:
         "200":
           content:
             application/json:
               schema:
                 items:
-                  $ref: '#/components/schemas/Executor'
+                  $ref: '#/components/schemas/Execution'
                 type: array
                 x-content-type: application/json
           description: Success
-      summary: Get all executors
+      summary: Get all executions
       tags:
-      - Executors
-      x-openapi-router-controller: openapi_server.controllers.executors_controller
+      - Execution
+      x-openapi-router-controller: openapi_server.controllers.execution_controller
     post:
-      operationId: create_executor
+      operationId: create_execution
       requestBody:
-        $ref: '#/components/requestBodies/POSTExecutors'
+        $ref: '#/components/requestBodies/POSTExecution'
       responses:
         "201":
           description: Success
-      summary: Creates an executor
+      summary: Creates an execution
       tags:
-      - Executors
-      x-openapi-router-controller: openapi_server.controllers.executors_controller
-  /project/{project_id}:
+      - Execution
+      x-openapi-router-controller: openapi_server.controllers.execution_controller
+  /execution/{execution_uuid}:
     delete:
-      operationId: delete_project
+      description: Deletes the execution with the given UUID and all elements depending
+        on it
+      operationId: delete_execution_by_uuid
       parameters:
-      - description: ID of the project to delete
+      - description: UUID of the execution to delete
         explode: false
         in: path
-        name: project_id
+        name: execution_uuid
         required: true
         schema:
-          format: int64
-          type: integer
-        style: simple
-      responses:
-        "200":
-          description: Success
-      summary: Delete a project
-      tags:
-      - Projects
-      x-openapi-router-controller: openapi_server.controllers.projects_controller
-    get:
-      operationId: get_project_by_id
-      parameters:
-      - description: ID of the project to return
-        explode: false
-        in: path
-        name: project_id
-        required: true
-        schema:
-          format: int64
-          type: integer
+          type: string
         style: simple
       responses:
         "200":
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Project'
-          description: Success
-      summary: Retrieve a project
+                $ref: '#/components/schemas/Execution'
+          description: Successful deletion of the execution
+      summary: Delete an execution
       tags:
-      - Projects
-      x-openapi-router-controller: openapi_server.controllers.projects_controller
-  /projects:
+      - Execution
+      x-openapi-router-controller: openapi_server.controllers.execution_controller
+    get:
+      operationId: get_execution_by_uuid
+      parameters:
+      - description: UUID of the execution to return
+        explode: false
+        in: path
+        name: execution_uuid
+        required: true
+        schema:
+          type: string
+        style: simple
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Execution'
+          description: Success
+      summary: Retrieve an execution
+      tags:
+      - Execution
+      x-openapi-router-controller: openapi_server.controllers.execution_controller
+  /project:
     get:
       operationId: get_projects
       responses:
@@ -178,70 +181,61 @@ paths:
           description: Success
       summary: Get a list of all projects
       tags:
-      - Projects
-      x-openapi-router-controller: openapi_server.controllers.projects_controller
+      - Project
+      x-openapi-router-controller: openapi_server.controllers.project_controller
     post:
       operationId: create_project
       requestBody:
-        $ref: '#/components/requestBodies/POSTProjects'
+        $ref: '#/components/requestBodies/POSTProject'
       responses:
         "201":
           description: Success
       summary: Creates a project
       tags:
-      - Projects
-      x-openapi-router-controller: openapi_server.controllers.projects_controller
-  /result/{result_id}:
-    get:
-      operationId: get_result_by_id
+      - Project
+      x-openapi-router-controller: openapi_server.controllers.project_controller
+  /project/{project_uuid}:
+    delete:
+      operationId: delete_project
       parameters:
-      - description: ID of the result to return
+      - description: UUID of the project to delete
         explode: false
         in: path
-        name: result_id
+        name: project_uuid
         required: true
         schema:
-          format: int64
-          type: integer
+          type: string
+        style: simple
+      responses:
+        "200":
+          description: Success
+      summary: Delete a project
+      tags:
+      - Project
+      x-openapi-router-controller: openapi_server.controllers.project_controller
+    get:
+      operationId: get_project_by_uuid
+      parameters:
+      - description: UUID of the project to return
+        explode: false
+        in: path
+        name: project_uuid
+        required: true
+        schema:
+          type: string
         style: simple
       responses:
         "200":
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Result'
+                $ref: '#/components/schemas/Project'
           description: Success
-      summary: Retrieve a result
+      summary: Retrieve a project
       tags:
-      - Results
-      x-openapi-router-controller: openapi_server.controllers.results_controller
-  /result/{result_id}/download:
-    get:
-      operationId: download_result_by_id
-      parameters:
-      - description: ID of the result to download
-        explode: false
-        in: path
-        name: result_id
-        required: true
-        schema:
-          format: int64
-          type: integer
-        style: simple
-      responses:
-        "200":
-          content:
-            application/json:
-              schema:
-                format: binary
-                type: string
-                x-content-type: application/json
-          description: Success
-      summary: Downloads the generated results
-      tags:
-      - Results
-      x-openapi-router-controller: openapi_server.controllers.results_controller
-  /results:
+      - Project
+      x-openapi-router-controller: openapi_server.controllers.project_controller
+  /result:
     get:
       operationId: get_results
       responses:
@@ -256,44 +250,165 @@ paths:
           description: Success
       summary: Get all results
       tags:
-      - Results
-      x-openapi-router-controller: openapi_server.controllers.results_controller
-  /testartifact/{testartifact_id}:
-    get:
-      operationId: get_testartifact_by_id
+      - Result
+      x-openapi-router-controller: openapi_server.controllers.result_controller
+  /result/{result_uuid}:
+    delete:
+      description: Deletes the result with the given UUID on it
+      operationId: delete_result_by_uuid
       parameters:
-      - description: ID of the test artifact to return
+      - description: UUID of the result to delete
         explode: false
         in: path
-        name: testartifact_id
+        name: result_uuid
         required: true
         schema:
-          format: int64
-          type: integer
+          type: string
         style: simple
       responses:
         "200":
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Testartifact'
+                $ref: '#/components/schemas/Result'
+          description: Successful deletion of the result
+      summary: Delete a result
+      tags:
+      - Result
+      x-openapi-router-controller: openapi_server.controllers.result_controller
+    get:
+      operationId: get_result_by_uuid
+      parameters:
+      - description: UUID of the result to return
+        explode: false
+        in: path
+        name: result_uuid
+        required: true
+        schema:
+          type: string
+        style: simple
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Result'
+          description: Success
+      summary: Retrieve a result
+      tags:
+      - Result
+      x-openapi-router-controller: openapi_server.controllers.result_controller
+  /result/{result_uuid}/download:
+    get:
+      operationId: download_result_by_uuid
+      parameters:
+      - description: UUID of the result to download
+        explode: false
+        in: path
+        name: result_uuid
+        required: true
+        schema:
+          type: string
+        style: simple
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                format: binary
+                type: string
+                x-content-type: application/json
+          description: Success
+      summary: Downloads the generated results
+      tags:
+      - Result
+      x-openapi-router-controller: openapi_server.controllers.result_controller
+  /testartifact:
+    get:
+      operationId: get_testartifacts
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/TestArtifact'
+                type: array
+                x-content-type: application/json
+          description: Success
+      summary: Get all test artifacts
+      tags:
+      - TestArtifact
+      x-openapi-router-controller: openapi_server.controllers.test_artifact_controller
+    post:
+      operationId: create_testartifact
+      requestBody:
+        $ref: '#/components/requestBodies/POSTTestArtifact'
+      responses:
+        "201":
+          description: Success
+      summary: Creates a test artifact
+      tags:
+      - TestArtifact
+      x-openapi-router-controller: openapi_server.controllers.test_artifact_controller
+  /testartifact/{testartifact_uuid}:
+    delete:
+      description: Deletes the test artifact with the given UUID and all elements
+        depending on it
+      operationId: delete_testartifact_by_uuid
+      parameters:
+      - description: UUID of the test artifact to delete
+        explode: false
+        in: path
+        name: testartifact_uuid
+        required: true
+        schema:
+          type: string
+        style: simple
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TestArtifact'
+          description: Successful deletion of the test artifact
+      summary: Delete a test artifact
+      tags:
+      - TestArtifact
+      x-openapi-router-controller: openapi_server.controllers.test_artifact_controller
+    get:
+      operationId: get_testartifact_by_uuid
+      parameters:
+      - description: UUID of the test artifact to return
+        explode: false
+        in: path
+        name: testartifact_uuid
+        required: true
+        schema:
+          type: string
+        style: simple
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TestArtifact'
           description: Success
       summary: Retrieve a test artifact
       tags:
-      - Testartifacts
-      x-openapi-router-controller: openapi_server.controllers.testartifacts_controller
-  /testartifact/{testartifact_id}/download:
+      - TestArtifact
+      x-openapi-router-controller: openapi_server.controllers.test_artifact_controller
+  /testartifact/{testartifact_uuid}/download:
     get:
-      operationId: download_testartifact_by_id
+      operationId: download_testartifact_by_uuid
       parameters:
-      - description: ID of the test artifact to download
+      - description: UUID of the test artifact to download
         explode: false
         in: path
-        name: testartifact_id
+        name: testartifact_uuid
         required: true
         schema:
-          format: int64
-          type: integer
+          type: string
         style: simple
       responses:
         "200":
@@ -306,322 +421,159 @@ paths:
           description: Success
       summary: Downloads the generated test artifact
       tags:
-      - Testartifacts
-      x-openapi-router-controller: openapi_server.controllers.testartifacts_controller
-  /testartifacts:
-    get:
-      operationId: get_testartifacts
-      responses:
-        "200":
-          content:
-            application/json:
-              schema:
-                items:
-                  $ref: '#/components/schemas/Testartifact'
-                type: array
-                x-content-type: application/json
-          description: Success
-      summary: Get all test artifacts
-      tags:
-      - Testartifacts
-      x-openapi-router-controller: openapi_server.controllers.testartifacts_controller
-    post:
-      operationId: create_testartifact
-      requestBody:
-        $ref: '#/components/requestBodies/POSTTestartifacts'
-      responses:
-        "201":
-          description: Success
-      summary: Creates a test artifact
-      tags:
-      - Testartifacts
-      x-openapi-router-controller: openapi_server.controllers.testartifacts_controller
+      - TestArtifact
+      x-openapi-router-controller: openapi_server.controllers.test_artifact_controller
 components:
   requestBodies:
-    POSTDeployments:
+    POSTProject:
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/POSTDeployments'
-    POSTExecutors:
+            $ref: '#/components/schemas/POSTProject'
+    POSTTestArtifact:
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/POSTExecutors'
-    POSTProjects:
+            $ref: '#/components/schemas/POSTTestArtifact'
+    POSTDeployment:
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/POSTProjects'
-    POSTTestartifacts:
+            $ref: '#/components/schemas/POSTDeployment'
+    POSTExecution:
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/POSTTestartifacts'
+            $ref: '#/components/schemas/POSTExecution'
   schemas:
-    Deployment:
-      example:
-        id: 0
-        projectId: 6
-        status: status
-        testartifactId: 1
-      properties:
-        id:
-          format: int64
-          readOnly: true
-          type: integer
-        projectId:
-          format: int64
-          readOnly: true
-          type: integer
-        status:
-          type: string
-        testartifactId:
-          format: int64
-          readOnly: true
-          type: integer
-      type: object
-    Executor:
-      example:
-        deploymentId: 1
-        id: 0
-        projectId: 6
-        status: status
-      properties:
-        deploymentId:
-          format: int64
-          readOnly: true
-          type: integer
-        id:
-          format: int64
-          readOnly: true
-          type: integer
-        projectId:
-          format: int64
-          readOnly: true
-          type: integer
-        status:
-          type: string
-      type: object
-    NodeTest:
-      example:
-        artifactPath: artifactPath
-        id: 2
-        node: node
-        policyTestId: 9
-        projectId: 7
-        status: status
-      properties:
-        artifactPath:
-          type: string
-        id:
-          format: int64
-          readOnly: true
-          type: integer
-        node:
-          type: string
-        policyTestId:
-          format: int64
-          readOnly: true
-          type: integer
-        projectId:
-          format: int64
-          readOnly: true
-          type: integer
-        status:
-          type: string
-      type: object
-    POSTDeployments:
-      example:
-        testartifactId: 1
-      properties:
-        testartifactId:
-          example: 1
-          format: int64
-          type: integer
-      required:
-      - testartifactId
-      type: object
-    POSTExecutors:
-      example:
-        deploymentId: 1
-      properties:
-        deploymentId:
-          example: 1
-          format: int64
-          type: integer
-      required:
-      - deploymentId
-      type: object
-    POSTProjects:
-      example:
-        servicetemplate_location: radon-ctt/servicetemplate.yml
-        file: ""
-        repository_url: https://github.com/UST-CTT/radon-ctt-sockshop-example.git
-      properties:
-        file:
-          format: binary
-          type: string
-        repository_url:
-          example: https://github.com/UST-CTT/radon-ctt-sockshop-example.git
-          type: string
-        servicetemplate_location:
-          example: radon-ctt/servicetemplate.yml
-          type: string
-      required:
-      - servicetemplate_location
-      type: object
-    POSTTestartifacts:
-      example:
-        projectId: 1
-      properties:
-        projectId:
-          example: 1
-          format: int64
-          type: integer
-      required:
-      - projectId
-      type: object
-    PolicyTest:
-      example:
-        id: 1
-        nodeTests:
-        - artifactPath: artifactPath
-          id: 2
-          node: node
-          policyTestId: 9
-          projectId: 7
-          status: status
-        - artifactPath: artifactPath
-          id: 2
-          node: node
-          policyTestId: 9
-          projectId: 7
-          status: status
-        policy: policy
-        projectId: 5
-        status: status
-        testartifactId: 5
-      properties:
-        id:
-          format: int64
-          readOnly: true
-          type: integer
-        nodeTests:
-          items:
-            $ref: '#/components/schemas/NodeTest'
-          type: array
-        policy:
-          type: string
-        projectId:
-          format: int64
-          readOnly: true
-          type: integer
-        status:
-          type: string
-        testartifactId:
-          format: int64
-          readOnly: true
-          type: integer
-      type: object
     Project:
       example:
-        id: 0
-        projectPath: projectPath
-        repositoryUrl: repositoryUrl
-        servicetemplateLocation: servicetemplateLocation
-        status: status
+        uuid: ac9431bd-1a1c-4d6f-a98f-cc97401b5e47
+        name: SockShop
+        repository_url: https://github.com/UST-CTT/radon-ctt-sockshop-example.git
       properties:
-        id:
-          format: int64
+        uuid:
           readOnly: true
-          type: integer
-        projectPath:
           type: string
-        repositoryUrl:
+        name:
+          readOnly: true
           type: string
-        servicetemplateLocation:
+        repository_url:
+          readOnly: true
           type: string
-        status:
+      type: object
+    TestArtifact:
+      example:
+        uuid: 0036bd60-1ac0-44db-9578-0181792e2ac1
+        project_uuid: ac9431bd-1a1c-4d6f-a98f-cc97401b5e47
+        sut_tosca_path: radon-ctt/sut_tosca.yml
+        ti_tosca_path: radon-ctt/ti_tosca.yml
+        commit_hash: 667d69cc5b0527d0c3d0887cd175114e9310d518
+      properties:
+        uuid:
+          readOnly: true
+          type: string
+        project_uuid:
+          readOnly: true
+          type: string
+        sut_tosca_path:
+          readOnly: true
+          type: string
+        ti_tosca_path:
+          readOnly: true
+          type: string
+        commit_hash:
+          readOnly: true
+          type: string
+      type: object
+    Deployment:
+      example:
+        uuid: 1f89586a-8fd8-4766-baed-28b615809b14
+        testartifact_uuid: 0036bd60-1ac0-44db-9578-0181792e2ac1
+      properties:
+        uuid:
+          readOnly: true
+          type: string
+        testartifact_uuid:
+          readOnly: true
+          type: string
+      type: object
+    Execution:
+      example:
+        uuid: 03a2d4ff-e0c9-4312-a4ee-53a6ac060e6e
+        deployment_uuid: 1f89586a-8fd8-4766-baed-28b615809b14
+      properties:
+        uuid:
+          readOnly: true
+          type: string
+        deployment_uuid:
+          readOnly: true
           type: string
       type: object
     Result:
       example:
-        id: 0
-        projectId: 6
-        resultPath: resultPath
-        testartifactId: 1
+        uuid: 6ce56e02-aa45-4a57-b097-f6c63564f2e3
+        execution_uuid: 03a2d4ff-e0c9-4312-a4ee-53a6ac060e6e
       properties:
-        id:
-          format: int64
+        uuid:
           readOnly: true
-          type: integer
-        projectId:
-          format: int64
-          readOnly: true
-          type: integer
-        resultPath:
           type: string
-        testartifactId:
-          format: int64
+        execution_uuid:
           readOnly: true
-          type: integer
+          type: string
       type: object
-    Testartifact:
+    POSTProject:
       example:
-        id: 0
-        policyTests:
-        - id: 1
-          nodeTests:
-          - artifactPath: artifactPath
-            id: 2
-            node: node
-            policyTestId: 9
-            projectId: 7
-            status: status
-          - artifactPath: artifactPath
-            id: 2
-            node: node
-            policyTestId: 9
-            projectId: 7
-            status: status
-          policy: policy
-          projectId: 5
-          status: status
-          testartifactId: 5
-        - id: 1
-          nodeTests:
-          - artifactPath: artifactPath
-            id: 2
-            node: node
-            policyTestId: 9
-            projectId: 7
-            status: status
-          - artifactPath: artifactPath
-            id: 2
-            node: node
-            policyTestId: 9
-            projectId: 7
-            status: status
-          policy: policy
-          projectId: 5
-          status: status
-          testartifactId: 5
-        projectId: 6
-        status: status
+        name: SockShop
+        repository_url: https://github.com/UST-CTT/radon-ctt-sockshop-example.git
       properties:
-        id:
-          format: int64
-          readOnly: true
-          type: integer
-        policyTests:
-          items:
-            $ref: '#/components/schemas/PolicyTest'
-          type: array
-        projectId:
-          format: int64
-          readOnly: true
-          type: integer
-        status:
+        name:
+          example: SockShop
           type: string
+        repository_url:
+          example: https://github.com/UST-CTT/radon-ctt-sockshop-example.git
+          type: string
+      required:
+      - name
+      - repository_url
+      type: object
+    POSTTestArtifact:
+      example:
+        project_uuid: ac9431bd-1a1c-4d6f-a98f-cc97401b5e47
+        sut_tosca_path: radon-ctt/sut_tosca.yml
+        ti_tosca_path: radon-ctt/ti_tosca.yml
+      properties:
+        project_uuid:
+          example: ac9431bd-1a1c-4d6f-a98f-cc97401b5e47
+          type: string
+        sut_tosca_path:
+          example: radon-ctt/sut_tosca.yml
+          type: string
+        ti_tosca_path:
+          example: radon-ctt/ti_tosca.yml
+          type: string
+      required:
+      - project_uuid
+      - sut_tosca_path
+      - ti_tosca_path
+      type: object
+    POSTDeployment:
+      example:
+        testartifact_uuid: 0036bd60-1ac0-44db-9578-0181792e2ac1
+      properties:
+        testartifact_uuid:
+          example: 0036bd60-1ac0-44db-9578-0181792e2ac1
+          type: string
+      required:
+      - testartifact_uuid
+      type: object
+    POSTExecution:
+      example:
+        deployment_uuid: 1f89586a-8fd8-4766-baed-28b615809b14
+      properties:
+        deployment_uuid:
+          example: 1f89586a-8fd8-4766-baed-28b615809b14
+          type: string
+      required:
+      - deployment_uuid
       type: object

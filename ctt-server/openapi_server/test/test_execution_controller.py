@@ -6,59 +6,61 @@ import unittest
 from flask import json
 from six import BytesIO
 
-from openapi_server.models.executor import Executor  # noqa: E501
-from openapi_server.models.post_executors import POSTExecutors  # noqa: E501
+from openapi_server.models.execution import Execution  # noqa: E501
+from openapi_server.models.post_execution import POSTExecution  # noqa: E501
 from openapi_server.test import BaseTestCase
 
 
-class TestExecutorsController(BaseTestCase):
-    """ExecutorsController integration test stubs"""
+class TestExecutionController(BaseTestCase):
+    """ExecutionController integration test stubs"""
 
-    def test_create_executor(self):
-        """Test case for create_executor
+    def test_create_execution(self):
+        """Test case for create_execution
 
-        Creates an executor
+        Creates an execution
         """
-        post_executors = {
-  "deploymentId" : 1
+        post_execution = {
+  "project_uuid" : "ac9431bd-1a1c-4d6f-a98f-cc97401b5e47",
+  "testartifact_uuid" : "0036bd60-1ac0-44db-9578-0181792e2ac1",
+  "deployment_uuid" : "1f89586a-8fd8-4766-baed-28b615809b14"
 }
         headers = { 
             'Content-Type': 'application/json',
         }
         response = self.client.open(
-            '/RadonCTT/executors',
+            '/RadonCTT/execution',
             method='POST',
             headers=headers,
-            data=json.dumps(post_executors),
+            data=json.dumps(post_execution),
             content_type='application/json')
         self.assert200(response,
                        'Response body is : ' + response.data.decode('utf-8'))
 
-    def test_get_executor_by_id(self):
-        """Test case for get_executor_by_id
+    def test_get_execution_by_uuid(self):
+        """Test case for get_execution_by_uuid
 
-        Retrieve a executor
+        Retrieve an execution
         """
         headers = { 
             'Accept': 'application/json',
         }
         response = self.client.open(
-            '/RadonCTT/executor/{executor_id}'.format(executor_id=56),
+            '/RadonCTT/execution/{execution_uuid}'.format(execution_uuid='execution_uuid_example'),
             method='GET',
             headers=headers)
         self.assert200(response,
                        'Response body is : ' + response.data.decode('utf-8'))
 
-    def test_get_executors(self):
-        """Test case for get_executors
+    def test_get_executions(self):
+        """Test case for get_executions
 
-        Get all executors
+        Get all executions
         """
         headers = { 
             'Accept': 'application/json',
         }
         response = self.client.open(
-            '/RadonCTT/executors',
+            '/RadonCTT/execution',
             method='GET',
             headers=headers)
         self.assert200(response,

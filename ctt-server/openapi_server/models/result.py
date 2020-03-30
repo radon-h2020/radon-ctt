@@ -15,36 +15,26 @@ class Result(Model):
     Do not edit the class manually.
     """
 
-    def __init__(self, id=None, project_id=None, result_path=None, testartifact_id=None):  # noqa: E501
+    def __init__(self, uuid=None, execution_uuid=None):  # noqa: E501
         """Result - a model defined in OpenAPI
 
-        :param id: The id of this Result.  # noqa: E501
-        :type id: int
-        :param project_id: The project_id of this Result.  # noqa: E501
-        :type project_id: int
-        :param result_path: The result_path of this Result.  # noqa: E501
-        :type result_path: str
-        :param testartifact_id: The testartifact_id of this Result.  # noqa: E501
-        :type testartifact_id: int
+        :param uuid: The uuid of this Result.  # noqa: E501
+        :type uuid: str
+        :param execution_uuid: The execution_uuid of this Result.  # noqa: E501
+        :type execution_uuid: str
         """
         self.openapi_types = {
-            'id': int,
-            'project_id': int,
-            'result_path': str,
-            'testartifact_id': int
+            'uuid': str,
+            'execution_uuid': str
         }
 
         self.attribute_map = {
-            'id': 'id',
-            'project_id': 'projectId',
-            'result_path': 'resultPath',
-            'testartifact_id': 'testartifactId'
+            'uuid': 'uuid',
+            'execution_uuid': 'execution_uuid'
         }
 
-        self._id = id
-        self._project_id = project_id
-        self._result_path = result_path
-        self._testartifact_id = testartifact_id
+        self._uuid = uuid
+        self._execution_uuid = execution_uuid
 
     @classmethod
     def from_dict(cls, dikt) -> 'Result':
@@ -58,85 +48,43 @@ class Result(Model):
         return util.deserialize_model(dikt, cls)
 
     @property
-    def id(self):
-        """Gets the id of this Result.
+    def uuid(self):
+        """Gets the uuid of this Result.
 
 
-        :return: The id of this Result.
-        :rtype: int
-        """
-        return self._id
-
-    @id.setter
-    def id(self, id):
-        """Sets the id of this Result.
-
-
-        :param id: The id of this Result.
-        :type id: int
-        """
-
-        self._id = id
-
-    @property
-    def project_id(self):
-        """Gets the project_id of this Result.
-
-
-        :return: The project_id of this Result.
-        :rtype: int
-        """
-        return self._project_id
-
-    @project_id.setter
-    def project_id(self, project_id):
-        """Sets the project_id of this Result.
-
-
-        :param project_id: The project_id of this Result.
-        :type project_id: int
-        """
-
-        self._project_id = project_id
-
-    @property
-    def result_path(self):
-        """Gets the result_path of this Result.
-
-
-        :return: The result_path of this Result.
+        :return: The uuid of this Result.
         :rtype: str
         """
-        return self._result_path
+        return self._uuid
 
-    @result_path.setter
-    def result_path(self, result_path):
-        """Sets the result_path of this Result.
+    @uuid.setter
+    def uuid(self, uuid):
+        """Sets the uuid of this Result.
 
 
-        :param result_path: The result_path of this Result.
-        :type result_path: str
+        :param uuid: The uuid of this Result.
+        :type uuid: str
         """
 
-        self._result_path = result_path
+        self._uuid = uuid
 
     @property
-    def testartifact_id(self):
-        """Gets the testartifact_id of this Result.
+    def execution_uuid(self):
+        """Gets the execution_uuid of this Result.
 
 
-        :return: The testartifact_id of this Result.
-        :rtype: int
+        :return: The execution_uuid of this Result.
+        :rtype: str
         """
-        return self._testartifact_id
+        return self._execution_uuid
 
-    @testartifact_id.setter
-    def testartifact_id(self, testartifact_id):
-        """Sets the testartifact_id of this Result.
+    @execution_uuid.setter
+    def execution_uuid(self, execution_uuid):
+        """Sets the execution_uuid of this Result.
 
 
-        :param testartifact_id: The testartifact_id of this Result.
-        :type testartifact_id: int
+        :param execution_uuid: The execution_uuid of this Result.
+        :type execution_uuid: str
         """
 
-        self._testartifact_id = testartifact_id
+        self._execution_uuid = execution_uuid
