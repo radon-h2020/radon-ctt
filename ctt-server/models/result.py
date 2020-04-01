@@ -6,7 +6,7 @@ from sqlalchemy import Column, String, ForeignKey
 
 from db_orm.database import Base, db_session
 from models.execution import Execution
-from models.model_interface import AbstractModel
+from models.abstract_model import AbstractModel
 from util.configuration import BasePath
 
 
@@ -35,12 +35,16 @@ class Result(Base, AbstractModel):
             raise Exception(f'Linked entities do not exist.')
 
     def __repr__(self):
-        return '<Result UUID=%r, PR_UUID=%r, TA_UUID=%r, DP_UUID=%r, EX_UUID=%r, ST_PATH=%r>' % \
-        (self.uuid, self.execution_uuid, self.storage_path)
+        return '<Result UUID=%r, EX_UUID=%r, ST_PATH=%r>' % \
+               (self.uuid, self.execution_uuid, self.storage_path)
 
     @property
     def fq_storage_path(self):
         return self.fq_storage_path
+
+    @fq_storage_path.setter
+    def fq_storage_path(self, value):
+        self._fq_storage_path = value
 
     @classmethod
     def get_parent_type(cls):
@@ -57,14 +61,13 @@ class Result(Base, AbstractModel):
         return Result.query.all()
 
     @classmethod
-    def get_by_uuid(cls, uuid):
-        return Result.query.filter_by(uuid=uuid).first()
+    def get_by_uuid(cls, get_uuid):
+        return Result.query.filter_by(uuid=get_uuid).first()
 
     @classmethod
-    def delete_by_uuid(cls, uuid):
-        result = Result.query.filter_by(uuid=uuid)
+    def delete_by_uuid(cls, del_uuid):
+        result = Result.query.filter_by(uuid=del_uuid)
         if result:
             result.delete()
             # rmtree(self.fq_storage_path)
             db_session.commit()
-

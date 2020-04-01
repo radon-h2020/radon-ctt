@@ -8,4 +8,5 @@ setuptools >= 21.0.0
 gitpython
 sqlalchemy
 marshmallow
+opera
 
