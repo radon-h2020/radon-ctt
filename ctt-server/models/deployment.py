@@ -33,19 +33,23 @@ class Deployment(Base, AbstractModel):
     def __repr__(self):
         return '<Deployment UUID=%r, TA_UUID=%r>' % (self.uuid, self.testartifact_uuid)
 
-    def deploy_sut(self):
+    def deploy(self):
         test_artifact = TestArtifact.get_by_uuid(self.testartifact_uuid)
         sut_fq_path = os.path.join(test_artifact.fq_storage_path, test_artifact.sut_tosca_path)
-        current_app.logger.info(f'Using test artifact {str(test_artifact)} for deploying the SuT')
-        current_app.logger.debug(f'SuT service template file is {test_artifact.sut_tosca_path} which is a file: {os.path.isfile(test_artifact.sut_tosca_path)}')
+        ti_fq_path = os.path.join(test_artifact.fq_storage_path, test_artifact.ti_tosca_path)
+
+        # Deployment of SuT
         if os.path.isfile(sut_fq_path):
-            current_app.logger.debug(f'Using working_dir {str(test_artifact.fq_storage_path)} to execute Opera')
-            subprocess.call(['pwd'], cwd=test_artifact.fq_storage_path)
+            current_app.logger.debug(f'Deploying SuT {str(test_artifact.sut_tosca_path)} with opera '
+                                     f'in folder {str(test_artifact.fq_storage_path)}.')
             subprocess.call(['opera', 'deploy', test_artifact.sut_tosca_path], cwd=test_artifact.fq_storage_path)
 
-    def deploy_ti(self):
-        pass
-
+        # Deployment of TI
+        if os.path.isfile(ti_fq_path):
+            current_app.logger.debug(f'Deploying TI {str(test_artifact.ti_tosca_path)} with opera '
+                                     f'in folder {str(test_artifact.fq_storage_path)}.')
+            subprocess.call(['opera', 'deploy', test_artifact.ti_tosca_path], cwd=test_artifact.fq_storage_path)
++
     @classmethod
     def get_parent_type(cls):
         return TestArtifact
@@ -55,8 +59,7 @@ class Deployment(Base, AbstractModel):
         linked_testartifact = TestArtifact.get_by_uuid(testartifact_uuid)
 
         deployment = Deployment(linked_testartifact)
-        deployment.deploy_sut()
-        deployment.deploy_ti()
+        deployment.deploy()
 
         # TODO: What to return here? Status of all deployments?
         return deployment
