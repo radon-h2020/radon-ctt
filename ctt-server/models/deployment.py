@@ -1,5 +1,6 @@
 import opera
 import os
+import subprocess
 import uuid
 
 from flask import current_app
@@ -15,6 +16,7 @@ class Deployment(Base, AbstractModel):
 
     uuid: str
     testartifact_uuid: str
+    status: str
 
     uuid = Column(String, primary_key=True)
     testartifact_uuid = Column(String, ForeignKey('testartifact.uuid'), nullable=False)
@@ -22,7 +24,6 @@ class Deployment(Base, AbstractModel):
     def __init__(self, testartifact):
         self.uuid = str(uuid.uuid4())
         self.testartifact_uuid = testartifact.uuid
-
         if testartifact:
             db_session.add(self)
             db_session.commit()
@@ -34,8 +35,13 @@ class Deployment(Base, AbstractModel):
 
     def deploy_sut(self):
         test_artifact = TestArtifact.get_by_uuid(self.testartifact_uuid)
-        if test_artifact and os.path.isfile(test_artifact.sut_tosca_path):
-            pass
+        sut_fq_path = os.path.join(test_artifact.fq_storage_path, test_artifact.sut_tosca_path)
+        current_app.logger.info(f'Using test artifact {str(test_artifact)} for deploying the SuT')
+        current_app.logger.debug(f'SuT service template file is {test_artifact.sut_tosca_path} which is a file: {os.path.isfile(test_artifact.sut_tosca_path)}')
+        if os.path.isfile(sut_fq_path):
+            current_app.logger.debug(f'Using working_dir {str(test_artifact.fq_storage_path)} to execute Opera')
+            subprocess.call(['pwd'], cwd=test_artifact.fq_storage_path)
+            subprocess.call(['opera', 'deploy', test_artifact.sut_tosca_path], cwd=test_artifact.fq_storage_path)
 
     def deploy_ti(self):
         pass
