@@ -1,5 +1,6 @@
 import opera
 import os
+import subprocess
 import uuid
 
 from flask import current_app
@@ -15,6 +16,7 @@ class Deployment(Base, AbstractModel):
 
     uuid: str
     testartifact_uuid: str
+    status: str
 
     uuid = Column(String, primary_key=True)
     testartifact_uuid = Column(String, ForeignKey('testartifact.uuid'), nullable=False)
@@ -22,7 +24,6 @@ class Deployment(Base, AbstractModel):
     def __init__(self, testartifact):
         self.uuid = str(uuid.uuid4())
         self.testartifact_uuid = testartifact.uuid
-
         if testartifact:
             db_session.add(self)
             db_session.commit()
@@ -32,13 +33,22 @@ class Deployment(Base, AbstractModel):
     def __repr__(self):
         return '<Deployment UUID=%r, TA_UUID=%r>' % (self.uuid, self.testartifact_uuid)
 
-    def deploy_sut(self):
+    def deploy(self):
         test_artifact = TestArtifact.get_by_uuid(self.testartifact_uuid)
-        if test_artifact and os.path.isfile(test_artifact.sut_tosca_path):
-            pass
+        sut_fq_path = os.path.join(test_artifact.fq_storage_path, test_artifact.sut_tosca_path)
+        ti_fq_path = os.path.join(test_artifact.fq_storage_path, test_artifact.ti_tosca_path)
 
-    def deploy_ti(self):
-        pass
+        # Deployment of SuT
+        if os.path.isfile(sut_fq_path):
+            current_app.logger.debug(f'Deploying SuT {str(test_artifact.sut_tosca_path)} with opera '
+                                     f'in folder {str(test_artifact.fq_storage_path)}.')
+            subprocess.call(['opera', 'deploy', test_artifact.sut_tosca_path], cwd=test_artifact.fq_storage_path)
+
+        # Deployment of TI
+        if os.path.isfile(ti_fq_path):
+            current_app.logger.debug(f'Deploying TI {str(test_artifact.ti_tosca_path)} with opera '
+                                     f'in folder {str(test_artifact.fq_storage_path)}.')
+            subprocess.call(['opera', 'deploy', test_artifact.ti_tosca_path], cwd=test_artifact.fq_storage_path)
 
     @classmethod
     def get_parent_type(cls):
@@ -49,8 +59,7 @@ class Deployment(Base, AbstractModel):
         linked_testartifact = TestArtifact.get_by_uuid(testartifact_uuid)
 
         deployment = Deployment(linked_testartifact)
-        deployment.deploy_sut()
-        deployment.deploy_ti()
+        deployment.deploy()
 
         # TODO: What to return here? Status of all deployments?
         return deployment

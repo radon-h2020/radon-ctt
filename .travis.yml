@@ -1,14 +1,26 @@
-# ref: https://docs.travis-ci.com/user/languages/python
-language: python
-python:
-  - "3.2"
-  - "3.3"
-  - "3.4"
-  - "3.5"
-  - "3.6"
-  - "3.7"
-  - "3.8"
-# command to install dependencies
-install: "pip install -r requirements.txt"
-# command to run tests
-script: nosetests
+language: minimal
+
+services:
+  - docker
+
+env:
+  global:
+    - DOCKER_ORG=ustctt
+    - DOCKER_REPO=ctt
+    - DOCKER_ORG_REPO="${DOCKER_ORG}/${DOCKER_REPO}"
+
+script:
+  # Build CTT agent base container
+  - docker build -t "${DOCKER_ORG_REPO}" "ctt-server/"
+  #
+  #
+  # DockerHub login
+  - docker login -u "${DOCKER_USERNAME}" -p "${DOCKER_PASSWORD}"
+  #
+  #
+  # Push CTT agent base container to DockerHub
+  - docker push "${DOCKER_ORG_REPO}"
+  #
+  #
+  # DockerHub logout
+  - docker logout
