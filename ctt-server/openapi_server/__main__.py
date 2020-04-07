@@ -18,13 +18,10 @@ def main():
     app.add_api('openapi.yaml',
                 arguments={'title': 'RADON CTT Server API'},
                 pythonic_params=True)
-    app.run(port=8080)
+    app.run(port=18080)
+    db_session.remove()
 
 
 if __name__ == '__main__':
     main()
 
-
-@current_app.teardown_appcontext
-def close_db_session(exception=None):
-    db_session.remove()

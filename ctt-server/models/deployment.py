@@ -1,4 +1,3 @@
-import opera
 import os
 import subprocess
 import uuid
@@ -49,6 +48,9 @@ class Deployment(Base, AbstractModel):
             current_app.logger.debug(f'Deploying TI {str(test_artifact.ti_tosca_path)} with opera '
                                      f'in folder {str(test_artifact.fq_storage_path)}.')
             subprocess.call(['opera', 'deploy', test_artifact.ti_tosca_path], cwd=test_artifact.fq_storage_path)
+
+    def undeploy(self):
+        pass
 
     @classmethod
     def get_parent_type(cls):
