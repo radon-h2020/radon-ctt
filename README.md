@@ -46,3 +46,20 @@ The CTT Server's REST API is defined in the file `radonctt-openapi.yaml`.
       1. Edit the file in the editor
       1. File -> Save as YAML -> `radonctt-openapi.yaml`
 1. For regenerating the CTT server stub, execute `generate_python_flask_stubs.sh` 
+
+## Examples
+
+The following sections describe the use case examples we use as first application scenarios.
+
+In general, the steps in RadonCTT are as follows:
+1. *Create a project* by providing a name and the URL to the repository that is supposed to be tested.
+1. *Create test artifacts* by specifying the paths to the TOSCA artifacts used for the system under test (SUT) and the test infrastructure (TI). This step collects all information necessary for the following deployment and execution steps.
+1. The *create deployment* step first deploys the SUT and TI using the opera orchestrator. When both have been deployed  successfully, the endpoints of the deployed services are known and can be used to execute the actual tests in the following step.
+1. *Create execution* provides the TI with the test configuration including dynamic properties required for a successful execution (e.g., IP address of the SUT) and then triggers the start of the test execution.
+1. Finally, after the test has finished, the results of the test execution can be obtained using the *results* section of the API.
+
+### Weaveworks SockShop
+
+The [SockShop](https://github.com/microservices-demo/microservices-demo) is an open-source microservice example implementation using docker containers and a wide range of configurations for easy deployment (e.g., `docker-compose` and Kubernetes). We [forked the project on GitHub](https://github.com/radon-h2020/demo-ctt-sockshop) and enriched it with artifacts for usage with the RadonCTT tool as a way to showcase the process of using RadonCTT with an existing project.
+
+
