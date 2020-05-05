@@ -1,6 +1,7 @@
 import os
 import subprocess
 import uuid
+import zipfile
 
 from flask import current_app
 from sqlalchemy import Column, String, ForeignKey
@@ -8,6 +9,7 @@ from sqlalchemy import Column, String, ForeignKey
 from db_orm.database import Base, db_session
 from models.testartifact import TestArtifact
 from models.abstract_model import AbstractModel
+from util.configuration import BasePath
 
 
 class Deployment(Base, AbstractModel):
@@ -15,6 +17,7 @@ class Deployment(Base, AbstractModel):
 
     uuid: str
     testartifact_uuid: str
+    storage_path: str
     status: str
 
     uuid = Column(String, primary_key=True)
@@ -23,11 +26,16 @@ class Deployment(Base, AbstractModel):
     def __init__(self, testartifact):
         self.uuid = str(uuid.uuid4())
         self.testartifact_uuid = testartifact.uuid
+        self.storage_path = os.path.join(BasePath, self.__tablename__, self.uuid)
+
         if testartifact:
             db_session.add(self)
             db_session.commit()
         else:
             raise Exception(f'Linked entities do not exist.')
+
+        if not os.path.exists(self.storage_path):
+            os.makedirs(self.storage_path)
 
     def __repr__(self):
         return '<Deployment UUID=%r, TA_UUID=%r>' % (self.uuid, self.testartifact_uuid)
@@ -37,20 +45,60 @@ class Deployment(Base, AbstractModel):
         sut_fq_path = os.path.join(test_artifact.fq_storage_path, test_artifact.sut_tosca_path)
         ti_fq_path = os.path.join(test_artifact.fq_storage_path, test_artifact.ti_tosca_path)
 
+        tosca_meta_file_path = 'TOSCA-Metadata/TOSCA.meta'
+
         # Deployment of SuT
         if os.path.isfile(sut_fq_path):
-            current_app.logger.debug(f'Deploying SuT {str(test_artifact.sut_tosca_path)} with opera '
-                                     f'in folder {str(test_artifact.fq_storage_path)}.')
-            subprocess.call(['opera', 'deploy', test_artifact.sut_tosca_path], cwd=test_artifact.fq_storage_path)
+            os.makedirs(self.sut_storage_path)
+
+            # As soon as opera supports automatic extraction,
+            # we do not need the extraction step anymore
+            zipfile.ZipFile(sut_fq_path).extractall(self.sut_storage_path)
+            entry_definition = Deployment.get_csar_entry_definition(os.path.join(self.sut_storage_path, tosca_meta_file_path))
+            #
+
+            current_app.logger.debug(f'Deploying SuT {str(entry_definition)} with opera '
+                                     f'in folder {str(self.sut_storage_path)}.')
+            subprocess.call(['opera', 'deploy', entry_definition], cwd=self.sut_storage_path)
 
         # Deployment of TI
         if os.path.isfile(ti_fq_path):
-            current_app.logger.debug(f'Deploying TI {str(test_artifact.ti_tosca_path)} with opera '
-                                     f'in folder {str(test_artifact.fq_storage_path)}.')
-            subprocess.call(['opera', 'deploy', test_artifact.ti_tosca_path], cwd=test_artifact.fq_storage_path)
+            os.makedirs(self.ti_storage_path)
+
+            # As soon as opera supports automatic extraction,
+            # we do not need the extraction step anymore
+            zipfile.ZipFile(ti_fq_path).extractall(self.ti_storage_path)
+            entry_definition = Deployment.get_csar_entry_definition(os.path.join(self.ti_storage_path, tosca_meta_file_path))
+            #
+
+            if entry_definition:
+                current_app.logger.debug(f'Deploying TI {str(entry_definition)} with opera '
+                                         f'in folder {str(self.ti_storage_path)}.')
+                subprocess.call(['opera', 'deploy', entry_definition], cwd=self.ti_storage_path)
 
     def undeploy(self):
         pass
+
+    @property
+    def base_storage_path(self):
+        return self.storage_path
+
+    @property
+    def sut_storage_path(self):
+        return os.path.join(self.storage_path, 'system_under_test')
+
+    @property
+    def ti_storage_path(self):
+        return os.path.join(self.storage_path, 'test_infrastructure')
+
+    @classmethod
+    def get_csar_entry_definition(cls, tosca_meta_file='TOSCA-Metadata/TOSCA.meta'):
+        if os.path.isfile(tosca_meta_file):
+            with open(tosca_meta_file) as tosca_meta:
+                for line in tosca_meta:
+                    if line.startswith('Entry-Definitions: '):
+                        return line.strip().split(' ')[1]
+        raise Exception('Entry definition could not be found.')
 
     @classmethod
     def get_parent_type(cls):
