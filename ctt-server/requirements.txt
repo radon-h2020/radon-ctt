@@ -11,5 +11,4 @@ marshmallow
 opera
 pyyaml
 docker
-docker-py
 
