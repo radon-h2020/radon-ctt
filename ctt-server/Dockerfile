@@ -5,7 +5,8 @@ WORKDIR /usr/src/app
 
 COPY requirements.txt /usr/src/app/
 
-RUN apk --update add python py-pip openssl ca-certificates py-openssl wget git docker docker-compose
+RUN apk --update add python py-pip openssl ca-certificates py-openssl wget git
+RUN apk --update add --virtual local-deployment-docker docker docker-compose docker-py
 RUN apk --update add --virtual build-dependencies libffi-dev openssl-dev python-dev py-pip build-base \
   && pip install --upgrade pip \
   && pip install -r requirements.txt \
