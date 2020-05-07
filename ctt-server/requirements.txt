@@ -9,4 +9,5 @@ gitpython
 sqlalchemy
 marshmallow
 opera
+pyyaml
 
