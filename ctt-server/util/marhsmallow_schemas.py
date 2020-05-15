@@ -22,9 +22,11 @@ class DeploymentSchema(Schema):
 
 class ExecutionSchema(Schema):
     uuid = fields.Str()
-    deployment_uuid = fields.Str()
+    agent_configuration_uuid = fields.Str()
+    agent_execution_uuid = fields.Str()
 
 
 class ResultSchema(Schema):
     uuid = fields.Str()
     execution_uuid = fields.Str()
+    results_file = fields.Str()

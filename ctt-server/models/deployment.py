@@ -61,8 +61,8 @@ class Deployment(Base, AbstractModel):
             Deployment.drop_policies(self.sut_storage_path)
             #
 
-            current_app.logger.info(f'Deploying SuT {str(entry_definition)} with opera '
-                                     f'in folder {str(self.sut_storage_path)}.')
+            current_app.logger.\
+                info(f'Deploying SuT {str(entry_definition)} with opera in folder {str(self.sut_storage_path)}.')
             subprocess.call(['opera', 'deploy', entry_definition], cwd=self.sut_storage_path)
 
         # Deployment of TI
@@ -78,9 +78,12 @@ class Deployment(Base, AbstractModel):
             #
 
             if entry_definition:
-                current_app.logger.info(f'Deploying TI {str(entry_definition)} with opera '
-                                         f'in folder {str(self.ti_storage_path)}.')
+                current_app.logger.\
+                    info(f'Deploying TI {str(entry_definition)} with opera in folder {str(self.ti_storage_path)}.')
                 subprocess.call(['opera', 'deploy', entry_definition], cwd=self.ti_storage_path)
+
+        # Temporary solution to support local Docker test deployment
+        subprocess.call(['docker', 'network', 'connect', 'docker-compose_default', 'JMeterAgent'])
 
     def undeploy(self):
         pass

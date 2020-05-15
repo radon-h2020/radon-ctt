@@ -1,5 +1,8 @@
 import connexion
+import os
 import six
+
+from flask import Response, send_file
 
 from openapi_server.models.result import Result  # noqa: E501
 from openapi_server import util
@@ -35,8 +38,12 @@ def download_result_by_uuid(result_uuid):  # noqa: E501
 
     :rtype: file
     """
-    raise Exception('Not Implemented')
-    return 'do some magic!'
+    result = ResultImpl.get_by_uuid(result_uuid)
+    return_file = os.path.join(result.fq_storage_path, result.results_file)
+    if os.path.isfile(return_file):
+        return send_file(return_file, as_attachment=True, attachment_filename="Results.zip")
+    else:
+        return None
 
 
 def get_result_by_uuid(result_uuid):  # noqa: E501

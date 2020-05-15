@@ -450,7 +450,7 @@ components:
       example:
         uuid: ac9431bd-1a1c-4d6f-a98f-cc97401b5e47
         name: SockShop
-        repository_url: https://github.com/UST-CTT/radon-ctt-sockshop-example.git
+        repository_url: 'https://github.com/radon-h2020/demo-ctt-sockshop.git'
       properties:
         uuid:
           readOnly: true
@@ -466,8 +466,8 @@ components:
       example:
         uuid: 0036bd60-1ac0-44db-9578-0181792e2ac1
         project_uuid: ac9431bd-1a1c-4d6f-a98f-cc97401b5e47
-        sut_tosca_path: radon-ctt/sut_tosca.yml
-        ti_tosca_path: radon-ctt/ti_tosca.yml
+        sut_tosca_path: radon-ctt/sut.csar
+        ti_tosca_path: radon-ctt/ti.csar
         commit_hash: 667d69cc5b0527d0c3d0887cd175114e9310d518
       properties:
         uuid:
@@ -525,13 +525,13 @@ components:
     POSTProject:
       example:
         name: SockShop
-        repository_url: https://github.com/UST-CTT/radon-ctt-sockshop-example.git
+        repository_url: 'https://github.com/radon-h2020/demo-ctt-sockshop.git'
       properties:
         name:
           example: SockShop
           type: string
         repository_url:
-          example: https://github.com/UST-CTT/radon-ctt-sockshop-example.git
+          example: 'https://github.com/radon-h2020/demo-ctt-sockshop.git'
           type: string
       required:
       - name
@@ -540,17 +540,17 @@ components:
     POSTTestArtifact:
       example:
         project_uuid: ac9431bd-1a1c-4d6f-a98f-cc97401b5e47
-        sut_tosca_path: radon-ctt/sut_tosca.yml
-        ti_tosca_path: radon-ctt/ti_tosca.yml
+        sut_tosca_path: radon-ctt/sut.csar
+        ti_tosca_path: radon-ctt/ti.csar
       properties:
         project_uuid:
           example: ac9431bd-1a1c-4d6f-a98f-cc97401b5e47
           type: string
         sut_tosca_path:
-          example: radon-ctt/sut_tosca.yml
+          example: radon-ctt/sut.csar
           type: string
         ti_tosca_path:
-          example: radon-ctt/ti_tosca.yml
+          example: radon-ctt/ti.csar
           type: string
       required:
       - project_uuid
