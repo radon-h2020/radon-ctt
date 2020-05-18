@@ -36,6 +36,8 @@ The following video provides a 5-minute demo.
 Starting CTT
 ~~~~~~~~~~~~
 
+(In progress)
+
 The easiest way to start CTT is by invoking the publicly available Docker container: 
 
 ::
