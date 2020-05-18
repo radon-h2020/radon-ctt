@@ -20,6 +20,9 @@ Technical Details
 
 .. include:: technical-details.rst
 
+Getting Started
+---------------
+
 Starting CTT
 ~~~~~~~~~~~~
 
