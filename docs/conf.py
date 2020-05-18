@@ -20,8 +20,8 @@
 # -- Project information -----------------------------------------------------
 
 project = u'CTT'
-copyright = u'2020, Andre van Hoorn and Thomas F. Düllmann'
-author = u'Andre van Hoorn and Thomas F. Düllmann'
+copyright = u'2020, Thomas F. Düllmann and Andre van Hoorn'
+author = u'Thomas F. Düllmann and Andre van Hoorn'
 
 # The short X.Y version
 version = u''
@@ -130,7 +130,7 @@ latex_elements = {
 #  author, documentclass [howto, manual, or own class]).
 latex_documents = [
     (master_doc, 'CTT.tex', u'CTT Documentation',
-     u'Andre van Hoorn and Thomas F. Düllmann', 'manual'),
+     u'Thomas F. Düllmann and Andre van Hoorn', 'manual'),
 ]
 
 
