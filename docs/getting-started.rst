@@ -7,7 +7,7 @@ The easiest way to start CTT is by invoking the publicly available Docker contai
 
 ::
 
-  docker run -t -i --name RadonCTT -p 18080:18080 -v /var/run/docker.sock:/var/run/docker.sock radonconsortium/ctt-server:dev
+  docker run -t -i --name RadonCTT -p 18080:18080 -v /var/run/docker.sock:/var/run/docker.sock radonconsortium/radon-ctt:latest
 
 To check whether the CTT server has started properly, you should be able to access the OpenAPI-based interface via a web browser: http://localhost:18080/RadonCTT/ui/
 
@@ -142,4 +142,4 @@ To inspect the test results, the execution UUID needs to be provided in the next
 
 The response includes a *Results.zip* files with the test results. 
 
-For your convenience, feel free to download a sample `Results.zip <_static/Results.zip>`_ or `browse its contents <_static/Results-JMeterExample/>`_.
+For your convenience, feel free to download a sample `Results.zip <_static/Results.zip>`_. Among other contents, the file includes a `report <_static/Results-JMeterExample/dashboard/index.html>`_.
