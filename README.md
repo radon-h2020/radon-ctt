@@ -1,33 +1,53 @@
 # RADON Continuous Testing Tool (CTT)
 
-## 
+| Items                    | Contents                                                     |
+| ------------------------ | ------------------------------------------------------------ |
+| **Short Description**    | The Continuous Testing Tool (CTT) provides the functionality for defining, generating, executing, and refining continuous tests of application functions, data pipelines and microservices, as well as for reporting test results. While targeting to provide a general framework for continuous quality testing in RADON, a particular focus of CTT is on testing workload-related quality attributes such as performance, elasticity, and resource/cost efficiency. |
+| **Documentation**        | [D2.3 – Architecture & Integration Plan I](http://radon-h2020.eu/wp-content/uploads/2019/11/D2-3_Architecture-and-integration-plan-I.pdf) |
+| **Stand-Alone Tutorial** | https://continuous-testing-tool.readthedocs.io/              |
+| **Video**                | https://youtu.be/35VN2edyvsc                                 |
+| **Source code**          | <ul><li>https://github.com/radon-h2020/radon-ctt<li><li>https://github.com/radon-h2020/radon-ctt-agent</li></ul> |
+| **Licence**              | [Apache License, Version 2.0](https://opensource.org/licenses/Apache-2.0) |
+| **Contact**              | <ul><li>Thomas F. Düllmann ([@duelle](https://github.com/duelle)) </li><li>Andre van Hoorn ([@avanhoorn](https://github.com/avanhoorn)) </li></ul> |
 
-| Items | Contents | 
-| --- | --- |
-| **Description** | The Continuous Testing Tool supports RADON's continuous testing workflow. This repository contains the CTT server.  |
-| **Licence**| Apache License, Version 2.0: https://opensource.org/licenses/Apache-2.0 |
-| **Maintainers**| <ul><li>Thomas F. Düllmann ([@duelle](https://github.com/duelle)) </li><li>Andre van Hoorn ([@avanhoorn](https://github.com/avanhoorn)) </li></ul> |
+
 
 ## System Requirements
 
 This README is currently tailored to Unix-like systems (Linux, MacOS). 
 
-For CTT users, the following software must be installed: 
+For CTT users, there are two modes of operation: 
 
-1. Python3
-1. Python Virtual Environment (`virtualenv`)
+- Docker-based execution (recommended). Therefore, Docker needs to be installed. 
+- Native execution. Therefore, Python3  and the Python Virtual Environment (`virtualenv`) need to be installed. 
 
 For CTT developers, the following additional software must be installed: 
 1. Docker 
 1. Recommended: A Python IDE such as [PyCharm](https://www.jetbrains.com/pycharm/) 
 
-## Starting the CTT Server
+## Using the CTT Server
+
+In general, the steps in RadonCTT are as follows:
+
+1. Start the CTT Server.
+1. *Create a project* by providing a name and the URL to the repository that is supposed to be tested.
+1. *Create test artifacts* by specifying the paths to the TOSCA artifacts used for the system under test (SUT) and the test infrastructure (TI). This step collects all information necessary for the following deployment and execution steps.
+1. The *create deployment* step first deploys the SUT and TI using the opera orchestrator. When both have been deployed  successfully, the endpoints of the deployed services are known and can be used to execute the actual tests in the following step.
+1. *Create execution* provides the TI with the test configuration including dynamic properties required for a successful execution (e.g., IP address of the SUT) and then triggers the start of the test execution.
+1. Finally, after the test has finished, the results of the test execution can be obtained using the *results* section of the API.
+
+### Docker-based Execution (Recommended)
+
+For the Docker-based execution using the latest Docker containers, please follow the steps provided on https://continuous-testing-tool.readthedocs.io/.
+
+### Native execution
 
 Execute the following steps to start start and access the CTT server:
 
 1. Clone this repository (if not done, yet)
 1. Start the CTT server by executing  `./radon_ctt_start.sh`
 1. Access the CTT server's (Swagger-based) UI by visiting the following URL in the Web browser: `http://localhost:8080/RadonCTT/ui/`
+1. Follow the next steps according to  https://continuous-testing-tool.readthedocs.io/.
 
 ## Developing/Extending the CTT Server
 
@@ -46,20 +66,5 @@ The CTT Server's REST API is defined in the file `radonctt-openapi.yaml`.
       1. Edit the file in the editor
       1. File -> Save as YAML -> `radonctt-openapi.yaml`
 1. For regenerating the CTT server stub, execute `generate_python_flask_stubs.sh` 
-
-## Examples
-
-The following sections describe the use case examples we use as first application scenarios.
-
-In general, the steps in RadonCTT are as follows:
-1. *Create a project* by providing a name and the URL to the repository that is supposed to be tested.
-1. *Create test artifacts* by specifying the paths to the TOSCA artifacts used for the system under test (SUT) and the test infrastructure (TI). This step collects all information necessary for the following deployment and execution steps.
-1. The *create deployment* step first deploys the SUT and TI using the opera orchestrator. When both have been deployed  successfully, the endpoints of the deployed services are known and can be used to execute the actual tests in the following step.
-1. *Create execution* provides the TI with the test configuration including dynamic properties required for a successful execution (e.g., IP address of the SUT) and then triggers the start of the test execution.
-1. Finally, after the test has finished, the results of the test execution can be obtained using the *results* section of the API.
-
-### Weaveworks SockShop
-
-The [SockShop](https://github.com/microservices-demo/microservices-demo) is an open-source microservice example implementation using docker containers and a wide range of configurations for easy deployment (e.g., `docker-compose` and Kubernetes). We [forked the project on GitHub](https://github.com/radon-h2020/demo-ctt-sockshop) and enriched it with artifacts for usage with the RadonCTT tool as a way to showcase the process of using RadonCTT with an existing project.
 
 

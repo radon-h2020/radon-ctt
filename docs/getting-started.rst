@@ -1,7 +1,21 @@
+This section exemplifies the usage of CTT with the `SockShop <https://github.com/microservices-demo/microservices-demo>`_ application. The `SockShop <https://github.com/microservices-demo/microservices-demo>`_ is an open-source microservice example implementation using Docker containers and a wide range of configurations for easy deployment (e.g., *docker-compose* and Kubernetes). We `forked the project on GitHub <https://github.com/radon-h2020/demo-ctt-sockshop>`_ and enriched it with artifacts for usage with the CTT tool as a way to showcase the process of using CTT with an existing project.
+
+In general, the steps in CTT (detailed below) are as follows:
+
+1. *Start* the CTT Server. 
+
+2. *Create a project* by providing a name and the URL to the repository that is supposed to be tested.
+
+3. *Create test artifacts* by specifying the paths to the TOSCA artifacts used for the system under test (SUT) and the test infrastructure (TI). This step collects all information necessary for the following deployment and execution steps.
+
+4. The *create deployment* step first deploys the SUT and TI using the opera orchestrator. When both have been deployed successfully, the endpoints of the deployed services are known and can be used to execute the actual tests in the following step.
+
+5. *Create execution* provides the TI with the test configuration including dynamic properties required for successful execution (e.g., IP address of the SUT) and then triggers the start of the test execution.
+
+6. Finally, after the test has finished, the results of the test execution can be obtained using the *results* section of the API.
+
 Starting CTT
 ~~~~~~~~~~~~
-
-(In progress)
 
 The easiest way to start CTT is by invoking the publicly available Docker container:
 
@@ -18,9 +32,9 @@ Creating a Project
 
 The first step is to create a CTT project by providing a project name and a Git repository URL. The repository contains TOSCA service templates.
 
-The following Git repository already includes a ready-to-use example: https://github.com/radon-h2020/demo-ctt-sockshop/
+The following Git repository already includes a ready-to-use example with the Weaveworks SockShop application: https://github.com/radon-h2020/demo-ctt-sockshop/. 
 
-To create a project using the example, execute the following:
+To create a project based on the SockShop example repository, execute the following:
 
 ::
 
@@ -66,13 +80,13 @@ To deploy the test artifacts (SUT and TI) using the xOpera TOSCA orchestrator, t
 
   curl -X POST "http://localhost:18080/RadonCTT/deployment" -H  "accept: */*" -H  "Content-Type: application/json" -d "{\"testartifact_uuid\":\"87a2d052-93ce-43d2-b765-74b0cef9df92\"}"
 
-This step will take a while, depending on the system and type of systems as. You can watch the progress by inspecting the CTT log and watching the Docker processes:
+This step will take a while, depending on the system and type of systems. You can watch the progress by inspecting the CTT log and watching the Docker processes:
 
-:: 
+::
 
   watch docker ps
 
-The response includes the UUID of the deployment. For example, the following output includes the UUID *5f435990-8a1a-4741-a040-6db2fe552603* of the deployment that was just created: 
+The response includes the UUID of the deployment. For example, the following output includes the UUID *5f435990-8a1a-4741-a040-6db2fe552603* of the deployment that was just created:
 
 ::
 
@@ -83,7 +97,7 @@ The response includes the UUID of the deployment. For example, the following out
 
 The deployed SockShop application is now reachable in the web browser via: http://localhost/
 
-The deployed JMeter agent is reachable via *http://localhost:5000/*. However, the REST-based interface is intended to be used by the CTT server and not by end users.
+The deployed JMeter agent is reachable via *http://localhost:5000/*. However, the REST-based interface is intended to be used by the CTT server and not by end-users.
 
 Executing the Test
 ~~~~~~~~~~~~~~~~~~
@@ -140,6 +154,6 @@ To inspect the test results, the execution UUID needs to be provided in the next
 
   curl -X GET "http://localhost:18080/RadonCTT/result/a2c6bc9f-7c1f-4060-b80b-3c66e3487db9/download" -H  "accept: application/json"
 
-The response includes a *Results.zip* files with the test results. 
+The response includes a *Results.zip* file with the test results. 
 
 For your convenience, feel free to download a sample `Results.zip <_static/Results.zip>`_. Among other contents, the file includes a `report <_static/Results-JMeterExample/dashboard/index.html>`_.
