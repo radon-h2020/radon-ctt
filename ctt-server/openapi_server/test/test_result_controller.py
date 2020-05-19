@@ -13,6 +13,31 @@ from openapi_server.test import BaseTestCase
 class TestResultController(BaseTestCase):
     """ResultController integration test stubs"""
 
+    def test_create_result(self):
+        """Test case for create_result
+
+        Creates new result
+        """
+        body = POSTResult()
+        response = self.client.open(
+            '/result',
+            method='POST',
+            data=json.dumps(body),
+            content_type='application/json')
+        self.assert200(response,
+                       'Response body is : ' + response.data.decode('utf-8'))
+
+    def test_delete_result_by_uuid(self):
+        """Test case for delete_result_by_uuid
+
+        Delete a result
+        """
+        response = self.client.open(
+            '/result/{result_uuid}'.format(result_uuid='result_uuid_example'),
+            method='DELETE')
+        self.assert200(response,
+                       'Response body is : ' + response.data.decode('utf-8'))
+
     def test_download_result_by_uuid(self):
         """Test case for download_result_by_uuid
 

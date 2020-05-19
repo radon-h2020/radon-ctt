@@ -1,6 +1,10 @@
 import connexion
+import os
 import six
 
+from flask import Response, send_file
+
+from openapi_server.models.post_result import POSTResult
 from openapi_server.models.result import Result  # noqa: E501
 from openapi_server import util
 
@@ -9,6 +13,22 @@ from util.marhsmallow_schemas import ResultSchema
 
 result_schema = ResultSchema()
 result_schema_many = ResultSchema(many=True)
+
+def create_result(post_result=None):  # noqa: E501
+    """Creates a new result
+
+     # noqa: E501
+
+    :param post_result:
+    :type post_result: dict | bytes
+
+    :rtype: None
+    """
+    if connexion.request.is_json:
+        post_result = POSTResult.from_dict(connexion.request.get_json())  # noqa: E501
+
+    created_result = ResultImpl.create(post_result.execution_uuid)
+    return result_schema.dump(created_result)
 
 
 def delete_result_by_uuid(result_uuid):  # noqa: E501
@@ -35,8 +55,11 @@ def download_result_by_uuid(result_uuid):  # noqa: E501
 
     :rtype: file
     """
-    raise Exception('Not Implemented')
-    return 'do some magic!'
+    result = ResultImpl.get_by_uuid(result_uuid)
+    if os.path.isfile(result.fq_result_storage_path):
+        return send_file(result.fq_result_storage_path, as_attachment=True, attachment_filename="Results.zip")
+    else:
+        return None
 
 
 def get_result_by_uuid(result_uuid):  # noqa: E501

@@ -2,7 +2,7 @@
 
 CURRENT_DIR=$(pwd)
 SH_DIR=$(dirname "$0")
-VENV_DIR=".venv"
+VENV_DIR=".pyenv"
 
 # Go to server folder
 cd $SH_DIR/ctt-server
