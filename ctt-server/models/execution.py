@@ -60,14 +60,15 @@ class Execution(Base, AbstractModel):
     def deployment_workaround(cls):
         sut_ip = 'localhost'
         ti_ip = 'localhost'
-        # if os.path.isfile('/.dockerenv'):
-        #     # Running in docker
-        #     host_address = subprocess.getoutput("ip route show 0/0 | awk '{print $3}'")
-        #     sut_ip = host_address
-        #     ti_ip = host_address
-        # else:
-        #     # Running natively
-        docker_network = 'docker-compose_default'
+
+        docker_network = subprocess.getoutput("docker network ls | grep compose | head -n1 | awk '{print $2}'")
+        if docker_network:
+            current_app.logger.info(f'Automatically determined docker network {docker_network}')
+        else:
+            docker_network = 'dockercompose_default'
+            current_app.logger.info(
+                f'Docker network could not be determined automatically. Falling back to {docker_network}')
+
         sut_docker_name = 'docker-compose_edge-router_1'
 
         if os.path.isfile('/.dockerenv'):
