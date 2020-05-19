@@ -18,8 +18,8 @@ This README is currently tailored to Unix-like systems (Linux, MacOS).
 
 For CTT users, there are two modes of operation: 
 
-- Docker-based execution (recommended). Therefore, Docker needs to be installed. 
-- Native execution. Therefore, Python3  and the Python Virtual Environment (`virtualenv`) need to be installed. 
+- Docker-based execution (recommended). Therefore, Docker needs to be installed (`sudo apt-get install docker.io docker-compose`).
+- Native execution. Therefore, Python3  and the Python Virtual Environment (`virtualenv`) need to be installed (`sudo apt-get install python3 python3-virtualenv`)
 
 For CTT developers, the following additional software must be installed: 
 1. Docker 
