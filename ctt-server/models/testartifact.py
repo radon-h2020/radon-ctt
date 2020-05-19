@@ -46,6 +46,8 @@ class TestArtifact(Base, AbstractModel):
         if os.path.isdir(src_dir) and os.path.isdir(self.fq_storage_path):
             copytree(src_dir, self.fq_storage_path, ignore=ignore_patterns('.git'), dirs_exist_ok=True)
 
+        self.copy_test_config()
+
         db_session.add(self)
         db_session.commit()
 
@@ -53,6 +55,12 @@ class TestArtifact(Base, AbstractModel):
         return '<TestArtifact UUID=%r, COMMIT_HASH=%r, SUT_PATH=%r, TI_PATH=%r, ST_PATH=%r, PR_UUID=%r >' % \
                (self.uuid, self.commit_hash, self.sut_tosca_path,
                 self.ti_tosca_path, self.storage_path, self.project_uuid)
+
+    def copy_test_config(self):
+        test_plan = os.path.join(self.fq_storage_path, 'radon-ctt', 'test_plan.jmx')
+        if os.path.isfile(test_plan):
+            import shutil
+            shutil.copy2(test_plan, '/tmp/test_plan.jmx')
 
     @property
     def fq_storage_path(self):

@@ -82,9 +82,6 @@ class Deployment(Base, AbstractModel):
                     info(f'Deploying TI {str(entry_definition)} with opera in folder {str(self.ti_storage_path)}.')
                 subprocess.call(['opera', 'deploy', entry_definition], cwd=self.ti_storage_path)
 
-        # Temporary solution to support local Docker test deployment
-        subprocess.call(['docker', 'network', 'connect', 'docker-compose_default', 'JMeterAgent'])
-
     def undeploy(self):
         pass
 
