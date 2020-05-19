@@ -140,6 +140,6 @@ To inspect the test results, the execution UUID needs to be provided in the next
 
   curl -X GET "http://localhost:18080/RadonCTT/result/a2c6bc9f-7c1f-4060-b80b-3c66e3487db9/download" -H  "accept: application/json"
 
-The response includes a *Results.zip* files with the test results. The file can be opened in the file manager.
+The response includes a *Results.zip* files with the test results. 
 
-Example: *Results.zip*
+For your convenience, feel free to download a sample `Results.zip <_static/Results.zip>`_ or `browse its contents <_static/Results-JMeterExample/>`_.
