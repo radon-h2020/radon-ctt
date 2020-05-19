@@ -156,4 +156,4 @@ To inspect the test results, the execution UUID needs to be provided in the next
 
 The response includes a *Results.zip* file with the test results. 
 
-For your convenience, feel free to download a sample `Results.zip <_static/Results.zip>`_. Among other contents, the file includes a `report <_static/Results-JMeterExample/dashboard/index.html>`_.
+For your convenience, feel free to download a sample `Results.zip <_static/Results.zip>`_. Among other contents, the file includes an HTML-based report (in the *dashboard/* directory).
