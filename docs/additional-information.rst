@@ -7,10 +7,13 @@ Development and Downloads
 
   - CTT server: https://github.com/radon-h2020/radon-ctt
   - CTT agent: https://github.com/radon-h2020/radon-ctt-agent
+  - CTT particles: https://github.com/radon-h2020/radon-particles
+
+- Issue tracking: https://github.com/radon-h2020/radon-ctt/issues
 
 - Demos
 
-  - SockShop: https://github.com/radon-h2020/demo-ctt-sockshop 
+  - SockShop: https://github.com/radon-h2020/demo-ctt-sockshop
 
 
 References
