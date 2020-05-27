@@ -17,7 +17,9 @@ pipeline {
     stage('Build CTT server image') {
       steps {
         script {
-          dockerImage = docker.build("radonconsortium/radon-ctt", "ctt-server")
+          dir('./ctt-server') {
+            dockerImage = docker.build("radonconsortium/radon-ctt")
+          }
         }
       }
     }
