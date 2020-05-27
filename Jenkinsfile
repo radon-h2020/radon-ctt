@@ -17,7 +17,7 @@ pipeline {
     stage('Build CTT server image') {
       steps {
         script {
-          sh 'ping -O -c 10 google.com'
+          sh 'ping -c 10 google.com'
           dir('./ctt-server') {
             dockerImage = docker.build("radonconsortium/radon-ctt")
           }
