@@ -1,9 +1,8 @@
 #!/usr/bin/env groovy
 
-pipeline {
-  environment {
-  }
+def dockerImage
 
+pipeline {
   agent none
 
   options {
@@ -14,11 +13,22 @@ pipeline {
     cron('H 4 * * *')
   }
 
-  def cttDockerImage
-
   stages {
     stage('Build CTT server image') {
-      cttDockerImage = docker.build("radonconsortium/radon-ctt:latest", "./ctt-server")
+      steps {
+        script {
+          dockerImage = docker.build("radonconsortium/radon-ctt", "./ctt-server")
+        }
+      }
+    }
+    stage('Push CTT server image to DockerHub') {
+      steps {
+        script {
+          docker.withRegistry('https://registry.hub.docker.com', 'dockerhub-credentials') {
+            dockerImage.push("latest")
+          }
+        }
+      }
     }
   }
 }

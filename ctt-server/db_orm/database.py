@@ -10,7 +10,7 @@ from util.configuration import BasePath, DBFile
 if not os.path.exists(BasePath):
     os.makedirs(BasePath)
 
-engine = create_engine('sqlite:///' + os.path.join(BasePath, DBFile))
+engine = create_engine('sqlite:///' + os.path.join(BasePath, DBFile), convert_unicode=True)
 db_session = scoped_session(sessionmaker(autocommit=False,
                                          autoflush=False,
                                          bind=engine))

@@ -3,7 +3,6 @@
 import connexion
 import logging
 
-from flask import current_app
 from openapi_server import encoder
 from db_orm.database import init_db, db_session
 
