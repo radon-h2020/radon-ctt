@@ -68,7 +68,7 @@ class Result(Base, AbstractModel):
 
         # Download results from test infrastructure
         with requests.get(
-                f'http://{linked_execution.test_infrastructure_ip}:5000/jmeter/loadtest/{linked_execution.agent_execution_uuid}', stream=True) as req:
+                f'http://{linked_execution.test_infrastructure_ip}:5000/jmeter/execution/{linked_execution.agent_execution_uuid}', stream=True) as req:
             with open(result.fq_result_storage_path, 'wb') as f:
                 shutil.copyfileobj(req.raw, f)
         if os.path.isfile(result.fq_result_storage_path):

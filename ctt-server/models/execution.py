@@ -112,7 +112,7 @@ class Execution(Base, AbstractModel):
         execution_uuid = None
         if config_uuid:
             data = {'config_uuid': config_uuid}
-            response = requests.post(f'http://{self.ti_ip_address}:5000/jmeter/loadtest', data=data)
+            response = requests.post(f'http://{self.ti_ip_address}:5000/jmeter/execution', data=data)
             json_response = response.json()
             if 'uuid' in json_response:
                 execution_uuid = json_response['uuid']
