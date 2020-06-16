@@ -25,7 +25,7 @@ pipeline {
       steps {
         script {
           withDockerRegistry(credentialsId: 'dockerhub-radonconsortium', url: 'https://registry.hub.docker.com') {
-            dockerImage.push("latest")
+            dockerImage.push("radonconsortium/radon-ctt:latest")
           }
         }
       }
