@@ -18,6 +18,7 @@ pipeline {
           dockerImage = docker.build("radonconsortium/radon-ctt", "./ctt-server")
           withDockerRegistry(credentialsId: 'dockerhub-radonconsortium', url: 'https://registry.hub.docker.com') {
             dockerImage.push("latest")
+          }
         }
       }
     }
