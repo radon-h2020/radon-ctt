@@ -24,7 +24,7 @@ pipeline {
     stage('Push CTT server image to DockerHub') {
       steps {
         script {
-          docker.withRegistry('https://registry.hub.docker.com', 'dockerhub-credentials') {
+          withDockerRegistry(credentialsId: 'dockerhub-radonconsortium', url: 'https://registry.hub.docker.com') {
             dockerImage.push("latest")
           }
         }
