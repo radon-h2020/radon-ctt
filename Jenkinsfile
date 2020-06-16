@@ -15,7 +15,7 @@ pipeline {
     stage('Build and push CTT server image') {
       steps {
         script {
-          dockerImage = docker.build("radonconsortium/radon-ctt", "./ctt-server")
+          dockerImage = docker.build("radonconsortium/radon-ctt:latest", "./ctt-server")
           withDockerRegistry(credentialsId: 'dockerhub-radonconsortium', url: 'https://registry.hub.docker.com') {
             dockerImage.push("latest")
           }
