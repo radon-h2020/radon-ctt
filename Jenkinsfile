@@ -1,9 +1,11 @@
 #!/usr/bin/env groovy
 
-def dockerImage
-
 pipeline {
   agent any
+
+  environment {
+    dockerImage
+  }
 
   options {
     timeout(time: 30, unit: 'MINUTES')
@@ -25,7 +27,7 @@ pipeline {
       steps {
         script {
           withDockerRegistry(credentialsId: 'dockerhub-radonconsortium', url: 'https://registry.hub.docker.com') {
-            dockerImage.push("radonconsortium/radon-ctt:latest")
+            dockerImage.push("latest")
           }
         }
       }
