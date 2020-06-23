@@ -26,7 +26,7 @@ def create_testartifact(post_test_artifact=None):  # noqa: E501
         post_test_artifact = POSTTestArtifact.from_dict(connexion.request.get_json())  # noqa: E501
     created_testartifacts = TestArtifactImpl.create(
         post_test_artifact.project_uuid, post_test_artifact.sut_tosca_path, post_test_artifact.ti_tosca_path)
-    return testartifact_schema.dump(created_testartifacts)
+    return testartifact_schema_many.dump(created_testartifacts)
 
 
 def delete_testartifact_by_uuid(testartifact_uuid):  # noqa: E501
