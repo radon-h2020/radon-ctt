@@ -26,7 +26,6 @@ class TestArtifact(Base, AbstractModel):
     plugin: str
     project_uuid: str
 
-
     uuid = Column(String, primary_key=True)
     commit_hash = Column(String, nullable=False)
     sut_tosca_path = Column(String, nullable=False)
@@ -47,8 +46,7 @@ class TestArtifact(Base, AbstractModel):
         self.ti_tosca_path = ti_tosca_path
         self.storage_path = os.path.join(BasePath, self.__tablename__, self.uuid)
         self.policy = policy
-        self.__plugin = plugin
-        self.__policy_yaml = yaml.full_load(self.policy)
+        self.plugin = plugin
 
         if not os.path.exists(self.fq_storage_path):
             os.makedirs(self.fq_storage_path)
@@ -80,11 +78,11 @@ class TestArtifact(Base, AbstractModel):
 
     @property
     def policy_yaml(self):
-        return self.__policy_yaml
+        return yaml.full_load(self.policy)
 
     @property
-    def plugin(self):
-        return self.__plugin
+    def handler_plugin(self):
+        return self.plugin
 
     @classmethod
     def get_parent_type(cls):
@@ -193,7 +191,6 @@ class TestArtifact(Base, AbstractModel):
             with Csar(ti_file_path) as ti_csar:
                 entry_point = ti_csar.tosca_entry_point
                 return ti_csar.file_ns_name(entry_point)
-
 
     @classmethod
     def get_all(cls):

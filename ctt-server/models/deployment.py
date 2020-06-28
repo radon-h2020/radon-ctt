@@ -1,9 +1,8 @@
-import glob
 import os
+import re
 import subprocess
+import time
 import uuid
-import yaml
-import zipfile
 
 from flask import current_app
 from sqlalchemy import Column, String, ForeignKey
@@ -11,8 +10,13 @@ from sqlalchemy import Column, String, ForeignKey
 from db_orm.database import Base, db_session
 from models.testartifact import TestArtifact
 from models.abstract_model import AbstractModel
-from util.configuration import BasePath, DropPolicies
+from util.configuration import BasePath, DropPolicies, DockerWorkaround
 from util.tosca_helper import Csar
+
+ip_pattern = re.compile('([1][0-9][0-9].|^[2][5][0-5].|^[2][0-4][0-9].|^[1][0-9][0-9].|^[0-9][0-9].|^[0-9].)'
+                        '([1][0-9][0-9].|[2][5][0-5].|[2][0-4][0-9].|[1][0-9][0-9].|[0-9][0-9].|[0-9].)'
+                        '([1][0-9][0-9].|[2][5][0-5].|[2][0-4][0-9].|[1][0-9][0-9].|[0-9][0-9].|[0-9].)'
+                        '([1][0-9][0-9]|[2][5][0-5]|[2][0-4][0-9]|[1][0-9][0-9]|[0-9][0-9]|[0-9])')
 
 
 class Deployment(Base, AbstractModel):
@@ -22,14 +26,21 @@ class Deployment(Base, AbstractModel):
     testartifact_uuid: str
     storage_path: str
     status: str
+    sut_hostname: str
+    ti_hostname: str
 
     uuid = Column(String, primary_key=True)
     testartifact_uuid = Column(String, ForeignKey('testartifact.uuid'), nullable=False)
+    sut_hostname = Column(String)
+    ti_hostname = Column(String)
 
     def __init__(self, testartifact):
         self.uuid = str(uuid.uuid4())
         self.testartifact_uuid = testartifact.uuid
         self.storage_path = os.path.join(BasePath, self.__tablename__, self.uuid)
+        self.__test_artifact = testartifact
+        self.sut_hostname = 'localhost'
+        self.ti_hostname = 'localhost'
 
         if testartifact:
             db_session.add(self)
@@ -42,6 +53,14 @@ class Deployment(Base, AbstractModel):
 
     def __repr__(self):
         return '<Deployment UUID=%r, TA_UUID=%r>' % (self.uuid, self.testartifact_uuid)
+
+    @property
+    def hostname_sut(self):
+        return self.sut_hostname
+
+    @property
+    def hostname_ti(self):
+        return self.ti_hostname
 
     def deploy(self):
         test_artifact = TestArtifact.get_by_uuid(self.testartifact_uuid)
@@ -69,6 +88,50 @@ class Deployment(Base, AbstractModel):
                     info(f'Deploying TI {str(entry_definition)} with opera in folder {str(self.ti_storage_path)}.')
                 subprocess.call(['opera', 'deploy', entry_definition], cwd=self.ti_storage_path)
 
+        if not DockerWorkaround:
+            # FaaS scenario
+            pass
+        else:
+            time.sleep(30)
+            deployed_systems = Deployment.deployment_workaround()
+            self.sut_hostname = deployed_systems['sut']
+            self.ti_hostname = deployed_systems['ti']
+            db_session.add(self)
+            db_session.commit()
+
+    @classmethod
+    def deployment_workaround(cls):
+
+        docker_network = subprocess.getoutput("docker network ls | grep compose | head -n1 | awk '{print $2}'")
+        if docker_network:
+            current_app.logger.info(f'Automatically determined docker network {docker_network}')
+        else:
+            docker_network = 'dockercompose_default'
+            current_app.logger.info(
+                f'Docker network could not be determined automatically. Falling back to {docker_network}')
+
+        sut_docker_name = 'docker-compose_edge-router_1'
+
+        if os.path.isfile('/.dockerenv'):
+            subprocess.call(['docker', 'network', 'connect', docker_network, 'RadonCTT'])
+
+        sut_ip = Deployment.workaround_parse_ip(docker_network, sut_docker_name)
+
+        ti_docker_name = 'JMeterAgent'
+        subprocess.call(['docker', 'network', 'connect', docker_network, ti_docker_name])
+        ti_ip = Deployment.workaround_parse_ip(docker_network, ti_docker_name)
+
+        current_app.logger.info(f'Determined SUT IP-address: {sut_ip}.')
+        current_app.logger.info(f'Determined TI IP-address: {ti_ip}.')
+        return {'sut': sut_ip, 'ti': ti_ip}
+
+    @classmethod
+    def workaround_parse_ip(cls, docker_network, docker_name):
+        ip_address_line = subprocess.getoutput(
+            f'docker network inspect {docker_network} | grep {docker_name} -A 3 | grep "IPv4Address"')
+        ip_address = re.search(ip_pattern, ip_address_line).group()
+        return ip_address
+
     def undeploy(self):
         subprocess.call(['opera', 'undeploy'], cwd=self.sut_storage_path)
         subprocess.call(['opera', 'undeploy'], cwd=self.ti_storage_path)
@@ -84,6 +147,10 @@ class Deployment(Base, AbstractModel):
     @property
     def ti_storage_path(self):
         return os.path.join(self.storage_path, 'test_infrastructure')
+
+    @property
+    def test_artifact(self):
+        return TestArtifact.get_by_uuid(self.testartifact_uuid)
 
     @classmethod
     def get_parent_type(cls):
