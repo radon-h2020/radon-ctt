@@ -10,7 +10,7 @@ from sqlalchemy import Column, String, ForeignKey
 from db_orm.database import Base, db_session
 from models.testartifact import TestArtifact
 from models.abstract_model import AbstractModel
-from util.configuration import BasePath, DropPolicies, DockerWorkaround
+from util.configuration import BasePath, DropPolicies, FaasScenario
 from util.tosca_helper import Csar
 
 ip_pattern = re.compile('([1][0-9][0-9].|^[2][5][0-5].|^[2][0-4][0-9].|^[1][0-9][0-9].|^[0-9][0-9].|^[0-9].)'
@@ -88,20 +88,28 @@ class Deployment(Base, AbstractModel):
                     info(f'Deploying TI {str(entry_definition)} with opera in folder {str(self.ti_storage_path)}.')
                 subprocess.call(['opera', 'deploy', entry_definition], cwd=self.ti_storage_path)
 
-        if not DockerWorkaround:
+        time.sleep(30)
+
+        envFaasScenario = os.getenv('CTT_FAAS_ENABLED')
+        if (envFaasScenario and envFaasScenario == "1") or FaasScenario:
             # FaaS scenario
-            pass
+            deployed_systems = Deployment.deployment_workaround(exclude_sut=True)
+            self.sut_hostname = self.__test_artifact.policy_yaml['properties']['hostname']
+            self.ti_hostname = deployed_systems['ti']
         else:
-            time.sleep(30)
-            deployed_systems = Deployment.deployment_workaround()
+            deployed_systems = Deployment.deployment_workaround(exclude_sut=False)
             self.sut_hostname = deployed_systems['sut']
             self.ti_hostname = deployed_systems['ti']
-            db_session.add(self)
-            db_session.commit()
+
+        db_session.add(self)
+        db_session.commit()
 
     @classmethod
-    def deployment_workaround(cls):
+    def deployment_workaround(cls, exclude_sut):
 
+        result_set = {}
+
+        # Determine Docker network that is used on the current machine
         docker_network = subprocess.getoutput("docker network ls | grep compose | head -n1 | awk '{print $2}'")
         if docker_network:
             current_app.logger.info(f'Automatically determined docker network {docker_network}')
@@ -110,20 +118,22 @@ class Deployment(Base, AbstractModel):
             current_app.logger.info(
                 f'Docker network could not be determined automatically. Falling back to {docker_network}')
 
-        sut_docker_name = 'docker-compose_edge-router_1'
-
         if os.path.isfile('/.dockerenv'):
             subprocess.call(['docker', 'network', 'connect', docker_network, 'RadonCTT'])
 
-        sut_ip = Deployment.workaround_parse_ip(docker_network, sut_docker_name)
+        if not exclude_sut:
+            sut_docker_name = 'docker-compose_edge-router_1'
+            sut_ip = Deployment.workaround_parse_ip(docker_network, sut_docker_name)
+            current_app.logger.info(f'Determined SUT IP-address: {sut_ip}.')
+            result_set['sut'] = sut_ip
 
         ti_docker_name = 'CTTAgent'
         subprocess.call(['docker', 'network', 'connect', docker_network, ti_docker_name])
         ti_ip = Deployment.workaround_parse_ip(docker_network, ti_docker_name)
-
-        current_app.logger.info(f'Determined SUT IP-address: {sut_ip}.')
         current_app.logger.info(f'Determined TI IP-address: {ti_ip}.')
-        return {'sut': sut_ip, 'ti': ti_ip}
+        result_set['ti'] = ti_ip
+
+        return result_set
 
     @classmethod
     def workaround_parse_ip(cls, docker_network, docker_name):
