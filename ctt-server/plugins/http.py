@@ -52,24 +52,24 @@ def configure(ti_hostname, policy_yaml, test_artifact_storage_path, sut_hostname
         test_id = policy_properties['test_id']
 
     expected_status = None
-    if 'expected_status' in policy_properties['expected_status']:
-        expected_body = policy_properties['expected_status']
+    if 'expected_status' in policy_properties:
+        expected_status = policy_properties['expected_status']
 
     use_https = None
-    if 'use_https' in policy_properties['use_https']:
+    if 'use_https' in policy_properties:
         use_https = policy_properties['use_https']
 
     test_body = None
-    if 'test_body' in policy_properties['test_body']:
+    if 'test_body' in policy_properties:
         test_body = policy_properties['test_body']
 
     test_header = None
-    if 'test_header' in policy_properties['test_header']:
+    if 'test_header' in policy_properties:
         test_header = policy_properties['test_header']
 
     if sut_hostname and port and method and path and expected_status and test_id:
 
-        data = {'host': sut_hostname,
+        data = {'hostname': sut_hostname,
                 'port': port,
                 'method': method,
                 'path': path,
@@ -88,8 +88,8 @@ def configure(ti_hostname, policy_yaml, test_artifact_storage_path, sut_hostname
         response = requests.post(f'http://{ti_hostname}:{ti_port}/{plugin_name}/configuration', data=data)
         json_response = response.json()
         config_uuid = None
-        if 'configuration' in json_response and 'uuid' in json_response['configuration']:
-            config_uuid = json_response['configuration']['uuid']
+        if 'uuid' in json_response:
+            config_uuid = json_response['uuid']
             current_app.logger.info(f'Configuration has ID {config_uuid}.')
         return config_uuid
     else:

@@ -117,7 +117,7 @@ class Deployment(Base, AbstractModel):
 
         sut_ip = Deployment.workaround_parse_ip(docker_network, sut_docker_name)
 
-        ti_docker_name = 'JMeterAgent'
+        ti_docker_name = 'CTTAgent'
         subprocess.call(['docker', 'network', 'connect', docker_network, ti_docker_name])
         ti_ip = Deployment.workaround_parse_ip(docker_network, ti_docker_name)
 
