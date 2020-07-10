@@ -91,7 +91,14 @@ class Deployment(Base, AbstractModel):
         time.sleep(30)
 
         envFaasScenario = os.getenv('CTT_FAAS_ENABLED')
-        if (envFaasScenario and envFaasScenario == "1") or FaasScenario:
+        faas_mode = False
+        if envFaasScenario:
+            if envFaasScenario == "1":
+                faas_mode = True
+        elif FaasScenario:
+            faas_mode = True
+
+        if faas_mode:
             # FaaS scenario
             deployed_systems = Deployment.deployment_workaround(exclude_sut=True)
             self.sut_hostname = self.__test_artifact.policy_yaml['properties']['hostname']
