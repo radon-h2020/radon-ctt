@@ -6,7 +6,7 @@
 | **Documentation**        | [D3.4 – Continuous Testing Tool I](https://radon-h2020.eu/public-deliverables/) |
 | **Stand-Alone Tutorial** | https://continuous-testing-tool.readthedocs.io/              |
 | **Video**                | https://youtu.be/35VN2edyvsc                                 |
-| **Source code**          | <ul><li>https://github.com/radon-h2020/radon-ctt (CTT Server)</li><li>https://github.com/radon-h2020/radon-ctt-agent (CTT Agent)</li><li>https://github.com/radon-h2020/radon-particles (Includes CTT-related types)</li></ul> |
+| **Source code**          | <ul><li>https://github.com/radon-h2020/radon-ctt (CTT Server)</li><li>https://github.com/radon-h2020/radon-ctt-agent (CTT Agent)</li><li>https://github.com/radon-h2020/radon-ctt-agent-plugins (CTT Agent Plugins)</li><li>https://github.com/radon-h2020/radon-particles (Includes CTT-related types)</li><li>https://github.com/radon-h2020/demo-ctt-sockshop (CTT SockShop Demo)</li><li>https://github.com/radon-h2020/demo-ctt-imageresize (CTT Thumbnail Demo)</li></ul> |
 | **Licence**              | [Apache License, Version 2.0](https://opensource.org/licenses/Apache-2.0) |
 | **Contact**              | <ul><li>Thomas F. Düllmann ([@duelle](https://github.com/duelle)) </li><li>Andre van Hoorn ([@avanhoorn](https://github.com/avanhoorn)) </li></ul> |
 
