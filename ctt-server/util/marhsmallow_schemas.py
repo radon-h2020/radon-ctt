@@ -9,9 +9,9 @@ class ProjectSchema(Schema):
 
 class TestArtifactSchema(Schema):
     uuid = fields.Str()
-    commit_hash = fields.Str()
-    sut_tosca_path = fields.Str()
-    ti_tosca_path = fields.Str()
+    # commit_hash = fields.Str()
+    # sut_tosca_path = fields.Str()
+    # ti_tosca_path = fields.Str()
     project_uuid = fields.Str()
 
 

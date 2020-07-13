@@ -1,10 +1,14 @@
 import uuid
 import os
+import yaml
 
+from flask import current_app
 from sqlalchemy import Column, String, ForeignKey
 from shutil import copytree, ignore_patterns, rmtree
+from straight.plugin.loaders import ModuleLoader
 
 from util.configuration import BasePath
+from util.tosca_helper import Csar
 from db_orm.database import Base, db_session
 from models.project import Project
 from models.abstract_model import AbstractModel
@@ -18,6 +22,8 @@ class TestArtifact(Base, AbstractModel):
     sut_tosca_path: str
     ti_tosca_path: str
     storage_path: str
+    policy: str
+    plugin: str
     project_uuid: str
 
     uuid = Column(String, primary_key=True)
@@ -25,16 +31,22 @@ class TestArtifact(Base, AbstractModel):
     sut_tosca_path = Column(String, nullable=False)
     ti_tosca_path = Column(String, nullable=False)
     storage_path = Column(String, nullable=False)
+    policy = Column(String, nullable=False)
+    plugin = Column(String, nullable=False)
     project_uuid = Column(String, ForeignKey('project.uuid'), nullable=False)
 
     parentType = Project
 
-    def __init__(self, project, sut_tosca_path, ti_tosca_path):
+    plugin_list = None
+
+    def __init__(self, project, sut_tosca_path, ti_tosca_path, policy, plugin):
         self.uuid = str(uuid.uuid4())
         self.project_uuid = project.uuid
         self.sut_tosca_path = sut_tosca_path
         self.ti_tosca_path = ti_tosca_path
         self.storage_path = os.path.join(BasePath, self.__tablename__, self.uuid)
+        self.policy = policy
+        self.plugin = plugin
 
         if not os.path.exists(self.fq_storage_path):
             os.makedirs(self.fq_storage_path)
@@ -45,8 +57,6 @@ class TestArtifact(Base, AbstractModel):
         src_dir = project.fq_storage_path
         if os.path.isdir(src_dir) and os.path.isdir(self.fq_storage_path):
             copytree(src_dir, self.fq_storage_path, ignore=ignore_patterns('.git'), dirs_exist_ok=True)
-
-        self.copy_test_config()
 
         db_session.add(self)
         db_session.commit()
@@ -66,6 +76,14 @@ class TestArtifact(Base, AbstractModel):
     def fq_storage_path(self):
         return os.path.join(BasePath, self.storage_path)
 
+    @property
+    def policy_yaml(self):
+        return yaml.full_load(self.policy)
+
+    @property
+    def handler_plugin(self):
+        return self.plugin
+
     @classmethod
     def get_parent_type(cls):
         return Project
@@ -73,7 +91,106 @@ class TestArtifact(Base, AbstractModel):
     @classmethod
     def create(cls, project_uuid, sut_tosca_path, ti_tosca_path):
         linked_project = Project.get_by_uuid(project_uuid)
-        return TestArtifact(linked_project, sut_tosca_path, ti_tosca_path)
+
+        sut_file_path = os.path.join(linked_project.fq_storage_path, sut_tosca_path)
+        ti_file_path = os.path.join(linked_project.fq_storage_path, ti_tosca_path)
+
+        test_artifact_list = []
+        sut_policy_list = TestArtifact.parse_policies(sut_file_path)
+        ti_blueprint = TestArtifact.parse_ti_metadata(ti_file_path)
+        plugin_list = ModuleLoader().load('plugins')
+
+        # Collect all available plugins
+        plugins_available = []
+        for plugin in plugin_list:
+            plugins_available.append(plugin.plugin_type)
+            current_app.logger.info(f'Plugin \'{plugin.plugin_type}\' found.')
+
+        # Check which policies match the available plugins and which TI blueprint is present
+        for policy in sut_policy_list:
+            current_policy = sut_policy_list[policy]
+            if current_policy['type'] in plugins_available:
+                if current_policy['properties']['ti_blueprint'] == ti_blueprint:
+
+                    # Policy matches existing TI blueprint, so test artifact will be created.
+                    test_artifact_list.append(TestArtifact(linked_project, sut_tosca_path, ti_tosca_path,
+                                                           yaml.dump(current_policy), current_policy['type']))
+                    current_app.logger.info(f'Created test artifact for {ti_blueprint}.')
+                else:
+                    # No matching TI blueprint, so nothing to be done with this policy.
+                    current_app.logger.info(f"The policy-defined TI blueprint "
+                                            f"({current_policy['properties']['ti_blueprint']}) "
+                                            f"does not match the TI model ({ti_blueprint}).")
+            else:
+                current_app.logger.info(f"Could not find matching plugin for {sut_policy_list[policy]['type']}.")
+
+        return test_artifact_list
+
+    @classmethod
+    def parse_policies(cls, sut_file_path=None):
+        if sut_file_path:
+            with Csar(sut_file_path) as sut_csar:
+                entry_point = sut_csar.tosca_entry_point
+                sut_tosca = sut_csar.file_as_dict(entry_point)
+                try:
+                    return sut_tosca['topology_template']['policies']
+                except LookupError as e:
+                    current_app.logger.debug(f'Policies could not be found in {sut_file_path}.')
+
+        else:
+            return [
+                {
+                    'SimplePingTest': {
+                        'type': 'radon.policies.testing.PingTest',
+                        'properties': {
+                            'hostname': 'localhost',
+                            'ti_blueprint': 'radon.blueprints.DeploymentTestAgent',
+                            'test_id': 'pingtest_123',
+                        },
+                        'targets': ['SockShop'],
+                    }
+                },
+                {
+                    'SimpleEndpointTest': {
+                        'type': 'radon.policies.testing.HttpEndpointTest',
+                        'properties': {
+                            'path': "/cart/",
+                            'hostname': 'localhost',
+                            'method': "GET",
+                            'port': 80,
+                            'expected_status': 200,
+                            'expected_body': None,
+                            'ti_blueprint': None,
+                            'use_https': False,
+                            'test_body': None,
+                            'test_header': None,
+                            'test_id': None,
+                        },
+                        'targets': ['SockShop'],
+                    }
+                },
+                {
+                    'SimpleJMeterLoadTest': {
+                        'type': 'radon.policies.testing.JMeterLoadTest',
+                        'properties': {
+                            'jmx_file': 'sockshop.jmx',
+                            'hostname': 'localhost',
+                            'port': 8080,
+                            'ti_blueprint': 'radon.blueprints.testing.JMeterMasterOnly',
+                            'user.properties': None,
+                            'test_id': 'loadtest213',
+                        },
+                        'targets': ['SockShop'],
+                    }
+                }
+            ]
+
+    @classmethod
+    def parse_ti_metadata(cls, ti_file_path):
+        if ti_file_path:
+            with Csar(ti_file_path) as ti_csar:
+                entry_point = ti_csar.tosca_entry_point
+                return ti_csar.file_ns_name(entry_point)
 
     @classmethod
     def get_all(cls):

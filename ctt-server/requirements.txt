@@ -15,4 +15,5 @@ six
 # Only needed for local execution
 docker
 opera
+straight.plugin
 

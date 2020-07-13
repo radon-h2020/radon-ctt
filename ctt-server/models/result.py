@@ -32,14 +32,17 @@ class Result(Base, AbstractModel):
         self.execution_uuid = execution.uuid
         self.storage_path = os.path.join(self.__tablename__, self.uuid)
 
-        if execution:
+        if execution and os.path.isfile(execution.fq_result_storage_path):
+
+            if not os.path.exists(self.fq_storage_path):
+                os.makedirs(self.fq_storage_path)
+
+            # Potentially post-process the results before storing them.
+            shutil.copy2(execution.fq_result_storage_path, self.fq_result_storage_path)
             db_session.add(self)
             db_session.commit()
         else:
             raise Exception(f'Linked entities do not exist.')
-
-        if not os.path.exists(self.fq_storage_path):
-            os.makedirs(self.fq_storage_path)
 
     def __repr__(self):
         return '<Result UUID=%r, EX_UUID=%r, ST_PATH=%r>' % \
@@ -64,19 +67,7 @@ class Result(Base, AbstractModel):
     @classmethod
     def create(cls, execution_uuid):
         linked_execution = Execution.get_by_uuid(execution_uuid)
-        result = Result(linked_execution)
-
-        # Download results from test infrastructure
-        with requests.get(
-                f'http://{linked_execution.test_infrastructure_ip}:5000/jmeter/execution/{linked_execution.agent_execution_uuid}', stream=True) as req:
-            with open(result.fq_result_storage_path, 'wb') as f:
-                shutil.copyfileobj(req.raw, f)
-        if os.path.isfile(result.fq_result_storage_path):
-            result.results_file = result.fq_storage_path
-            db_session.add(result)
-            db_session.commit()
-
-        return result
+        return Result(linked_execution)
 
     @classmethod
     def get_all(cls):

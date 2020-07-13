@@ -38,7 +38,7 @@ class Project(Base, AbstractModel):
             makedirs(self.fq_storage_path)
             current_app.logger.info(f"Created directory path {self.fq_storage_path}")
 
-        current_app.logger.info(f"Cloning repository {self.repository_url} into {self.fq_storage_path}")
+        current_app.logger.info(f'Cloning repository {self.repository_url} into {self.fq_storage_path}')
         git.Git(self.fq_storage_path).clone(self.repository_url, self.fq_storage_path)
 
         db_session.add(self)

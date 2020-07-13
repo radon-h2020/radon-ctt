@@ -23,6 +23,13 @@ The easiest way to start CTT is by invoking the publicly available Docker contai
 
   docker run -t -i --name RadonCTT -p 18080:18080 -v /var/run/docker.sock:/var/run/docker.sock radonconsortium/radon-ctt:latest
 
+In order to be able to deploy to AWS (e.g., use the ImageResize example), you need to enable this feature and pass your AWS credentials like shown below:
+
+::
+
+  docker run --rm -t -i -e CTT_FAAS_ENABLED="1" -e AWS_ACCESS_KEY_ID="<YOUR_AWS_ACCESS_KEY_ID>" -e AWS_SECRET_ACCESS_KEY="<YOUR_AWS_SECRET_ACCESS_KEY>" --name RadonCTT -p 18080:18080 -v /var/run/docker.sock:/var/run/docker.sock radonconsortium/radon-ctt:latest
+
+
 To check whether the CTT server has started properly, you should be able to access the OpenAPI-based interface via a web browser: http://localhost:18080/RadonCTT/ui/
 
 However, for the remaining step, we will interact with the CTT server via `Curl <https://curl.haxx.se/>`_.
@@ -49,6 +56,15 @@ The response includes a UUID for the project that is required for the further in
     "repository_url": "https://github.com/radon-h2020/demo-ctt-sockshop.git",
     "uuid": "d3cb9d75-73df-422e-9575-76e7a5775f8e"
   }
+
+
+Similarly, you can use the ImageResize example repository which uses AWS to deploy a example FaaS application including two S3 buckets and one Lambda function:
+
+::
+
+    curl -X POST "http://localhost:18080/RadonCTT/project" -H  "accept: */*" -H  "Content-Type: application/json" -d "{\"name\":\"ImageResize\",\"repository_url\":\"https://github.com/radon-h2020/demo-ctt-imageresize.git\"}"
+
+
 
 Generating Artifacts
 ~~~~~~~~~~~~~~~~~~~~
