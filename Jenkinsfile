@@ -15,9 +15,13 @@ pipeline {
     stage('Build and push CTT server image') {
       steps {
         script {
-          dockerImage = docker.build("radonconsortium/radon-ctt:latest", "./ctt-server")
+          dockerTag = env.BRANCH_NAME
+          if (env.BRANCH_NAME == 'master') {
+            dockerTag = 'latest'
+          }
+          dockerImage = docker.build("radonconsortium/radon-ctt:${dockerTag}", "./ctt-server")
           withDockerRegistry(credentialsId: 'dockerhub-radonconsortium') {
-            dockerImage.push("latest")
+            dockerImage.push(dockerTag)
           }
         }
       }
