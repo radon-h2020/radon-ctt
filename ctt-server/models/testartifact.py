@@ -1,5 +1,6 @@
 import uuid
 import os
+import requests
 import yaml
 
 from flask import current_app
@@ -89,11 +90,43 @@ class TestArtifact(Base, AbstractModel):
         return Project
 
     @classmethod
-    def create(cls, project_uuid, sut_tosca_path, ti_tosca_path):
+    def create(cls, project_uuid, sut_tosca_location, ti_tosca_location):
         linked_project = Project.get_by_uuid(project_uuid)
 
-        sut_file_path = os.path.join(linked_project.fq_storage_path, sut_tosca_path)
-        ti_file_path = os.path.join(linked_project.fq_storage_path, ti_tosca_path)
+        # Read property
+        csar_as_url_env = os.getenv('CSAR_URL')
+
+        # If present and set to "1"
+        if csar_as_url_env and csar_as_url_env == "1":
+            csar_as_url = True
+            current_app.logger.info('CSAR as URL mode enabled.')
+        else:
+            csar_as_url = False
+            current_app.logger.info('CSAR as URL mode disabled.')
+
+        if csar_as_url:
+            # Define default paths
+            artifact_dir = os.path.join(linked_project.fq_storage_path, 'radon-ctt')
+            sut_file_path = os.path.join(artifact_dir, 'sut.csar')
+            ti_file_path = os.path.join(artifact_dir, 'ti.csar')
+
+            # Create directory if it does not exist
+            os.makedirs(artifact_dir, exist_ok=True)
+
+            if TestArtifact.url_exists(sut_tosca_location):
+                sut_file = requests.get(sut_tosca_location, allow_redirects=True)
+                with open(sut_file_path, 'wb') as sut_csar_dl:
+                    sut_csar_dl.write(sut_file.content)
+                current_app.logger.info(f'Obtained SUT CSAR from "${sut_tosca_location}"')
+
+            if TestArtifact.url_exists(ti_tosca_location):
+                ti_file = requests.get(ti_tosca_location, allow_redirects=True)
+                with open(ti_file_path, 'wb') as ti_csar_dl:
+                    ti_csar_dl.write(ti_file.content)
+                current_app.logger.info(f'Obtained TI CSAR from "${ti_tosca_location}"')
+        else:
+            sut_file_path = os.path.join(linked_project.fq_storage_path, sut_tosca_location)
+            ti_file_path = os.path.join(linked_project.fq_storage_path, ti_tosca_location)
 
         test_artifact_list = []
         sut_policy_list = TestArtifact.parse_policies(sut_file_path)
@@ -112,8 +145,11 @@ class TestArtifact(Base, AbstractModel):
             if current_policy['type'] in plugins_available:
                 if current_policy['properties']['ti_blueprint'] == ti_blueprint:
 
+                    sut_file_path_relative = os.path.relpath(sut_file_path, start=linked_project.fq_storage_path)
+                    ti_file_path_relative = os.path.relpath(ti_file_path, start=linked_project.fq_storage_path)
+
                     # Policy matches existing TI blueprint, so test artifact will be created.
-                    test_artifact_list.append(TestArtifact(linked_project, sut_tosca_path, ti_tosca_path,
+                    test_artifact_list.append(TestArtifact(linked_project, sut_file_path_relative, ti_file_path_relative,
                                                            yaml.dump(current_policy), current_policy['type']))
                     current_app.logger.info(f'Created test artifact for {ti_blueprint}.')
                 else:
@@ -212,3 +248,8 @@ class TestArtifact(Base, AbstractModel):
             testartifact.delete()
             rmtree(folder_to_delete)
             db_session.commit()
+
+    @classmethod
+    def url_exists(cls, path):
+        r = requests.head(path)
+        return r.status_code == requests.codes.ok
