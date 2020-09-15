@@ -128,7 +128,7 @@ The test is now executing. You can watch the progress in the CTT server log and 
 
 :: 
 
-  docker logs -f JMeterAgent
+  docker logs -f CTTAgent
 
 After the test has finished, the response includes the UUID of the text execution. For example, the following output includes the UUID *beead8ea-8e3e-42ec-ad1c-7e2b3e5b4492* of the most recent execution: 
 
@@ -168,8 +168,8 @@ To inspect the test results, the execution UUID needs to be provided in the next
 
 ::
 
-  curl -X GET "http://localhost:18080/RadonCTT/result/a2c6bc9f-7c1f-4060-b80b-3c66e3487db9/download" -H  "accept: application/json"
+  curl -X GET "http://localhost:18080/RadonCTT/result/a2c6bc9f-7c1f-4060-b80b-3c66e3487db9/download" -H  "accept: application/json" --output /tmp/Results.zip
 
-The response includes a *Results.zip* file with the test results. 
+The response includes a *Results.zip* file with the test results which is stored in `/tmp/Results.zip` after executing the command above.
 
 For your convenience, feel free to download a sample `Results.zip <_static/Results.zip>`_. Among other contents, the file includes an HTML-based report (in the *dashboard/* directory).
