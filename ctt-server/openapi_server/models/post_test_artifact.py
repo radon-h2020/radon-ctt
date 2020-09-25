@@ -15,7 +15,7 @@ class POSTTestArtifact(Model):
     Do not edit the class manually.
     """
 
-    def __init__(self, project_uuid=None, sut_tosca_path=None, ti_tosca_path=None):  # noqa: E501
+    def __init__(self, project_uuid=None, sut_tosca_path=None, ti_tosca_path=None, inputs_file=None):  # noqa: E501
         """POSTTestArtifact - a model defined in OpenAPI
 
         :param project_uuid: The project_uuid of this POSTTestArtifact.  # noqa: E501
@@ -28,18 +28,21 @@ class POSTTestArtifact(Model):
         self.openapi_types = {
             'project_uuid': str,
             'sut_tosca_path': str,
-            'ti_tosca_path': str
+            'ti_tosca_path': str,
+            'inputs_file': str
         }
 
         self.attribute_map = {
             'project_uuid': 'project_uuid',
             'sut_tosca_path': 'sut_tosca_path',
-            'ti_tosca_path': 'ti_tosca_path'
+            'ti_tosca_path': 'ti_tosca_path',
+            'inputs_file': 'inputs_file'
         }
 
         self._project_uuid = project_uuid
         self._sut_tosca_path = sut_tosca_path
         self._ti_tosca_path = ti_tosca_path
+        self._inputs_file = inputs_file
 
     @classmethod
     def from_dict(cls, dikt) -> 'POSTTestArtifact':
@@ -120,3 +123,26 @@ class POSTTestArtifact(Model):
             raise ValueError("Invalid value for `ti_tosca_path`, must not be `None`")  # noqa: E501
 
         self._ti_tosca_path = ti_tosca_path
+
+    @property
+    def inputs_file(self):
+        """Gets the input_file of this POSTTestArtifact.
+
+
+        :return: The input_file of this POSTTestArtifact.
+        :rtype: str
+        """
+        return self._inputs_file
+
+    @inputs_file.setter
+    def inputs_file(self, inputs_file):
+        """Sets the ti_tosca_path of this POSTTestArtifact.
+
+
+        :param ti_tosca_path: The ti_tosca_path of this POSTTestArtifact.
+        :type ti_tosca_path: str
+        """
+        if inputs_file is None:
+            raise ValueError("Invalid value for `input_file`, must not be `None`")  # noqa: E501
+
+        self._inputs_file = inputs_file

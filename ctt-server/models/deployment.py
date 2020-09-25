@@ -1,3 +1,4 @@
+import json
 import os
 import re
 import subprocess
@@ -67,6 +68,10 @@ class Deployment(Base, AbstractModel):
         sut_csar_path = os.path.join(test_artifact.fq_storage_path, test_artifact.sut_tosca_path)
         ti_csar_path = os.path.join(test_artifact.fq_storage_path, test_artifact.ti_tosca_path)
 
+        inputs_param = ''
+        if test_artifact.inputs_path is not None:
+            inputs_param = ' --inputs ' + str(os.path.join(test_artifact.fq_storage_path, test_artifact.inputs_path))
+
         # Deployment of SuT
         with Csar(sut_csar_path, extract_dir=self.sut_storage_path, keep=True) as sut_csar:
             if DropPolicies:
@@ -75,7 +80,10 @@ class Deployment(Base, AbstractModel):
 
             current_app.logger.\
                 info(f'Deploying SuT {str(entry_definition)} with opera in folder {str(self.sut_storage_path)}.')
-            subprocess.call(['opera', 'deploy', entry_definition], cwd=self.sut_storage_path)
+            # subprocess.call(['opera', 'init', '-p', self.sut_storage_path, sut_csar_path], cwd=self.sut_storage_path)
+            subprocess.call(['opera', 'deploy', '-p', self.sut_storage_path, inputs_param], cwd=self.sut_storage_path)
+            opera_outputs = subprocess.check_output(['opera', 'outputs'])
+            current_app.logger.info(f'Opera returned output {opera_outputs}.')
 
         # Deployment of TI
         with Csar(ti_csar_path, extract_dir=self.ti_storage_path, keep=True) as ti_csar:
@@ -86,7 +94,12 @@ class Deployment(Base, AbstractModel):
             if entry_definition:
                 current_app.logger.\
                     info(f'Deploying TI {str(entry_definition)} with opera in folder {str(self.ti_storage_path)}.')
-                subprocess.call(['opera', 'deploy', entry_definition], cwd=self.ti_storage_path)
+
+                # subprocess.call(['opera', 'init', '-p', self.ti_storage_path, ti_csar_path], cwd=self.ti_storage_path)
+                subprocess.call(['opera', 'deploy', '-p', self.ti_storage_path, inputs_param], cwd=self.ti_storage_path)
+                opera_outputs = subprocess.check_output(['opera', 'outputs'])
+                current_app.logger.info(f'Opera returned output {opera_outputs}.')
+                opera_json_outputs = json.loads(opera_outputs)
 
         time.sleep(30)
 
@@ -100,9 +113,10 @@ class Deployment(Base, AbstractModel):
 
         if faas_mode:
             # FaaS scenario
-            deployed_systems = Deployment.deployment_workaround(exclude_sut=True)
+            # deployed_systems = Deployment.deployment_workaround(exclude_sut=True)
             self.sut_hostname = self.__test_artifact.policy_yaml['properties']['hostname']
-            self.ti_hostname = deployed_systems['ti']
+            self.ti_hostname = opera_json_outputs['public_address']
+            # self.ti_hostname = deployed_systems['ti']
         else:
             deployed_systems = Deployment.deployment_workaround(exclude_sut=False)
             self.sut_hostname = deployed_systems['sut']
@@ -150,8 +164,8 @@ class Deployment(Base, AbstractModel):
         return ip_address
 
     def undeploy(self):
-        subprocess.call(['opera', 'undeploy'], cwd=self.sut_storage_path)
-        subprocess.call(['opera', 'undeploy'], cwd=self.ti_storage_path)
+        subprocess.call(['opera', 'undeploy', '-p', self.ti_storage_path], cwd=self.sut_storage_path)
+        subprocess.call(['opera', 'undeploy', '-p', self.ti_storage_path], cwd=self.ti_storage_path)
 
     @property
     def base_storage_path(self):

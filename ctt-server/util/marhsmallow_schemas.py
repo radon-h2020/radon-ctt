@@ -12,6 +12,7 @@ class TestArtifactSchema(Schema):
     # commit_hash = fields.Str()
     # sut_tosca_path = fields.Str()
     # ti_tosca_path = fields.Str()
+    # inputs_file = fields.Str()
     project_uuid = fields.Str()
 
 

@@ -573,6 +573,8 @@ components:
         ti_tosca_path:
           example: radon-ctt/ti.csar
           type: string
+        inputs_file:
+          example: radon-ctt/inputs.yaml
       required:
         - project_uuid
         - sut_tosca_path
