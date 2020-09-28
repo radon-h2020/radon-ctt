@@ -7,6 +7,7 @@ import uuid
 
 from flask import current_app
 from sqlalchemy import Column, String, ForeignKey
+from opera.error import OperationError
 
 from db_orm.database import Base, db_session
 from models.testartifact import TestArtifact
@@ -68,9 +69,15 @@ class Deployment(Base, AbstractModel):
         sut_csar_path = os.path.join(test_artifact.fq_storage_path, test_artifact.sut_tosca_path)
         ti_csar_path = os.path.join(test_artifact.fq_storage_path, test_artifact.ti_tosca_path)
 
-        inputs_param = ''
-        if test_artifact.inputs_path is not None:
-            inputs_param = ' --inputs ' + str(os.path.join(test_artifact.fq_storage_path, test_artifact.inputs_path))
+        if test_artifact.sut_inputs_path:
+            sut_inputs_path = os.path.join(test_artifact.fq_storage_path, test_artifact.sut_inputs_path)
+        else:
+            sut_inputs_path = None
+
+        if test_artifact.ti_inputs_path:
+            ti_inputs_path = os.path.join(test_artifact.fq_storage_path, test_artifact.ti_inputs_path)
+        else:
+            ti_inputs_path = None
 
         # Deployment of SuT
         with Csar(sut_csar_path, extract_dir=self.sut_storage_path, keep=True) as sut_csar:
@@ -81,9 +88,15 @@ class Deployment(Base, AbstractModel):
             current_app.logger.\
                 info(f'Deploying SuT {str(entry_definition)} with opera in folder {str(self.sut_storage_path)}.')
             # subprocess.call(['opera', 'init', '-p', self.sut_storage_path, sut_csar_path], cwd=self.sut_storage_path)
-            subprocess.call(['opera', 'deploy', '-p', self.sut_storage_path, inputs_param], cwd=self.sut_storage_path)
-            opera_outputs = subprocess.check_output(['opera', 'outputs'])
-            current_app.logger.info(f'Opera returned output {opera_outputs}.')
+            try:
+                if sut_inputs_path:
+                    subprocess.call(['opera', 'deploy', '-p', self.sut_storage_path, '-i', sut_inputs_path, entry_definition], cwd=self.sut_storage_path)
+                else:
+                    subprocess.call(['opera', 'deploy', '-p', self.sut_storage_path, entry_definition], cwd=self.sut_storage_path)
+                opera_outputs = subprocess.check_output(['opera', 'outputs', '-p', self.sut_storage_path], cwd=self.sut_storage_path)
+                current_app.logger.info(f'Opera returned output {opera_outputs}.')
+            except OperationError:
+                subprocess.call(['opera', 'undeploy', '-p', self.sut_storage_path])
 
         # Deployment of TI
         with Csar(ti_csar_path, extract_dir=self.ti_storage_path, keep=True) as ti_csar:
@@ -96,10 +109,16 @@ class Deployment(Base, AbstractModel):
                     info(f'Deploying TI {str(entry_definition)} with opera in folder {str(self.ti_storage_path)}.')
 
                 # subprocess.call(['opera', 'init', '-p', self.ti_storage_path, ti_csar_path], cwd=self.ti_storage_path)
-                subprocess.call(['opera', 'deploy', '-p', self.ti_storage_path, inputs_param], cwd=self.ti_storage_path)
-                opera_outputs = subprocess.check_output(['opera', 'outputs'])
-                current_app.logger.info(f'Opera returned output {opera_outputs}.')
-                opera_json_outputs = json.loads(opera_outputs)
+                try:
+                    if ti_inputs_path:
+                        subprocess.call(['opera', 'deploy', '-p', self.ti_storage_path, '-i', ti_inputs_path, entry_definition], cwd=self.ti_storage_path)
+                    else:
+                        subprocess.call(['opera', 'deploy', '-p', self.ti_storage_path, entry_definition], cwd=self.ti_storage_path)
+                    opera_outputs = subprocess.check_output(['opera', 'outputs', '-p', self.ti_storage_path], cwd=self.sut_storage_path)
+                    current_app.logger.info(f'Opera returned output {opera_outputs}.')
+                    opera_json_outputs = json.loads(opera_outputs)
+                except OperationError:
+                    subprocess.call(['opera', 'undeploy', '-p', self.ti_storage_path])
 
         time.sleep(30)
 
@@ -164,7 +183,7 @@ class Deployment(Base, AbstractModel):
         return ip_address
 
     def undeploy(self):
-        subprocess.call(['opera', 'undeploy', '-p', self.ti_storage_path], cwd=self.sut_storage_path)
+        subprocess.call(['opera', 'undeploy', '-p', self.sut_storage_path], cwd=self.sut_storage_path)
         subprocess.call(['opera', 'undeploy', '-p', self.ti_storage_path], cwd=self.ti_storage_path)
 
     @property

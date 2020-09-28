@@ -15,34 +15,32 @@ class POSTTestArtifact(Model):
     Do not edit the class manually.
     """
 
-    def __init__(self, project_uuid=None, sut_tosca_path=None, ti_tosca_path=None, inputs_file=None):  # noqa: E501
-        """POSTTestArtifact - a model defined in OpenAPI
-
-        :param project_uuid: The project_uuid of this POSTTestArtifact.  # noqa: E501
-        :type project_uuid: str
-        :param sut_tosca_path: The sut_tosca_path of this POSTTestArtifact.  # noqa: E501
-        :type sut_tosca_path: str
-        :param ti_tosca_path: The ti_tosca_path of this POSTTestArtifact.  # noqa: E501
-        :type ti_tosca_path: str
+    def __init__(self, project_uuid=None, sut_tosca_path=None, sut_inputs_path=None, ti_tosca_path=None, ti_inputs_path=None):  # noqa: E501
         """
+        POSTTestArtifact - a model defined in OpenAPI
+        """
+
         self.openapi_types = {
             'project_uuid': str,
             'sut_tosca_path': str,
+            'sut_inputs_path': str,
             'ti_tosca_path': str,
-            'inputs_file': str
+            'ti_inputs_path': str
         }
 
         self.attribute_map = {
             'project_uuid': 'project_uuid',
             'sut_tosca_path': 'sut_tosca_path',
+            'sut_inputs_path': 'sut_inputs_path',
             'ti_tosca_path': 'ti_tosca_path',
-            'inputs_file': 'inputs_file'
+            'ti_inputs_path': 'ti_inputs_path'
         }
 
         self._project_uuid = project_uuid
         self._sut_tosca_path = sut_tosca_path
+        self._sut_inputs_path = sut_inputs_path
         self._ti_tosca_path = ti_tosca_path
-        self._inputs_file = inputs_file
+        self._ti_inputs_path = ti_inputs_path
 
     @classmethod
     def from_dict(cls, dikt) -> 'POSTTestArtifact':
@@ -125,24 +123,47 @@ class POSTTestArtifact(Model):
         self._ti_tosca_path = ti_tosca_path
 
     @property
-    def inputs_file(self):
-        """Gets the input_file of this POSTTestArtifact.
+    def sut_inputs_path(self):
+        """Gets the sut_inputs_path of this POSTTestArtifact.
 
 
-        :return: The input_file of this POSTTestArtifact.
+        :return: The sut_inputs_path of this POSTTestArtifact.
         :rtype: str
         """
-        return self._inputs_file
+        return self._sut_inputs_path
 
-    @inputs_file.setter
-    def inputs_file(self, inputs_file):
+    @sut_inputs_path.setter
+    def sut_inputs_path(self, sut_inputs_path: str):
         """Sets the ti_tosca_path of this POSTTestArtifact.
 
 
-        :param ti_tosca_path: The ti_tosca_path of this POSTTestArtifact.
-        :type ti_tosca_path: str
+        :param sut_inputs_path: The sut_inputs_path of this POSTTestArtifact.
+        :type sut_inputs_path: str
         """
-        if inputs_file is None:
-            raise ValueError("Invalid value for `input_file`, must not be `None`")  # noqa: E501
+        if sut_inputs_path is None:
+            raise ValueError("Invalid value for `sut_inputs_path`, must not be `None`")  # noqa: E501
 
-        self._inputs_file = inputs_file
+        self._sut_inputs_path = sut_inputs_path
+
+    @property
+    def ti_inputs_path(self):
+        """Gets the ti_inputs_path of this POSTTestArtifact.
+
+
+        :return: The ti_inputs_path of this POSTTestArtifact.
+        :rtype: str
+        """
+        return self._ti_inputs_path
+
+    @ti_inputs_path.setter
+    def ti_inputs_path(self, ti_inputs_path):
+        """Sets the ti_inputs_path of this POSTTestArtifact.
+
+
+        :param ti_inputs_path: The sut_inputs_path of this POSTTestArtifact.
+        :type ti_inputs_path: str
+        """
+        if ti_inputs_path is None:
+            raise ValueError("Invalid value for `ti_inputs_path`, must not be `None`")  # noqa: E501
+
+        self._ti_inputs_path = ti_inputs_path

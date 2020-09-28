@@ -22,8 +22,9 @@ class TestArtifact(Base, AbstractModel):
     uuid: str
     commit_hash: str
     sut_tosca_path: str
+    sut_inputs_path: str
     ti_tosca_path: str
-    inputs_path: str
+    ti_inputs_path: str
     storage_path: str
     policy: str
     plugin: str
@@ -32,9 +33,11 @@ class TestArtifact(Base, AbstractModel):
     uuid = Column(String, primary_key=True)
     commit_hash = Column(String, nullable=False)
     sut_tosca_path = Column(String, nullable=False)
+    sut_inputs_path = Column(String, nullable=True)
     ti_tosca_path = Column(String, nullable=False)
+    ti_inputs_path = Column(String, nullable=True)
     storage_path = Column(String, nullable=False)
-    inputs_path = Column(String, nullable=True)
+
     policy = Column(String, nullable=False)
     plugin = Column(String, nullable=False)
     project_uuid = Column(String, ForeignKey('project.uuid'), nullable=False)
@@ -42,7 +45,12 @@ class TestArtifact(Base, AbstractModel):
     parentType = Project
     plugin_list = None
 
-    def __init__(self, project, sut_tosca_path, ti_tosca_path, inputs_file_path, tmp_dir, policy, plugin):
+    sut_default_file_name = 'sut.csar'
+    sut_inputs_default_file_name = 'sut-inputs.yaml'
+    ti_default_file_name = 'ti.csar'
+    ti_inputs_default_file_name = 'ti-inputs.yaml'
+
+    def __init__(self, project, sut_tosca_path, sut_inputs_path, ti_tosca_path, ti_inputs_path, tmp_dir, policy, plugin):
         self.uuid = str(uuid.uuid4())
         self.project_uuid = project.uuid
         self.storage_path = os.path.join(BasePath, self.__tablename__, self.uuid)
@@ -60,15 +68,23 @@ class TestArtifact(Base, AbstractModel):
             copytree(src_dir, self.fq_storage_path, ignore=ignore_patterns('.git'), dirs_exist_ok=True)
 
         # Set default paths for the artifacts and copy them into the testartifact folder in the RepoDir of RadonCTT
-        self.sut_tosca_path = os.path.join(self.fq_storage_path, RepoDir, 'sut.csar')
-        copy(sut_tosca_path, self.sut_tosca_path)
+        self.sut_tosca_path = os.path.join(RepoDir, TestArtifact.sut_default_file_name)
+        sut_tosca_path_fq = os.path.join(self.fq_storage_path, self.sut_tosca_path)
+        copy(sut_tosca_path, sut_tosca_path_fq)
 
-        self.ti_tosca_path = os.path.join(self.fq_storage_path, RepoDir, 'ti.csar')
-        copy(ti_tosca_path, self.ti_tosca_path)
+        self.ti_tosca_path = os.path.join(RepoDir, TestArtifact.ti_default_file_name)
+        ti_tosca_path_fq = os.path.join(self.fq_storage_path, self.ti_tosca_path)
+        copy(ti_tosca_path, ti_tosca_path_fq)
 
-        if inputs_file_path:
-            self.inputs_file_path = os.path.join(self.fq_storage_path, RepoDir, 'inputs.yaml')
-            copy(inputs_file_path, self.inputs_file_path)
+        if sut_inputs_path:
+            self.sut_inputs_path = os.path.join(RepoDir, TestArtifact.sut_inputs_default_file_name)
+            sut_inputs_path_fq = os.path.join(self.fq_storage_path, self.sut_inputs_path)
+            copy(sut_inputs_path, sut_inputs_path_fq)
+
+        if ti_inputs_path:
+            self.ti_inputs_path = os.path.join(RepoDir, TestArtifact.ti_inputs_default_file_name)
+            ti_inputs_path_fq = os.path.join(self.fq_storage_path, self.ti_inputs_path)
+            copy(ti_inputs_path, ti_inputs_path_fq)
 
         db_session.add(self)
         db_session.commit()
@@ -97,23 +113,29 @@ class TestArtifact(Base, AbstractModel):
         return Project
 
     @classmethod
-    def create(cls, project_uuid, sut_tosca_location, ti_tosca_location, inputs_file=None):
+    def create(cls, project_uuid, sut_tosca_location, sut_inputs_location, ti_tosca_location, ti_inputs_location):
         linked_project = Project.get_by_uuid(project_uuid)
 
         # Create temporary directory to collect all the artifacts (SUT, TI, inputs), as they might come from URL or path
         artifact_dir = tempfile.mkdtemp(prefix="radon-ctt")
 
-        sut_file_path = os.path.join(artifact_dir, 'sut.csar')
+        sut_file_path = os.path.join(artifact_dir, TestArtifact.sut_default_file_name)
         TestArtifact.process_resource(sut_tosca_location, sut_file_path, linked_project.fq_storage_path)
 
-        ti_file_path = os.path.join(artifact_dir, 'ti.csar')
+        ti_file_path = os.path.join(artifact_dir, TestArtifact.ti_default_file_name)
         TestArtifact.process_resource(ti_tosca_location, ti_file_path, linked_project.fq_storage_path)
 
-        if inputs_file:
-            inputs_file_path = os.path.join(artifact_dir, 'inputs.yaml')
-            TestArtifact.process_resource(inputs_file, inputs_file_path, linked_project.fq_storage_path)
+        if sut_inputs_location:
+            sut_inputs_path = os.path.join(artifact_dir, TestArtifact.sut_inputs_default_file_name)
+            TestArtifact.process_resource(sut_inputs_location, sut_inputs_path, linked_project.fq_storage_path)
         else:
-            inputs_file_path = None
+            sut_inputs_path = None
+
+        if ti_inputs_location:
+            ti_inputs_path = os.path.join(artifact_dir, TestArtifact.ti_inputs_default_file_name)
+            TestArtifact.process_resource(ti_inputs_location, ti_inputs_path, linked_project.fq_storage_path)
+        else:
+            sut_inputs_path = None
 
         test_artifact_list = []
         sut_policy_list = TestArtifact.parse_policies(sut_file_path)
@@ -136,8 +158,8 @@ class TestArtifact(Base, AbstractModel):
                     #ti_file_path_relative = os.path.relpath(ti_file_path, start=linked_project.fq_storage_path)
 
                     # Policy matches existing TI blueprint, so test artifact will be created.
-                    test_artifact_list.append(TestArtifact(linked_project, sut_file_path, ti_file_path,
-                                                           inputs_file_path, artifact_dir, yaml.dump(current_policy),
+                    test_artifact_list.append(TestArtifact(linked_project, sut_file_path, sut_inputs_path, ti_file_path,
+                                                           ti_inputs_path, artifact_dir, yaml.dump(current_policy),
                                                            current_policy['type']))
                     current_app.logger.info(f'Created test artifact for {ti_blueprint}.')
                 else:
