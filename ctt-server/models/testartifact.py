@@ -135,7 +135,7 @@ class TestArtifact(Base, AbstractModel):
             ti_inputs_path = os.path.join(artifact_dir, TestArtifact.ti_inputs_default_file_name)
             TestArtifact.process_resource(ti_inputs_location, ti_inputs_path, linked_project.fq_storage_path)
         else:
-            sut_inputs_path = None
+            ti_inputs_path = None
 
         test_artifact_list = []
         sut_policy_list = TestArtifact.parse_policies(sut_file_path)

@@ -90,13 +90,23 @@ class Deployment(Base, AbstractModel):
             # subprocess.call(['opera', 'init', '-p', self.sut_storage_path, sut_csar_path], cwd=self.sut_storage_path)
             try:
                 if sut_inputs_path:
-                    subprocess.call(['opera', 'deploy', '-p', self.sut_storage_path, '-i', sut_inputs_path, entry_definition], cwd=self.sut_storage_path)
+                    subprocess.call(['opera', 'deploy',
+                                     '-p', self.sut_storage_path,
+                                     '-i', sut_inputs_path,
+                                     entry_definition],
+                                    cwd=self.sut_storage_path)
                 else:
-                    subprocess.call(['opera', 'deploy', '-p', self.sut_storage_path, entry_definition], cwd=self.sut_storage_path)
-                opera_outputs = subprocess.check_output(['opera', 'outputs', '-p', self.sut_storage_path], cwd=self.sut_storage_path)
+                    subprocess.call(['opera', 'deploy',
+                                     '-p', self.sut_storage_path,
+                                     entry_definition],
+                                    cwd=self.sut_storage_path)
+                opera_outputs = subprocess.check_output(['opera', 'outputs',
+                                                         '-p', self.sut_storage_path],
+                                                        cwd=self.sut_storage_path)
                 current_app.logger.info(f'Opera returned output {opera_outputs}.')
             except OperationError:
-                subprocess.call(['opera', 'undeploy', '-p', self.sut_storage_path])
+                subprocess.call(['opera', 'undeploy',
+                                 '-p', self.sut_storage_path])
 
         # Deployment of TI
         with Csar(ti_csar_path, extract_dir=self.ti_storage_path, keep=True) as ti_csar:
@@ -111,14 +121,24 @@ class Deployment(Base, AbstractModel):
                 # subprocess.call(['opera', 'init', '-p', self.ti_storage_path, ti_csar_path], cwd=self.ti_storage_path)
                 try:
                     if ti_inputs_path:
-                        subprocess.call(['opera', 'deploy', '-p', self.ti_storage_path, '-i', ti_inputs_path, entry_definition], cwd=self.ti_storage_path)
+                        subprocess.call(['opera', 'deploy',
+                                         '-p', self.ti_storage_path,
+                                         '-i', ti_inputs_path,
+                                         entry_definition],
+                                        cwd=self.ti_storage_path)
                     else:
-                        subprocess.call(['opera', 'deploy', '-p', self.ti_storage_path, entry_definition], cwd=self.ti_storage_path)
-                    opera_outputs = subprocess.check_output(['opera', 'outputs', '-p', self.ti_storage_path], cwd=self.sut_storage_path)
+                        subprocess.call(['opera', 'deploy',
+                                         '-p', self.ti_storage_path,
+                                         entry_definition],
+                                        cwd=self.ti_storage_path)
+                    opera_outputs = subprocess.check_output(['opera', 'outputs',
+                                                             '-p', self.ti_storage_path],
+                                                            cwd=self.ti_storage_path)
                     current_app.logger.info(f'Opera returned output {opera_outputs}.')
                     opera_json_outputs = json.loads(opera_outputs)
                 except OperationError:
-                    subprocess.call(['opera', 'undeploy', '-p', self.ti_storage_path])
+                    subprocess.call(['opera', 'undeploy',
+                                     '-p', self.ti_storage_path])
 
         time.sleep(30)
 
