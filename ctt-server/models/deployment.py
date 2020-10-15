@@ -1,9 +1,9 @@
-import json
 import os
 import re
 import subprocess
 import time
 import uuid
+import yaml
 
 from flask import current_app
 from sqlalchemy import Column, String, ForeignKey
@@ -124,18 +124,20 @@ class Deployment(Base, AbstractModel):
                         subprocess.call(['opera', 'deploy',
                                          '-p', self.ti_storage_path,
                                          '-i', ti_inputs_path,
+                                         '-v',
                                          entry_definition],
                                         cwd=self.ti_storage_path)
                     else:
                         subprocess.call(['opera', 'deploy',
                                          '-p', self.ti_storage_path,
+                                         '-v',
                                          entry_definition],
                                         cwd=self.ti_storage_path)
                     opera_outputs = subprocess.check_output(['opera', 'outputs',
                                                              '-p', self.ti_storage_path],
                                                             cwd=self.ti_storage_path)
                     current_app.logger.info(f'Opera returned output {opera_outputs}.')
-                    opera_json_outputs = json.loads(opera_outputs)
+                    opera_yaml_outputs = yaml.safe_load(opera_outputs)
                 except OperationError:
                     subprocess.call(['opera', 'undeploy',
                                      '-p', self.ti_storage_path])
@@ -154,7 +156,9 @@ class Deployment(Base, AbstractModel):
             # FaaS scenario
             # deployed_systems = Deployment.deployment_workaround(exclude_sut=True)
             self.sut_hostname = self.__test_artifact.policy_yaml['properties']['hostname']
-            self.ti_hostname = opera_json_outputs['public_address']
+            current_app.logger.info(f'SUT hostname {self.sut_hostname}.')
+            self.ti_hostname = opera_yaml_outputs['public_address']['value']
+            current_app.logger.info(f'TI hostname {self.ti_hostname}.')
             # self.ti_hostname = deployed_systems['ti']
         else:
             deployed_systems = Deployment.deployment_workaround(exclude_sut=False)
