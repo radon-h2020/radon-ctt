@@ -12,7 +12,7 @@ from opera.error import OperationError
 from db_orm.database import Base, db_session
 from models.testartifact import TestArtifact
 from models.abstract_model import AbstractModel
-from util.configuration import BasePath, DropPolicies, FaasScenario
+from util.configuration import get_path, DropPolicies, FaasScenario
 from util.tosca_helper import Csar
 
 ip_pattern = re.compile('([1][0-9][0-9].|^[2][5][0-5].|^[2][0-4][0-9].|^[1][0-9][0-9].|^[0-9][0-9].|^[0-9].)'
@@ -39,7 +39,7 @@ class Deployment(Base, AbstractModel):
     def __init__(self, testartifact):
         self.uuid = str(uuid.uuid4())
         self.testartifact_uuid = testartifact.uuid
-        self.storage_path = os.path.join(BasePath, self.__tablename__, self.uuid)
+        self.storage_path = os.path.join(get_path(), self.__tablename__, self.uuid)
         self.__test_artifact = testartifact
         self.sut_hostname = 'localhost'
         self.ti_hostname = 'localhost'
@@ -124,13 +124,11 @@ class Deployment(Base, AbstractModel):
                         subprocess.call(['opera', 'deploy',
                                          '-p', self.ti_storage_path,
                                          '-i', ti_inputs_path,
-                                         '-v',
                                          entry_definition],
                                         cwd=self.ti_storage_path)
                     else:
                         subprocess.call(['opera', 'deploy',
                                          '-p', self.ti_storage_path,
-                                         '-v',
                                          entry_definition],
                                         cwd=self.ti_storage_path)
                     opera_outputs = subprocess.check_output(['opera', 'outputs',

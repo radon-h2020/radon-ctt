@@ -9,7 +9,7 @@ from sqlalchemy import Column, String, ForeignKey
 from shutil import copy, copytree, ignore_patterns, rmtree
 from straight.plugin.loaders import ModuleLoader
 
-from util.configuration import BasePath, RepoDir
+from util.configuration import get_path, RepoDir
 from util.tosca_helper import Csar
 from db_orm.database import Base, db_session
 from models.project import Project
@@ -53,7 +53,7 @@ class TestArtifact(Base, AbstractModel):
     def __init__(self, project, sut_tosca_path, sut_inputs_path, ti_tosca_path, ti_inputs_path, tmp_dir, policy, plugin):
         self.uuid = str(uuid.uuid4())
         self.project_uuid = project.uuid
-        self.storage_path = os.path.join(BasePath, self.__tablename__, self.uuid)
+        self.storage_path = os.path.join(get_path(), self.__tablename__, self.uuid)
         self.policy = policy
         self.plugin = plugin
 
@@ -70,20 +70,24 @@ class TestArtifact(Base, AbstractModel):
         # Set default paths for the artifacts and copy them into the testartifact folder in the RepoDir of RadonCTT
         self.sut_tosca_path = os.path.join(RepoDir, TestArtifact.sut_default_file_name)
         sut_tosca_path_fq = os.path.join(self.fq_storage_path, self.sut_tosca_path)
+        os.makedirs(os.path.dirname(sut_tosca_path_fq), exist_ok=True)
         copy(sut_tosca_path, sut_tosca_path_fq)
 
         self.ti_tosca_path = os.path.join(RepoDir, TestArtifact.ti_default_file_name)
         ti_tosca_path_fq = os.path.join(self.fq_storage_path, self.ti_tosca_path)
+        os.makedirs(os.path.dirname(ti_tosca_path_fq), exist_ok=True)
         copy(ti_tosca_path, ti_tosca_path_fq)
 
         if sut_inputs_path:
             self.sut_inputs_path = os.path.join(RepoDir, TestArtifact.sut_inputs_default_file_name)
             sut_inputs_path_fq = os.path.join(self.fq_storage_path, self.sut_inputs_path)
+            os.makedirs(os.path.dirname(sut_inputs_path_fq), exist_ok=True)
             copy(sut_inputs_path, sut_inputs_path_fq)
 
         if ti_inputs_path:
             self.ti_inputs_path = os.path.join(RepoDir, TestArtifact.ti_inputs_default_file_name)
             ti_inputs_path_fq = os.path.join(self.fq_storage_path, self.ti_inputs_path)
+            os.makedirs(os.path.dirname(ti_inputs_path_fq), exist_ok=True)
             copy(ti_inputs_path, ti_inputs_path_fq)
 
         db_session.add(self)
@@ -98,7 +102,7 @@ class TestArtifact(Base, AbstractModel):
 
     @property
     def fq_storage_path(self):
-        return os.path.join(BasePath, self.storage_path)
+        return os.path.join(get_path(), self.storage_path)
 
     @property
     def policy_yaml(self):

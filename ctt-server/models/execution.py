@@ -9,7 +9,7 @@ from straight.plugin.loaders import ModuleLoader
 from db_orm.database import Base, db_session
 from models.abstract_model import AbstractModel
 from models.deployment import Deployment
-from util.configuration import BasePath
+from util.configuration import get_path
 
 
 class Execution(Base, AbstractModel):
@@ -38,7 +38,7 @@ class Execution(Base, AbstractModel):
             self.uuid = str(uuid.uuid4())
             self.deployment = deployment
             self.deployment_uuid = deployment.uuid
-            self.storage_path = os.path.join(BasePath, self.__tablename__, self.uuid)
+            self.storage_path = os.path.join(get_path(), self.__tablename__, self.uuid)
             self.plugin = None
             self.test_artifact = deployment.test_artifact
 
@@ -64,7 +64,7 @@ class Execution(Base, AbstractModel):
 
     @property
     def fq_storage_path(self):
-        return os.path.join(BasePath, self.storage_path)
+        return os.path.join(get_path(), self.storage_path)
 
     @property
     def fq_result_storage_path(self):
