@@ -87,7 +87,6 @@ class Deployment(Base, AbstractModel):
 
             current_app.logger.\
                 info(f'Deploying SuT {str(entry_definition)} with opera in folder {str(self.sut_storage_path)}.')
-            # subprocess.call(['opera', 'init', '-p', self.sut_storage_path, sut_csar_path], cwd=self.sut_storage_path)
             try:
                 if sut_inputs_path:
                     subprocess.call(['opera', 'deploy',
@@ -118,7 +117,6 @@ class Deployment(Base, AbstractModel):
                 current_app.logger.\
                     info(f'Deploying TI {str(entry_definition)} with opera in folder {str(self.ti_storage_path)}.')
 
-                # subprocess.call(['opera', 'init', '-p', self.ti_storage_path, ti_csar_path], cwd=self.ti_storage_path)
                 try:
                     if ti_inputs_path:
                         subprocess.call(['opera', 'deploy',
@@ -142,67 +140,16 @@ class Deployment(Base, AbstractModel):
 
         time.sleep(30)
 
-        envFaasScenario = os.getenv('CTT_FAAS_ENABLED')
-        faas_mode = False
-        if envFaasScenario:
-            if envFaasScenario == "1":
-                faas_mode = True
-        elif FaasScenario:
-            faas_mode = True
-
-        if faas_mode:
-            # FaaS scenario
-            # deployed_systems = Deployment.deployment_workaround(exclude_sut=True)
-            self.sut_hostname = self.__test_artifact.policy_yaml['properties']['hostname']
-            current_app.logger.info(f'SUT hostname {self.sut_hostname}.')
-            self.ti_hostname = opera_yaml_outputs['public_address']['value']
-            current_app.logger.info(f'TI hostname {self.ti_hostname}.')
-            # self.ti_hostname = deployed_systems['ti']
-        else:
-            deployed_systems = Deployment.deployment_workaround(exclude_sut=False)
-            self.sut_hostname = deployed_systems['sut']
-            self.ti_hostname = deployed_systems['ti']
+        # FaaS scenario
+        # deployed_systems = Deployment.deployment_workaround(exclude_sut=True)
+        self.sut_hostname = self.__test_artifact.policy_yaml['properties']['hostname']
+        current_app.logger.info(f'SUT hostname {self.sut_hostname}.')
+        self.ti_hostname = opera_yaml_outputs['public_address']['value']
+        current_app.logger.info(f'TI hostname {self.ti_hostname}.')
+        # self.ti_hostname = deployed_systems['ti']
 
         db_session.add(self)
         db_session.commit()
-
-    @classmethod
-    def deployment_workaround(cls, exclude_sut):
-
-        result_set = {}
-
-        # Determine Docker network that is used on the current machine
-        docker_network = subprocess.getoutput("docker network ls | grep compose | head -n1 | awk '{print $2}'")
-        if docker_network:
-            current_app.logger.info(f'Automatically determined docker network {docker_network}')
-        else:
-            docker_network = 'dockercompose_default'
-            current_app.logger.info(
-                f'Docker network could not be determined automatically. Falling back to {docker_network}')
-
-        if os.path.isfile('/.dockerenv'):
-            subprocess.call(['docker', 'network', 'connect', docker_network, 'RadonCTT'])
-
-        if not exclude_sut:
-            sut_docker_name = 'docker-compose_edge-router_1'
-            sut_ip = Deployment.workaround_parse_ip(docker_network, sut_docker_name)
-            current_app.logger.info(f'Determined SUT IP-address: {sut_ip}.')
-            result_set['sut'] = sut_ip
-
-        ti_docker_name = 'CTTAgent'
-        subprocess.call(['docker', 'network', 'connect', docker_network, ti_docker_name])
-        ti_ip = Deployment.workaround_parse_ip(docker_network, ti_docker_name)
-        current_app.logger.info(f'Determined TI IP-address: {ti_ip}.')
-        result_set['ti'] = ti_ip
-
-        return result_set
-
-    @classmethod
-    def workaround_parse_ip(cls, docker_network, docker_name):
-        ip_address_line = subprocess.getoutput(
-            f'docker network inspect {docker_network} | grep {docker_name} -A 3 | grep "IPv4Address"')
-        ip_address = re.search(ip_pattern, ip_address_line).group()
-        return ip_address
 
     def undeploy(self):
         subprocess.call(['opera', 'undeploy', '-p', self.sut_storage_path], cwd=self.sut_storage_path)

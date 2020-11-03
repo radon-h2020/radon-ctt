@@ -153,27 +153,27 @@ class TestArtifact(Base, AbstractModel):
             current_app.logger.info(f'Plugin \'{plugin.plugin_type}\' found.')
 
         # Check which policies match the available plugins and which TI blueprint is present
-        for policy in sut_policy_list:
-            current_policy = sut_policy_list[policy]
-            if current_policy['type'] in plugins_available:
-                if current_policy['properties']['ti_blueprint'] == ti_blueprint:
+        for policy_map in sut_policy_list:
+            for policy in policy_map:
+                current_policy = policy_map[policy]
+                if current_policy['type'] in plugins_available:
+                    if current_policy['properties']['ti_blueprint'] == ti_blueprint:
 
-                    #sut_file_path_relative = os.path.relpath(sut_file_path, start=linked_project.fq_storage_path)
-                    #ti_file_path_relative = os.path.relpath(ti_file_path, start=linked_project.fq_storage_path)
+                        #sut_file_path_relative = os.path.relpath(sut_file_path, start=linked_project.fq_storage_path)
+                        #ti_file_path_relative = os.path.relpath(ti_file_path, start=linked_project.fq_storage_path)
 
-                    # Policy matches existing TI blueprint, so test artifact will be created.
-                    test_artifact_list.append(TestArtifact(linked_project, sut_file_path, sut_inputs_path, ti_file_path,
-                                                           ti_inputs_path, artifact_dir, yaml.dump(current_policy),
-                                                           current_policy['type']))
-                    current_app.logger.info(f'Created test artifact for {ti_blueprint}.')
+                        # Policy matches existing TI blueprint, so test artifact will be created.
+                        test_artifact_list.append(TestArtifact(linked_project, sut_file_path, sut_inputs_path, ti_file_path,
+                                                               ti_inputs_path, artifact_dir, yaml.dump(current_policy),
+                                                               current_policy['type']))
+                        current_app.logger.info(f'Created test artifact for {ti_blueprint}.')
+                    else:
+                        # No matching TI blueprint, so nothing to be done with this policy.
+                        current_app.logger.info(f"The policy-defined TI blueprint "
+                                                f"({current_policy['properties']['ti_blueprint']}) "
+                                                f"does not match the TI model ({ti_blueprint}).")
                 else:
-                    # No matching TI blueprint, so nothing to be done with this policy.
-                    current_app.logger.info(f"The policy-defined TI blueprint "
-                                            f"({current_policy['properties']['ti_blueprint']}) "
-                                            f"does not match the TI model ({ti_blueprint}).")
-            else:
-                current_app.logger.info(f"Could not find matching plugin for {sut_policy_list[policy]['type']}.")
-
+                    current_app.logger.info(f"Could not find matching plugin for {sut_policy_list[policy]['type']}.")
         return test_artifact_list
 
     @classmethod
