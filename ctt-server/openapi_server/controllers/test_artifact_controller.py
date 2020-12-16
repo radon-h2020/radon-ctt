@@ -25,7 +25,11 @@ def create_testartifact(post_test_artifact=None):  # noqa: E501
     if connexion.request.is_json:
         post_test_artifact = POSTTestArtifact.from_dict(connexion.request.get_json())  # noqa: E501
     created_testartifacts = TestArtifactImpl.create(
-        post_test_artifact.project_uuid, post_test_artifact.sut_tosca_path, post_test_artifact.ti_tosca_path)
+        post_test_artifact.project_uuid,
+        post_test_artifact.sut_tosca_path,
+        post_test_artifact.sut_inputs_path,
+        post_test_artifact.ti_tosca_path,
+        post_test_artifact.ti_inputs_path)
     return testartifact_schema_many.dump(created_testartifacts)
 
 

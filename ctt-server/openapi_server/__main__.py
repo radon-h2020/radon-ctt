@@ -5,6 +5,7 @@ import logging
 
 from openapi_server import encoder
 from db_orm.database import init_db, db_session
+from waitress import serve
 
 logging.basicConfig(level=logging.INFO)
 
@@ -17,7 +18,9 @@ def main():
     app.add_api('openapi.yaml',
                 arguments={'title': 'RADON CTT Server API'},
                 pythonic_params=True)
-    app.run(port=18080)
+    #app.run(port=18080)
+    serve(app, host="0.0.0.0", port=18080)
+
     db_session.remove()
 
 

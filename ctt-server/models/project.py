@@ -1,13 +1,13 @@
 import git
 
 from flask import current_app
-from os import makedirs, path
-from shutil import rmtree
-from sqlalchemy import Column, String
+from os import getenv, makedirs, path
+from shutil import copytree, rmtree
+from sqlalchemy import Boolean, Column, String
 
 from db_orm.database import Base, db_session
 from models.abstract_model import AbstractModel
-from util.configuration import BasePath
+from util.configuration import is_che_env, get_dir_prefix, get_path
 
 
 class Project(Base, AbstractModel):
@@ -22,24 +22,34 @@ class Project(Base, AbstractModel):
     name: str
     repository_url: str
     storage_path: str
+    che_env: bool
 
     uuid = Column(String, primary_key=True)
     name = Column(String, nullable=False, unique=True)
     repository_url = Column(String, nullable=False)
     storage_path = Column(String, nullable=False)
+    che_env = Column(Boolean, nullable=False)
 
     def __init__(self, uuid, name, repository_url, storage_path):
         self.uuid = uuid
         self.name = name
         self.repository_url = repository_url
         self.storage_path = storage_path
+        self.che_env = is_che_env()
+
+        current_app.logger.info(f"CHE environment: {self.che_env}")
 
         if not path.exists(self.fq_storage_path):
             makedirs(self.fq_storage_path)
             current_app.logger.info(f"Created directory path {self.fq_storage_path}")
 
-        current_app.logger.info(f'Cloning repository {self.repository_url} into {self.fq_storage_path}')
-        git.Git(self.fq_storage_path).clone(self.repository_url, self.fq_storage_path)
+        if self.che_env:
+            src_path = path.join(get_dir_prefix(), self.repository_url)
+            current_app.logger.info(f'Copying directory tree from  {src_path} into {self.fq_storage_path}')
+            copytree(src_path, self.fq_storage_path, dirs_exist_ok=True)
+        else:
+            current_app.logger.info(f'Cloning repository {self.repository_url} into {self.fq_storage_path}')
+            git.Git(self.fq_storage_path).clone(self.repository_url, self.fq_storage_path)
 
         db_session.add(self)
         db_session.commit()
@@ -49,11 +59,22 @@ class Project(Base, AbstractModel):
 
     @property
     def commit_hash(self):
-        return git.Repo(self.fq_storage_path).head.commit.hexsha
+        if self.che_env:
+            return "che-mode_no-hash-available"
+        else:
+            return git.Repo(self.fq_storage_path).head.commit.hexsha
+
+    @property
+    def repository_src_url(self):
+        return self.repository_url
+
+    @property
+    def is_che_project(self):
+        return self.che_env
 
     @property
     def fq_storage_path(self):
-        return path.join(BasePath, self.storage_path)
+        return path.join(get_path(), self.storage_path)
 
     @classmethod
     def get_parent_type(cls):
@@ -72,7 +93,10 @@ class Project(Base, AbstractModel):
         # Existing Project
         else:
             project = Project.query.filter_by(name=name).first()
-            git.Git(path.join(BasePath, project.storage_path)).pull()
+            if project.is_che_project:
+                copytree(path.join(get_dir_prefix(), project.repository_src_url), path.join(get_path(), project.storage_path), dirs_exist_ok=True)
+            else:
+                git.Git(path.join(get_path(), project.storage_path)).pull()
             current_app.logger.info(f"Project {str(project)} updated.")
 
         return project

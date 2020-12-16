@@ -15,7 +15,7 @@ class TestArtifact(Model):
     Do not edit the class manually.
     """
 
-    def __init__(self, uuid=None, project_uuid=None, sut_tosca_path=None, ti_tosca_path=None, commit_hash=None):  # noqa: E501
+    def __init__(self, uuid=None, project_uuid=None, sut_tosca_path=None, sut_inputs_path=None, ti_tosca_path=None, ti_inputs_path=None, commit_hash=None):  # noqa: E501
         """TestArtifact - a model defined in OpenAPI
 
         :param uuid: The uuid of this TestArtifact.  # noqa: E501
@@ -33,7 +33,9 @@ class TestArtifact(Model):
             'uuid': str,
             'project_uuid': str,
             'sut_tosca_path': str,
+            'sut_inputs_path': str,
             'ti_tosca_path': str,
+            'ti_inputs_path': str,
             'commit_hash': str
         }
 
@@ -41,14 +43,18 @@ class TestArtifact(Model):
             'uuid': 'uuid',
             'project_uuid': 'project_uuid',
             'sut_tosca_path': 'sut_tosca_path',
+            'sut_inputs_path': 'sut_inputs_path',
             'ti_tosca_path': 'ti_tosca_path',
+            'ti_inputs_path': 'ti_inputs_path',
             'commit_hash': 'commit_hash'
         }
 
         self._uuid = uuid
         self._project_uuid = project_uuid
         self._sut_tosca_path = sut_tosca_path
+        self._sut_inputs_path = sut_inputs_path
         self._ti_tosca_path = ti_tosca_path
+        self._ti_inputs_path = ti_inputs_path
         self._commit_hash = commit_hash
 
     @classmethod
@@ -126,6 +132,27 @@ class TestArtifact(Model):
         self._sut_tosca_path = sut_tosca_path
 
     @property
+    def sut_inputs_path(self):
+        """Gets the sut_inputs_path of this TestArtifact.
+
+
+        :return: The sut_inputs_path of this TestArtifact.
+        :rtype: str
+        """
+        return self._sut_inputs_path
+
+    @sut_inputs_path.setter
+    def sut_inputs_path(self, sut_inputs_path):
+        """Sets the sut_inputs_path of this TestArtifact.
+
+
+        :param sut_inputs_path: The sut_tosca_path of this TestArtifact.
+        :type sut_inputs_path: str
+        """
+
+        self._sut_inputs_path = sut_inputs_path
+
+    @property
     def ti_tosca_path(self):
         """Gets the ti_tosca_path of this TestArtifact.
 
@@ -145,6 +172,27 @@ class TestArtifact(Model):
         """
 
         self._ti_tosca_path = ti_tosca_path
+
+    @property
+    def ti_inputs_path(self):
+        """Gets the ti_inputs_path of this TestArtifact.
+
+
+        :return: The ti_inputs_path of this TestArtifact.
+        :rtype: str
+        """
+        return self._ti_inputs_path
+
+    @ti_inputs_path.setter
+    def ti_inputs_path(self, ti_inputs_path):
+        """Sets the ti_inputs_path of this TestArtifact.
+
+
+        :param ti_inputs_path: The ti_tosca_path of this TestArtifact.
+        :type ti_inputs_path: str
+        """
+
+        self._ti_inputs_path = ti_inputs_path
 
     @property
     def commit_hash(self):

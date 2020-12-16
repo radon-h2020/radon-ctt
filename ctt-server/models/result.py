@@ -9,7 +9,7 @@ from sqlalchemy import Column, String, ForeignKey
 from db_orm.database import Base, db_session
 from models.execution import Execution
 from models.abstract_model import AbstractModel
-from util.configuration import BasePath
+from util.configuration import get_path
 
 
 class Result(Base, AbstractModel):
@@ -33,7 +33,6 @@ class Result(Base, AbstractModel):
         self.storage_path = os.path.join(self.__tablename__, self.uuid)
 
         if execution and os.path.isfile(execution.fq_result_storage_path):
-
             if not os.path.exists(self.fq_storage_path):
                 os.makedirs(self.fq_storage_path)
 
@@ -50,7 +49,7 @@ class Result(Base, AbstractModel):
 
     @property
     def fq_storage_path(self):
-        return os.path.join(BasePath, self.storage_path)
+        return os.path.join(get_path(), self.storage_path)
 
     @property
     def fq_result_storage_path(self):

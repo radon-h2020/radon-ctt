@@ -5,12 +5,12 @@ from sqlalchemy.engine import Engine
 from sqlalchemy.orm import scoped_session, sessionmaker
 from sqlalchemy.ext.declarative import declarative_base
 
-from util.configuration import BasePath, DBFile
+from util.configuration import get_path, DBFile, DefaultDirectoryPrefix
 
-if not os.path.exists(BasePath):
-    os.makedirs(BasePath)
+os.makedirs(get_path(), exist_ok=True)
+db_path = os.path.join(get_path(), DBFile)
 
-engine = create_engine('sqlite:///' + os.path.join(BasePath, DBFile), convert_unicode=True)
+engine = create_engine('sqlite:///' + db_path, convert_unicode=True)
 db_session = scoped_session(sessionmaker(autocommit=False,
                                          autoflush=False,
                                          bind=engine))

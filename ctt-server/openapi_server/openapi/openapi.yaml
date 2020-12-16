@@ -488,7 +488,9 @@ components:
         uuid: 0036bd60-1ac0-44db-9578-0181792e2ac1
         project_uuid: ac9431bd-1a1c-4d6f-a98f-cc97401b5e47
         sut_tosca_path: radon-ctt/sut.csar
+        sut_inputs_path: radon-ctt/sut-inputs.yaml
         ti_tosca_path: radon-ctt/ti.csar
+        ti_inputs_path: radon-ctt/ti-inputs.yaml
         commit_hash: 667d69cc5b0527d0c3d0887cd175114e9310d518
       properties:
         uuid:
@@ -500,7 +502,13 @@ components:
         sut_tosca_path:
           readOnly: true
           type: string
+        sut_inputs_path:
+          readOnly: true
+          type: string
         ti_tosca_path:
+          readOnly: true
+          type: string
+        ti_inputs_path:
           readOnly: true
           type: string
         commit_hash:
@@ -562,7 +570,9 @@ components:
       example:
         project_uuid: ac9431bd-1a1c-4d6f-a98f-cc97401b5e47
         sut_tosca_path: radon-ctt/sut.csar
+        sut_inputs_path: radon-ctt/sut-inputs.yaml
         ti_tosca_path: radon-ctt/ti.csar
+        ti_inputs_path: radon-ctt/ti-inputs.yaml
       properties:
         project_uuid:
           example: ac9431bd-1a1c-4d6f-a98f-cc97401b5e47
@@ -572,6 +582,12 @@ components:
           type: string
         ti_tosca_path:
           example: radon-ctt/ti.csar
+          type: string
+        sut_inputs_path:
+          example: radon-ctt/sut-inputs.yaml
+          type: string
+        ti_inputs_path:
+          example: radon-ctt/ti-inputs.yaml
           type: string
       required:
         - project_uuid
