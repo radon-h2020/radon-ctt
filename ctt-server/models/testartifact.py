@@ -50,7 +50,8 @@ class TestArtifact(Base, AbstractModel):
     ti_default_file_name = 'ti.csar'
     ti_inputs_default_file_name = 'ti-inputs.yaml'
 
-    def __init__(self, project, sut_tosca_path, sut_inputs_path, ti_tosca_path, ti_inputs_path, tmp_dir, policy, plugin):
+    def __init__(self, project, sut_tosca_path, sut_inputs_path,
+                 ti_tosca_path, ti_inputs_path, tmp_dir, policy, plugin):
         self.uuid = str(uuid.uuid4())
         self.project_uuid = project.uuid
         self.storage_path = os.path.join(get_path(), self.__tablename__, self.uuid)
@@ -100,6 +101,9 @@ class TestArtifact(Base, AbstractModel):
                (self.uuid, self.commit_hash, self.sut_tosca_path,
                 self.ti_tosca_path, self.storage_path, self.project_uuid)
 
+    def get_uuid(self):
+        return self.uuid
+
     @property
     def fq_storage_path(self):
         return os.path.join(get_path(), self.storage_path)
@@ -131,13 +135,15 @@ class TestArtifact(Base, AbstractModel):
 
         if sut_inputs_location:
             sut_inputs_path = os.path.join(artifact_dir, TestArtifact.sut_inputs_default_file_name)
-            TestArtifact.process_resource(sut_inputs_location, sut_inputs_path, linked_project.fq_storage_path)
+            TestArtifact.process_resource(sut_inputs_location, sut_inputs_path,
+                                          linked_project.fq_storage_path, inputs_file=True)
         else:
             sut_inputs_path = None
 
         if ti_inputs_location:
             ti_inputs_path = os.path.join(artifact_dir, TestArtifact.ti_inputs_default_file_name)
-            TestArtifact.process_resource(ti_inputs_location, ti_inputs_path, linked_project.fq_storage_path)
+            TestArtifact.process_resource(ti_inputs_location, ti_inputs_path,
+                                          linked_project.fq_storage_path, inputs_file=True)
         else:
             ti_inputs_path = None
 
@@ -159,13 +165,13 @@ class TestArtifact(Base, AbstractModel):
                 if current_policy['type'] in plugins_available:
                     if current_policy['properties']['ti_blueprint'] == ti_blueprint:
 
-                        #sut_file_path_relative = os.path.relpath(sut_file_path, start=linked_project.fq_storage_path)
-                        #ti_file_path_relative = os.path.relpath(ti_file_path, start=linked_project.fq_storage_path)
+                        # sut_file_path_relative = os.path.relpath(sut_file_path, start=linked_project.fq_storage_path)
+                        # ti_file_path_relative = os.path.relpath(ti_file_path, start=linked_project.fq_storage_path)
 
                         # Policy matches existing TI blueprint, so test artifact will be created.
-                        test_artifact_list.append(TestArtifact(linked_project, sut_file_path, sut_inputs_path, ti_file_path,
-                                                               ti_inputs_path, artifact_dir, yaml.dump(current_policy),
-                                                               current_policy['type']))
+                        test_artifact_list.append(TestArtifact(linked_project, sut_file_path, sut_inputs_path,
+                                                               ti_file_path, ti_inputs_path, artifact_dir,
+                                                               yaml.dump(current_policy), current_policy['type']))
                         current_app.logger.info(f'Created test artifact for {ti_blueprint}.')
                     else:
                         # No matching TI blueprint, so nothing to be done with this policy.
@@ -184,7 +190,7 @@ class TestArtifact(Base, AbstractModel):
                 sut_tosca = sut_csar.file_as_dict(entry_point)
                 try:
                     return sut_tosca['topology_template']['policies']
-                except LookupError as e:
+                except LookupError:
                     current_app.logger.debug(f'Policies could not be found in {sut_file_path}.')
 
         else:
@@ -248,7 +254,14 @@ class TestArtifact(Base, AbstractModel):
 
     @classmethod
     def get_by_uuid(cls, get_uuid):
-        return TestArtifact.query.filter_by(uuid=get_uuid).first()
+        result = TestArtifact.query.filter_by(uuid=get_uuid).first()
+
+        if result:
+            return result
+        else:
+            error_msg = f'{cls.__name__} with UUID {get_uuid} could not be found.'
+            current_app.logger.error(error_msg)
+            raise LookupError(error_msg)
 
     @classmethod
     def delete_by_uuid(cls, del_uuid):
@@ -278,7 +291,16 @@ class TestArtifact(Base, AbstractModel):
             return False
 
     @classmethod
-    def process_resource(cls, resource_string, resource_destination, storage_path):
+    def __is_yaml(cls, yaml_string):
+        import yaml.parser
+        try:
+            yaml.safe_load(yaml_string)
+            return True
+        except yaml.parser.ParserError:
+            return False
+
+    @classmethod
+    def process_resource(cls, resource_string, resource_destination, storage_path, inputs_file: bool = False):
         # Check if the resource is an URL
         if TestArtifact.__is_url(resource_string):
             current_app.logger.info(f'Resource {resource_string} is a valid URL.')
@@ -291,6 +313,12 @@ class TestArtifact(Base, AbstractModel):
             else:
                 current_app.logger.error(f'Resource {resource_string} is *NOT* a valid URL.')
                 raise LookupError(f'Resource {resource_string} is *NOT* a valid URL.')
+        # elif inputs_file and TestArtifact.__is_yaml(resource_string):
+        #     current_app.logger.info(f'Resource {resource_string} is a valid JSON.')
+        #     yaml_content = yaml.safe_load(resource_string)
+        #     with open(resource_destination, 'w') as res_dest:
+        #       yaml.safe_dump(yaml_content, res_dest)
+        #     current_app.logger.info(f'Resource {resource_string} is a valid JSON.')
         # Check if it is a file
         elif os.path.isfile(os.path.join(storage_path, resource_string)):
             current_app.logger.info(f'Resource {resource_string} is a valid file.')

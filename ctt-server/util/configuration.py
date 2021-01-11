@@ -9,6 +9,7 @@ SUTFile = 'sut_tosca.yaml'
 TIFile = 'ti_tosca.yaml'
 DropPolicies = True
 FaasScenario = False
+AutoUndeploy = False
 
 
 def is_che_env():

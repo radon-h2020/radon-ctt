@@ -155,6 +155,9 @@ class Deployment(Base, AbstractModel):
         subprocess.call(['opera', 'undeploy', '-p', self.sut_storage_path], cwd=self.sut_storage_path)
         subprocess.call(['opera', 'undeploy', '-p', self.ti_storage_path], cwd=self.ti_storage_path)
 
+    def get_uuid(self):
+        return self.uuid
+
     @property
     def base_storage_path(self):
         return self.storage_path
@@ -191,7 +194,14 @@ class Deployment(Base, AbstractModel):
 
     @classmethod
     def get_by_uuid(cls, get_uuid):
-        return Deployment.query.filter_by(uuid=get_uuid).first()
+        result = Deployment.query.filter_by(uuid=get_uuid).first()
+
+        if result:
+            return result
+        else:
+            error_msg = f'{cls.__name__} with UUID {get_uuid} could not be found.'
+            current_app.logger.error(error_msg)
+            raise LookupError(error_msg)
 
     @classmethod
     def delete_by_uuid(cls, del_uuid):

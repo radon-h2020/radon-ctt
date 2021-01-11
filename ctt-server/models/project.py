@@ -7,7 +7,7 @@ from sqlalchemy import Boolean, Column, String
 
 from db_orm.database import Base, db_session
 from models.abstract_model import AbstractModel
-from util.configuration import is_che_env, get_dir_prefix, get_path
+from util.configuration import is_che_env, get_dir_prefix, get_path, AutoUndeploy
 
 
 class Project(Base, AbstractModel):
@@ -23,12 +23,14 @@ class Project(Base, AbstractModel):
     repository_url: str
     storage_path: str
     che_env: bool
+    auto_undeploy: bool
 
     uuid = Column(String, primary_key=True)
     name = Column(String, nullable=False, unique=True)
     repository_url = Column(String, nullable=False)
     storage_path = Column(String, nullable=False)
     che_env = Column(Boolean, nullable=False)
+    auto_undeploy = Column(Boolean, nullable=False)
 
     def __init__(self, uuid, name, repository_url, storage_path):
         self.uuid = uuid
@@ -36,8 +38,10 @@ class Project(Base, AbstractModel):
         self.repository_url = repository_url
         self.storage_path = storage_path
         self.che_env = is_che_env()
+        self.auto_undeploy = AutoUndeploy
 
         current_app.logger.info(f"CHE environment: {self.che_env}")
+        current_app.logger.info(f"Auto Undeploy: {self.auto_undeploy}")
 
         if not path.exists(self.fq_storage_path):
             makedirs(self.fq_storage_path)
@@ -56,6 +60,13 @@ class Project(Base, AbstractModel):
 
     def __repr__(self):
         return '<Project %r, %r, %r, %r>' % (self.uuid, self.name, self.repository_url, self.storage_path)
+
+    def get_uuid(self):
+        return self.uuid
+
+    @property
+    def auto_undeploy_enabled(self):
+        return self.auto_undeploy
 
     @property
     def commit_hash(self):
@@ -82,6 +93,7 @@ class Project(Base, AbstractModel):
 
     @classmethod
     def create(cls, name, repository_url):
+
         # New Project
         if not Project.exists(name):
             import uuid
@@ -94,7 +106,8 @@ class Project(Base, AbstractModel):
         else:
             project = Project.query.filter_by(name=name).first()
             if project.is_che_project:
-                copytree(path.join(get_dir_prefix(), project.repository_src_url), path.join(get_path(), project.storage_path), dirs_exist_ok=True)
+                copytree(path.join(get_dir_prefix(), project.repository_src_url),
+                         path.join(get_path(), project.storage_path), dirs_exist_ok=True)
             else:
                 git.Git(path.join(get_path(), project.storage_path)).pull()
             current_app.logger.info(f"Project {str(project)} updated.")
@@ -107,7 +120,13 @@ class Project(Base, AbstractModel):
 
     @classmethod
     def get_by_uuid(cls, get_uuid):
-        return Project.query.filter_by(uuid=get_uuid).first()
+        result = Project.query.filter_by(uuid=get_uuid).first()
+        if result:
+            return result
+        else:
+            error_msg = f'{cls.__name__} with UUID {get_uuid} could not be found.'
+            current_app.logger.error(error_msg)
+            raise LookupError(error_msg)
 
     @classmethod
     def exists(cls, name):

@@ -120,6 +120,12 @@ class Execution(Base, AbstractModel):
                 execution.get_results(exec_uuid)
                 db_session.add(execution)
                 db_session.commit()
+                # from models.testartifact import TestArtifact
+                # from models.project import Project
+                # test_artifact = TestArtifact.get_by_uuid(linked_deployment.uuid)
+                # project = Project.get_by_uuid(test_artifact.uuid)
+                # if project.auto_undeploy:
+                #     linked_deployment.undeploy()
         else:
             current_app.logger.info("Execution could not be triggered. No config_uuid provided.")
         return execution
@@ -130,7 +136,14 @@ class Execution(Base, AbstractModel):
 
     @classmethod
     def get_by_uuid(cls, get_uuid):
-        return Execution.query.filter_by(uuid=get_uuid).first()
+        result = Execution.query.filter_by(uuid=get_uuid).first()
+
+        if result:
+            return result
+        else:
+            error_msg = f'{cls.__name__} with UUID {get_uuid} could not be found.'
+            current_app.logger.error(error_msg)
+            raise LookupError(error_msg)
 
     @classmethod
     def delete_by_uuid(cls, del_uuid):
