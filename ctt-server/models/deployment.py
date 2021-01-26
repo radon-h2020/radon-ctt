@@ -12,7 +12,7 @@ from opera.error import OperationError
 from db_orm.database import Base, db_session
 from models.testartifact import TestArtifact
 from models.abstract_model import AbstractModel
-from util.configuration import get_path, DropPolicies, FaasScenario
+from util.configuration import get_path, DropPolicies, is_test_mode
 from util.tosca_helper import Csar
 
 ip_pattern = re.compile('([1][0-9][0-9].|^[2][5][0-5].|^[2][0-4][0-9].|^[1][0-9][0-9].|^[0-9][0-9].|^[0-9].)'
@@ -87,25 +87,27 @@ class Deployment(Base, AbstractModel):
 
             current_app.logger.\
                 info(f'Deploying SuT {str(entry_definition)} with opera in folder {str(self.sut_storage_path)}.')
-            try:
-                if sut_inputs_path:
-                    subprocess.call(['opera', 'deploy',
-                                     '-p', self.sut_storage_path,
-                                     '-i', sut_inputs_path,
-                                     entry_definition],
-                                    cwd=self.sut_storage_path)
-                else:
-                    subprocess.call(['opera', 'deploy',
-                                     '-p', self.sut_storage_path,
-                                     entry_definition],
-                                    cwd=self.sut_storage_path)
-                opera_outputs = subprocess.check_output(['opera', 'outputs',
-                                                         '-p', self.sut_storage_path],
-                                                        cwd=self.sut_storage_path)
-                current_app.logger.info(f'Opera returned output {opera_outputs}.')
-            except OperationError:
-                subprocess.call(['opera', 'undeploy',
-                                 '-p', self.sut_storage_path])
+
+            if not is_test_mode():
+                try:
+                    if sut_inputs_path:
+                        subprocess.call(['opera', 'deploy',
+                                         '-p', self.sut_storage_path,
+                                         '-i', sut_inputs_path,
+                                         entry_definition],
+                                        cwd=self.sut_storage_path)
+                    else:
+                        subprocess.call(['opera', 'deploy',
+                                         '-p', self.sut_storage_path,
+                                         entry_definition],
+                                        cwd=self.sut_storage_path)
+                    opera_outputs = subprocess.check_output(['opera', 'outputs',
+                                                             '-p', self.sut_storage_path],
+                                                            cwd=self.sut_storage_path)
+                    current_app.logger.info(f'Opera returned output {opera_outputs}.')
+                except OperationError:
+                    subprocess.call(['opera', 'undeploy',
+                                     '-p', self.sut_storage_path])
 
         # Deployment of TI
         with Csar(ti_csar_path, extract_dir=self.ti_storage_path, keep=True) as ti_csar:
@@ -117,43 +119,42 @@ class Deployment(Base, AbstractModel):
                 current_app.logger.\
                     info(f'Deploying TI {str(entry_definition)} with opera in folder {str(self.ti_storage_path)}.')
 
-                try:
-                    if ti_inputs_path:
-                        subprocess.call(['opera', 'deploy',
-                                         '-p', self.ti_storage_path,
-                                         '-i', ti_inputs_path,
-                                         entry_definition],
-                                        cwd=self.ti_storage_path)
-                    else:
-                        subprocess.call(['opera', 'deploy',
-                                         '-p', self.ti_storage_path,
-                                         entry_definition],
-                                        cwd=self.ti_storage_path)
-                    opera_outputs = subprocess.check_output(['opera', 'outputs',
-                                                             '-p', self.ti_storage_path],
-                                                            cwd=self.ti_storage_path)
-                    current_app.logger.info(f'Opera returned output {opera_outputs}.')
-                    opera_yaml_outputs = yaml.safe_load(opera_outputs)
-                except OperationError:
-                    subprocess.call(['opera', 'undeploy',
-                                     '-p', self.ti_storage_path])
+                if not is_test_mode():
+                    try:
+                        if ti_inputs_path:
+                            subprocess.call(['opera', 'deploy',
+                                             '-p', self.ti_storage_path,
+                                             '-i', ti_inputs_path,
+                                             entry_definition],
+                                            cwd=self.ti_storage_path)
+                        else:
+                            subprocess.call(['opera', 'deploy',
+                                             '-p', self.ti_storage_path,
+                                             entry_definition],
+                                            cwd=self.ti_storage_path)
+                        opera_outputs = subprocess.check_output(['opera', 'outputs',
+                                                                 '-p', self.ti_storage_path],
+                                                                cwd=self.ti_storage_path)
+                        current_app.logger.info(f'Opera returned output {opera_outputs}.')
+                        opera_yaml_outputs = yaml.safe_load(opera_outputs)
+                        time.sleep(30)
+                    except OperationError:
+                        subprocess.call(['opera', 'undeploy',
+                                         '-p', self.ti_storage_path])
 
-        time.sleep(30)
+                    self.sut_hostname = self.__test_artifact.policy_yaml['properties']['hostname']
+                    current_app.logger.info(f'SUT hostname {self.sut_hostname}.')
 
-        # FaaS scenario
-        # deployed_systems = Deployment.deployment_workaround(exclude_sut=True)
-        self.sut_hostname = self.__test_artifact.policy_yaml['properties']['hostname']
-        current_app.logger.info(f'SUT hostname {self.sut_hostname}.')
-        self.ti_hostname = opera_yaml_outputs['public_address']['value']
-        current_app.logger.info(f'TI hostname {self.ti_hostname}.')
-        # self.ti_hostname = deployed_systems['ti']
+                    self.ti_hostname = opera_yaml_outputs['public_address']['value']
+                    current_app.logger.info(f'TI hostname {self.ti_hostname}.')
 
         db_session.add(self)
         db_session.commit()
 
     def undeploy(self):
-        subprocess.call(['opera', 'undeploy', '-p', self.sut_storage_path], cwd=self.sut_storage_path)
-        subprocess.call(['opera', 'undeploy', '-p', self.ti_storage_path], cwd=self.ti_storage_path)
+        if not is_test_mode():
+            subprocess.call(['opera', 'undeploy', '-p', self.sut_storage_path], cwd=self.sut_storage_path)
+            subprocess.call(['opera', 'undeploy', '-p', self.ti_storage_path], cwd=self.ti_storage_path)
 
     def get_uuid(self):
         return self.uuid

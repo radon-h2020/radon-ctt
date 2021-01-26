@@ -102,6 +102,7 @@ def execute(ti_hostname, config_uuid, ti_port=5000):
         data = {'config_uuid': config_uuid}
         response = requests.post(f'http://{ti_hostname}:{ti_port}/{plugin_name}/execution', data=data)
         json_response = response.json()
+
         if 'uuid' in json_response:
             execution_uuid = json_response['uuid']
             current_app.logger.info(f'Execution has ID {execution_uuid}.')

@@ -1,6 +1,8 @@
 import os
 import shutil
+import tempfile
 import uuid
+import zipfile
 
 from flask import current_app
 from sqlalchemy import Column, String, ForeignKey
@@ -9,7 +11,7 @@ from straight.plugin.loaders import ModuleLoader
 from db_orm.database import Base, db_session
 from models.abstract_model import AbstractModel
 from models.deployment import Deployment
-from util.configuration import get_path
+from util.configuration import get_path, is_test_mode
 
 
 class Execution(Base, AbstractModel):
@@ -86,24 +88,34 @@ class Execution(Base, AbstractModel):
         test_artifact_yaml_policy = self.test_artifact.policy_yaml
         test_artifact_storage_path = self.test_artifact.fq_storage_path
 
-        config_uuid = self.plugin.configure(self.deployment.hostname_ti,
-                                            test_artifact_yaml_policy,
-                                            test_artifact_storage_path,
-                                            sut_hostname=self.deployment.hostname_sut)
+        if not is_test_mode():
+            config_uuid = self.plugin.configure(self.deployment.hostname_ti, test_artifact_yaml_policy,
+                                                test_artifact_storage_path, sut_hostname=self.deployment.hostname_sut)
+        else:
+            config_uuid = str(uuid.uuid4())
 
         self.agent_configuration_uuid = config_uuid
         return config_uuid
 
     def execute(self, config_uuid):
-        execution_uuid = self.plugin.execute(self.deployment.hostname_ti,
-                                             config_uuid)
+        if not is_test_mode():
+            execution_uuid = self.plugin.execute(self.deployment.hostname_ti, config_uuid)
+        else:
+            execution_uuid = str(uuid.uuid4())
+
         self.agent_execution_uuid = execution_uuid
         return execution_uuid
 
     def get_results(self, execution_uuid):
         if execution_uuid:
-            temp_results_file = self.plugin.get_results(self.deployment.hostname_ti, execution_uuid)
-            shutil.move(temp_results_file, self.fq_result_storage_path)
+            if not is_test_mode():
+                temp_results_file = self.plugin.get_results(self.deployment.hostname_ti, execution_uuid)
+            else:
+                temp_results_file = tempfile.NamedTemporaryFile(prefix='ctt_', delete=False)
+                with zipfile.ZipFile(temp_results_file.name, 'w') as zip_f:
+                    zip_f.writestr('dummy.txt',
+                                   'This file was created in test mode. So this file does not contain real information.')
+            shutil.move(temp_results_file.name, self.fq_result_storage_path)
 
     @classmethod
     def get_parent_type(cls):

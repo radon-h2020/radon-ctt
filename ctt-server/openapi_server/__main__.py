@@ -12,7 +12,7 @@ from db_orm.database import init_db, db_session
 from waitress import serve
 
 # logging.basicConfig(level=logging.INFO)
-logging.config.dictConfig(yaml.load(open('logging.conf')))
+logging.config.dictConfig(yaml.load(open('logging.conf'), Loader=yaml.SafeLoader))
 logfile = logging.getLogger('file')
 logconsole = logging.getLogger('console')
 logwaitress = logging.getLogger('waitress')
@@ -61,4 +61,3 @@ def handle_exception(error):
 
 if __name__ == '__main__':
     main()
-
