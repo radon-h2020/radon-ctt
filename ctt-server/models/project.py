@@ -138,8 +138,9 @@ class Project(Base, AbstractModel):
     @classmethod
     def delete_by_uuid(cls, del_uuid):
         project = Project.query.filter_by(uuid=del_uuid)
-        if project:
-            folder_to_delete = project.first().fq_storage_path
+        project_entity = project.first()
+        if project and project_entity:
+            folder_to_delete = project_entity.fq_storage_path
             from models.testartifact import TestArtifact
             linked_testartifacts = TestArtifact.query.filter_by(project_uuid=del_uuid)
             for result in linked_testartifacts:
@@ -147,3 +148,6 @@ class Project(Base, AbstractModel):
             project.delete()
             rmtree(folder_to_delete)
             db_session.commit()
+        else:
+            warning_msg = f'{cls.__name__} with UUID {del_uuid} does not exist. So not deleted.'
+            current_app.logger.warning(warning_msg)

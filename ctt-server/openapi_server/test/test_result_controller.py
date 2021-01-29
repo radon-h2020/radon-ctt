@@ -9,21 +9,46 @@ from six import BytesIO
 from openapi_server.models.result import Result  # noqa: E501
 from openapi_server.test import BaseTestCase
 
+from test_util import TestUtil
+
 
 class TestResultController(BaseTestCase):
     """ResultController integration test stubs"""
+
+    def setUp(self) -> None:
+        response = TestUtil.create('project', self.client)
+        self.project_uuid = json.loads(response.data.decode('utf-8'))['uuid']
+
+        response = TestUtil.create('testartifact', self.client, self.project_uuid)
+        response_json = json.loads(response.data.decode('utf-8'))
+        self.testartifact_uuid = response_json[0]['uuid']
+
+        response = TestUtil.create('deployment', self.client, self.testartifact_uuid)
+        response_json = json.loads(response.data.decode('utf-8'))
+        self.deployment_uuid = response_json['uuid']
+
+        response = TestUtil.create('execution', self.client, self.deployment_uuid)
+        response_json = json.loads(response.data.decode('utf-8'))
+        self.execution_uuid = response_json['uuid']
+
+        response = TestUtil.create('result', self.client, self.execution_uuid)
+        response_json = json.loads(response.data.decode('utf-8'))
+        self.result_uuid = response_json['uuid']
+        self.assert200(response, 'Response body is : ' + response.data.decode('utf-8'))
+
+    def tearDown(self) -> None:
+        TestUtil.delete('result', self.client)
+        TestUtil.delete('execution', self.client)
+        TestUtil.delete('deployment', self.client)
+        TestUtil.delete('testartifact', self.client)
+        TestUtil.delete('project', self.client)
 
     def test_create_result(self):
         """Test case for create_result
 
         Creates new result
         """
-        body = POSTResult()
-        response = self.client.open(
-            '/result',
-            method='POST',
-            data=json.dumps(body),
-            content_type='application/json')
+        response = TestUtil.create('result', self.client, self.execution_uuid)
         self.assert200(response,
                        'Response body is : ' + response.data.decode('utf-8'))
 
@@ -33,7 +58,7 @@ class TestResultController(BaseTestCase):
         Delete a result
         """
         response = self.client.open(
-            '/result/{result_uuid}'.format(result_uuid='result_uuid_example'),
+            '/RadonCTT/result/{result_uuid}'.format(result_uuid=self.result_uuid),
             method='DELETE')
         self.assert200(response,
                        'Response body is : ' + response.data.decode('utf-8'))
@@ -46,12 +71,12 @@ class TestResultController(BaseTestCase):
         headers = { 
             'Accept': 'application/json',
         }
-        response = self.client.open(
-            '/RadonCTT/result/{result_uuid}/download'.format(result_uuid='result_uuid_example'),
+
+        with self.client.open(
+            '/RadonCTT/result/{result_uuid}/download'.format(result_uuid=self.result_uuid),
             method='GET',
-            headers=headers)
-        self.assert200(response,
-                       'Response body is : ' + response.data.decode('utf-8'))
+            headers=headers) as response:
+            self.assert200(response)
 
     def test_get_result_by_uuid(self):
         """Test case for get_result_by_uuid
@@ -62,7 +87,7 @@ class TestResultController(BaseTestCase):
             'Accept': 'application/json',
         }
         response = self.client.open(
-            '/RadonCTT/result/{result_uuid}'.format(result_uuid='result_uuid_example'),
+            '/RadonCTT/result/{result_uuid}'.format(result_uuid=self.result_uuid),
             method='GET',
             headers=headers)
         self.assert200(response,
