@@ -32,10 +32,12 @@ pipeline {
       agent {
         docker {
           image "${DOCKER_NAME}:${DOCKER_TAG}"
-          args "-e 'CTT_TEST_MODE=True' -v '$WORKSPACE:/output' --entrypoint='coverage run -m xmlrunner discover openapi_server/test/ -o /output/unittest && coverage xml -o /output/coverage.xml'"
+          args "-e 'CTT_TEST_MODE=True' -v '$WORKSPACE:/output' --entrypoint '/bin/sh'
         }
       }
       steps {
+        sh 'coverage run -m xmlrunner discover openapi_server/test/ -o /output/unittest'
+        sh 'coverage xml -o /output/coverage.xml'
         archiveArtifacts "unittest"
         archiveArtifacts "coverage.xml"
       }
