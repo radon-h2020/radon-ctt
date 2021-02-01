@@ -38,10 +38,10 @@ pipeline {
         }
       }
     }
-    stage('Store test results') {
+    stage('Publish test results') {
       steps {
-        archiveArtifacts artifacts: "unittest/*.xml" 
-        archiveArtifacts artifacts: "coverage.xml"
+        junit "unittest/*.xml" 
+        junit "coverage.xml"
       }
     }
     stage('Push CTT server Docker image to DockerHub') {
