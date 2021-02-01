@@ -38,6 +38,10 @@ pipeline {
       steps {
         sh 'coverage run -m xmlrunner discover openapi_server/test/ -o /output/unittest'
         sh 'coverage xml -o /output/coverage.xml'
+      }
+    }
+    stage('Store test results') {
+      steps {
         archiveArtifacts "unittest"
         archiveArtifacts "coverage.xml"
       }
