@@ -48,7 +48,7 @@ pipeline {
       steps {
         script {
           withDockerRegistry(credentialsId: 'dockerhub-radonconsortium') {
-            DOCKER_IMAGE.push("${DOCKER_NAME}:${DOCKER_TAG}")
+            DOCKER_IMAGE.push(DOCKER_TAG)
           }
         }
       }
