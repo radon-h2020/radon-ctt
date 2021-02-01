@@ -1,17 +1,19 @@
 FROM python:3-alpine
 
+ENV OPERA_SSH_HOST_KEY_CHECKING=False
 ENV ANSIBLE_HOST_KEY_CHECKING=False
 
 RUN mkdir -p /usr/src/app
 WORKDIR /usr/src/app
 
 COPY requirements.txt /usr/src/app/
+COPY test-requirements.txt /usr/src/app/
 
-RUN apk --update add python3 py3-pip openssl ca-certificates py3-openssl wget git aws-cli openssh
-RUN apk --update add --virtual local-deployment-docker docker docker-compose docker-py
+RUN apk --update add python3 py3-pip openssl ca-certificates py3-openssl wget git openssh
 RUN apk --update add --virtual build-dependencies libffi-dev openssl-dev python3-dev build-base \
   && pip install --upgrade pip \
   && pip install -r requirements.txt \
+  && pip install -r test-requirements.txt \
   && apk del build-dependencies
 
 COPY . /usr/src/app
