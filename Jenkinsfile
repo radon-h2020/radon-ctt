@@ -32,18 +32,9 @@ pipeline {
       options {
         skipDefaultCheckout true
       }
-      //agent {
-      //  docker {
-      //    image "${DOCKER_NAME}:${DOCKER_TAG}"
-      //    args "-e 'CTT_TEST_MODE=True' -v '$WORKSPACE:/output' --entrypoint '/bin/sh'"
-      //  }
-      //}
       steps {
         script {
-          DOCKER_IMAGE.inside("-e 'CTT_TEST_MODE=True' -v '$WORKSPACE:/output' --entrypoint '/bin/sh'") {
-            sh 'coverage run -m xmlrunner discover openapi_server/test/ -o /output/unittest'
-            sh 'coverage xml -o /output/coverage.xml'
-          }
+          sh "docker run -e 'CTT_TEST_MODE=True' -v '${WORKSPACE}:/output' --entrypoint '/bin/sh' ${DOCKER_NAME}:${DOCKER_TAG} -c 'coverage run -m xmlrunner discover openapi_server/test/ -o /output/unittest && sh 'coverage xml -o /output/coverage.xml'"
         }
       }
     }
