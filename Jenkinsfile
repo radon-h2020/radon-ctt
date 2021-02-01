@@ -41,7 +41,7 @@ pipeline {
     stage('Publish test results') {
       steps {
         junit "unittest/*.xml" 
-        junit "coverage.xml"
+        cobertura coberturaReportFile: 'coverage.xml'
       }
     }
     stage('Push CTT server Docker image to DockerHub') {
