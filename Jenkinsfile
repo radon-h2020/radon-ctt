@@ -35,9 +35,9 @@ pipeline {
           image "${DOCKER_IMAGE_BASE}:${DOCKER_TAG}"
           args "-v ${WORKSPACE}/test-results:/mnt/test-results -e 'CTT_TEST_MODE=True' --entrypoint='coverage run -m xmlrunner discover openapi_server/test/ -o /mnt/test-results/unittest && coverage xml -o /mnt/test-results/coverage/coverage.xml'"
         }
-        steps {
-          archiveArtifacts 'test-results'
-        }
+      }
+      steps {
+        archiveArtifacts 'test-results'
       }
     }
   }
