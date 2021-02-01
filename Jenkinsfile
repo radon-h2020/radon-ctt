@@ -40,8 +40,8 @@ pipeline {
     }
     stage('Store test results') {
       steps {
-        archiveArtifacts "unittest"
-        archiveArtifacts "coverage.xml"
+        archiveArtifacts "${WORKSPACE}/unittest/*.xml", fingerprint: true 
+        archiveArtifacts "${WORKSPACE}/coverage.xml", fingerprint: true
       }
     }
     stage('Push CTT server Docker image to DockerHub') {
