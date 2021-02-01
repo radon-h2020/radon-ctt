@@ -23,7 +23,7 @@ pipeline {
           if (env.BRANCH_NAME == 'master') {
             DOCKER_TAG = 'latest'
           }
-          DOCKER_IMAGE = docker.build("${DOCKER_IMAGE_BASE}:${DOCKER_TAG}", "./ctt-server")
+          DOCKER_IMAGE = docker.build("${DOCKER_IMAGE}:${DOCKER_TAG}", "./ctt-server")
         }
       }
     }
@@ -44,7 +44,7 @@ pipeline {
       steps {
         script {
           withDockerRegistry(credentialsId: 'dockerhub-radonconsortium') {
-            dockerImage.push(DOCKER_TAG)
+            dockerImage.push("${DOCKER_IMAGE}:${DOCKER_TAG}")
           }
         }
       }
