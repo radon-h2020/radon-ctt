@@ -12,7 +12,7 @@ pipeline {
   }
 
   environment {
-    DOCKER_TAG = env.BRANCH_NAME
+    DOCKER_TAG = "${env.BRANCH_NAME}"
     DOCKER_IMAGE_BASE = 'radonconsortium/radon-ctt'
   }
 
