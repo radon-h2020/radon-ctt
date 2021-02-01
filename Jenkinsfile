@@ -31,8 +31,7 @@ pipeline {
     stage('Unit tests and coverage tests') {
       agent {
         docker {
-          image DOCKER_NAME
-          label DOCKER_TAG
+          image "${DOCKER_NAME}:${DOCKER_TAG}"
           args "-e 'CTT_TEST_MODE=True' -v '$WORKSPACE:/output' --entrypoint='coverage run -m xmlrunner discover openapi_server/test/ -o /output/unittest && coverage xml -o /output/coverage.xml'"
         }
       }
