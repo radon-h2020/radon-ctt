@@ -13,7 +13,8 @@ pipeline {
 
   environment {
     DOCKER_TAG = "${env.BRANCH_NAME}"
-    DOCKER_IMAGE = 'radonconsortium/radon-ctt'
+    DOCKER_NAME = 'radonconsortium/radon-ctt'
+    DOCKER_IMAGE = ''
   }
 
   stages {
@@ -23,14 +24,14 @@ pipeline {
           if (env.BRANCH_NAME == 'master') {
             DOCKER_TAG = 'latest'
           }
-          DOCKER_IMAGE = docker.build("${DOCKER_IMAGE}:${DOCKER_TAG}", "./ctt-server")
+          DOCKER_IMAGE = docker.build("${DOCKER_NAME}:${DOCKER_TAG}", "./ctt-server")
         }
       }
     }
     stage('Unit tests and coverage tests') {
       agent {
         docker {
-          image DOCKER_IMAGE
+          image DOCKER_NAME
           label DOCKER_TAG
           args "-e 'CTT_TEST_MODE=True' -v '$WORKSPACE:/output' --entrypoint='coverage run -m xmlrunner discover openapi_server/test/ -o /output/unittest && coverage xml -o /output/coverage.xml'"
         }
@@ -44,7 +45,7 @@ pipeline {
       steps {
         script {
           withDockerRegistry(credentialsId: 'dockerhub-radonconsortium') {
-            dockerImage.push("${DOCKER_IMAGE}:${DOCKER_TAG}")
+            DOCKER_IMAGE.push("${DOCKER_NAME}:${DOCKER_TAG}")
           }
         }
       }
