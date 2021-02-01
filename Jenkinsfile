@@ -42,8 +42,10 @@ pipeline {
     }
     stage('Push CTT server Docker image to DockerHub') {
       steps {
-        withDockerRegistry(credentialsId: 'dockerhub-radonconsortium') {
-          dockerImage.push(DOCKER_TAG)
+        script {
+          withDockerRegistry(credentialsId: 'dockerhub-radonconsortium') {
+            dockerImage.push(DOCKER_TAG)
+          }
         }
       }
     }
