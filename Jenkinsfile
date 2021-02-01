@@ -32,7 +32,7 @@ pipeline {
       agent {
         docker {
           image "${DOCKER_NAME}:${DOCKER_TAG}"
-          args "-e 'CTT_TEST_MODE=True' -v '$WORKSPACE:/output' --entrypoint '/bin/sh'
+          args "-e 'CTT_TEST_MODE=True' -v '$WORKSPACE:/output' --entrypoint '/bin/sh'"
         }
       }
       steps {
