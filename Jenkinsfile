@@ -34,7 +34,7 @@ pipeline {
       }
       steps {
         script {
-          sh "docker run -e 'CTT_TEST_MODE=True' -v '${WORKSPACE}:/output' --entrypoint '/bin/sh' ${DOCKER_NAME}:${DOCKER_TAG} -c 'coverage run -m xmlrunner discover openapi_server/test/ -o /output/unittest && sh 'coverage xml -o /output/coverage.xml'"
+          sh "docker run -e 'CTT_TEST_MODE=True' -v '${WORKSPACE}:/output' --entrypoint '/bin/sh' ${DOCKER_NAME}:${DOCKER_TAG} -c 'coverage run -m xmlrunner discover openapi_server/test/ -o /output/unittest && coverage xml -o /output/coverage.xml'"
         }
       }
     }
