@@ -41,8 +41,9 @@ pipeline {
       steps {
         script {
           DOCKER_IMAGE.inside("-e 'CTT_TEST_MODE=True' -v '$WORKSPACE:/output' --entrypoint '/bin/sh'") {
-          sh 'coverage run -m xmlrunner discover openapi_server/test/ -o /output/unittest'
-          sh 'coverage xml -o /output/coverage.xml'
+            sh 'coverage run -m xmlrunner discover openapi_server/test/ -o /output/unittest'
+            sh 'coverage xml -o /output/coverage.xml'
+          }
         }
       }
     }
