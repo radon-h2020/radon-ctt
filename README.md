@@ -1,5 +1,9 @@
 # RADON Continuous Testing Tool (CTT)
 
+![build (dev)](https://img.shields.io/jenkins/build?jobUrl=http%3A%2F%2F217.172.12.165%3A8080%2Fjob%2FCTT%2Fjob%2Fradon-ctt%2Fjob%2Fdev%2F&style=plastic)
+![tests (dev)](https://img.shields.io/jenkins/tests?compact_message&jobUrl=http%3A%2F%2F217.172.12.165%3A8080%2Fjob%2FCTT%2Fjob%2Fradon-ctt%2Fjob%2Fdev%2F&style=plastic)
+![coverage (dev)](https://img.shields.io/jenkins/coverage/cobertura?jobUrl=http%3A%2F%2F217.172.12.165%3A8080%2Fjob%2FCTT%2Fjob%2Fradon-ctt%2Fjob%2Fdev%2F&style=plastic)
+
 | Items                    | Contents                                                     |
 | ------------------------ | ------------------------------------------------------------ |
 | **Short Description**    | The Continuous Testing Tool (CTT) provides the functionality for defining, generating, executing, and refining continuous tests of application functions, data pipelines and microservices, as well as for reporting test results. While targeting to provide a general framework for continuous quality testing in RADON, a particular focus of CTT is on testing workload-related quality attributes such as performance, elasticity, and resource/cost efficiency. |
