@@ -8,20 +8,20 @@ from flask import current_app
 
 name = 'DataPipeline'
 plugin_name = 'datapipeline'
-plugin_type = 'radon.policies.testing.DataPipeline'
+plugin_type = 'radon.policies.testing.DataPipelineLoadTest'
 
 """
-'SimpleJMeterLoadTest': {
-    'type': 'radon.policies.testing.DataPipeline',
-    'properties': {
-        'hostname': 'localhost',
-        'port': 8080,
-        'ti_blueprint': 'radon.blueprints.testing.NiFiTestingInfrastructure',
-        'user.properties': None,
-        'test_id': 'loadtest34',
-    },
-    'targets': ['ConsS3Bucket'],
-}
+    - DataPipelineLoadTest:
+        type: radon.policies.testing.DataPipelineLoadTest
+        properties:
+          velocity_per_minute: "60"
+          hostname: "radon.s3.eu-central-1.amazonaws.com"
+          port: "8080"
+          ti_blueprint: "radon.blueprints.testing.NiFiTIDocker"
+          resource_location: "/tmp/resources.zip"
+          test_duration_sec: "60"
+          test_id: "firstdptest"
+        targets: [ ConsS3Bucket_1 ]
 """
 
 
@@ -29,51 +29,52 @@ def configure(ti_hostname, policy_yaml, test_artifact_storage_path, sut_hostname
 
     policy_properties = policy_yaml['properties']
 
-    # TODO: Move JMeter-specific properties and their handling/parsing to separate class?
 
+    #resource_location
+    resource_location = ''
+    if 'resource_location' in policy_properties:
+        resources = os.path.join(test_artifact_storage_path, policy_properties['resource_location'])
 
-    samplesPerMinute = 1
-    aws_region = "eu-west-1"  # AWS_REGION - bucket region
-    aws_bucket = "test"  # AWS_BUCKET - bucket name
-    S3_bucket_path = "test"  # - folder path inside the bucker
-
-
-    data_archive_filename = ''
-    if 'data_archive_filename' in policy_properties:
-        data_archive_filename = policy_properties['data_archive_filename']
-
-    resources = ''
-    if 'resources' in policy_properties:
-        resources = os.path.join(test_artifact_storage_path, policy_properties['resources'])
-
+    #hostname
     if not sut_hostname and 'hostname' in policy_properties:
         sut_hostname = policy_properties['hostname']
 
+    # port
+    # - not used
+    sut_port = None
+    if 'port' in policy_properties:
+        sut_port = policy_properties['port']
 
-    user_properties = ''
-    if 'user.properties' in policy_properties and not policy_properties['user.properties'] is None:
-        user_properties = os.path.join(test_artifact_storage_path, policy_properties['user.properties'])
+    #velocity_per_minute
+    velocity_per_minute = None
+    if 'velocity_per_minute' in policy_properties:
+        velocity_per_minute = policy_properties['velocity_per_minute']
 
+    #test_duration_sec
+    test_duration_sec = None
+    if 'test_duration_sec' in policy_properties:
+        test_duration_sec = policy_properties['test_duration_sec']
+
+
+    # test_id
     test_id = None
-
     if 'test_id' in policy_properties:
         test_id = policy_properties['test_id']
 
-    if sut_hostname  and resources and os.path.isfile(resources) and test_id:
+
+
+    if sut_hostname and resources and test_duration_sec and velocity_per_minute and os.path.isfile(resources) and test_id:
         # Check if resources file is a zip file.
-        if data_archive_filename.endswith('.zip'):
+        if resources.endswith('.zip'):
             # No action needed, as a zip file is already provided by the user.
             current_app.logger.debug(f'ZIP file {resources} was provided.')
             pass
         else:
             raise ValueError(f'{resources} is not of a valid file type. Needs to be .jmx or .zip.')
 
-        data = {'host': sut_hostname}
+        data = {'host': sut_hostname, 'test_duration_sec': test_duration_sec, 'velocity_per_minute': velocity_per_minute}
 
         files = {'resources': open(resources, 'rb')}
-
-        if os.path.isfile(user_properties):
-            files['properties'] = open(user_properties, 'rb')
 
         response = requests.post(f'http://{ti_hostname}:{ti_port}/{plugin_name}/configuration', data=data, files=files)
         json_response = response.json()
@@ -85,6 +86,8 @@ def configure(ti_hostname, policy_yaml, test_artifact_storage_path, sut_hostname
     else:
         current_app.logger.error(f'Test information incomplete to finalize configuration.')
         raise ValueError(f'Test information incomplete to finalize configuration.')
+
+
 
 
 def execute(ti_hostname, config_uuid, ti_port=5000):
@@ -107,4 +110,5 @@ def get_results(ti_hostname, execution_uuid, ti_port=5000):
             with open(temp_results.name, 'wb') as f:
                 shutil.copyfileobj(req.raw, f)
             return temp_results.name
+
 
