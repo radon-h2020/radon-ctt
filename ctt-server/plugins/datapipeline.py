@@ -47,6 +47,24 @@ def configure(ti_hostname, policy_yaml, test_artifact_storage_path, sut_hostname
     if 'port' in policy_properties:
         sut_port = policy_properties['port']
 
+    #metric
+    if 'performance_metric'  in policy_properties:
+        performance_metric = policy_properties['performance_metric']
+    current_app.logger.info(f'sut: {performance_metric} was provided.')
+
+    #lower bound
+    if 'lower_bound' in policy_properties:
+        lower_bound = policy_properties['lower_bound']
+    current_app.logger.info(f'sut: {lower_bound} was provided.')
+
+    #upper bound
+    if 'upper_bound' in policy_properties:
+        upper_bound = policy_properties['upper_bound']
+    current_app.logger.info(f'sut: {upper_bound} was provided.')
+
+
+
+
     #velocity_per_minute
     velocity_per_minute = None
     if 'velocity_per_minute' in policy_properties:
@@ -77,6 +95,16 @@ def configure(ti_hostname, policy_yaml, test_artifact_storage_path, sut_hostname
             raise ValueError(f'{resources} is not of a valid file type. Needs to be .jmx or .zip.')
 
         data = {'host': sut_hostname, 'test_duration_sec': test_duration_sec, 'velocity_per_minute': velocity_per_minute}
+
+        if performance_metric is not None:
+           data['performance_metric'] = performance_metric
+
+        if lower_bound is not None:
+           data['lower_bound'] = lower_bound
+
+        if upper_bound is not None:
+           data['upper_bound'] = upper_bound
+
 
         files = {'resources': open(resources, 'rb')}
 
