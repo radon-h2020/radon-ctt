@@ -31,13 +31,15 @@ def configure(ti_hostname, policy_yaml, test_artifact_storage_path, sut_hostname
 
 
     #resource_location
-    resource_location = ''
+    resources = None
     if 'resource_location' in policy_properties:
         resources = os.path.join(test_artifact_storage_path, policy_properties['resource_location'])
+    current_app.logger.info(f'resources: {resources} was provided.')
 
     #hostname
     if not sut_hostname and 'hostname' in policy_properties:
         sut_hostname = policy_properties['hostname']
+    current_app.logger.info(f'sut: {sut_hostname} was provided.')
 
     # port
     # - not used
@@ -45,22 +47,42 @@ def configure(ti_hostname, policy_yaml, test_artifact_storage_path, sut_hostname
     if 'port' in policy_properties:
         sut_port = policy_properties['port']
 
+    #metric
+    if 'performance_metric'  in policy_properties:
+        performance_metric = policy_properties['performance_metric']
+    current_app.logger.info(f'sut: {performance_metric} was provided.')
+
+    #lower bound
+    if 'lower_bound' in policy_properties:
+        lower_bound = policy_properties['lower_bound']
+    current_app.logger.info(f'sut: {lower_bound} was provided.')
+
+    #upper bound
+    if 'upper_bound' in policy_properties:
+        upper_bound = policy_properties['upper_bound']
+    current_app.logger.info(f'sut: {upper_bound} was provided.')
+
+
+
+
     #velocity_per_minute
     velocity_per_minute = None
     if 'velocity_per_minute' in policy_properties:
         velocity_per_minute = policy_properties['velocity_per_minute']
+    current_app.logger.info(f'velocity_per_minute: {velocity_per_minute} was provided.')
 
     #test_duration_sec
     test_duration_sec = None
-    if 'test_duration_sec' in policy_properties:
-        test_duration_sec = policy_properties['test_duration_sec']
+    if 'test_duration' in policy_properties:
+        test_duration_sec = policy_properties['test_duration']
+    current_app.logger.info(f'test_duration_sec: {test_duration_sec} was provided.')
 
 
     # test_id
     test_id = None
     if 'test_id' in policy_properties:
         test_id = policy_properties['test_id']
-
+    current_app.logger.info(f'test_id: {test_id} was provided.')
 
 
     if sut_hostname and resources and test_duration_sec and velocity_per_minute and os.path.isfile(resources) and test_id:
@@ -74,6 +96,16 @@ def configure(ti_hostname, policy_yaml, test_artifact_storage_path, sut_hostname
 
         data = {'host': sut_hostname, 'test_duration_sec': test_duration_sec, 'velocity_per_minute': velocity_per_minute}
 
+        if performance_metric is not None:
+           data['performance_metric'] = performance_metric
+
+        if lower_bound is not None:
+           data['lower_bound'] = lower_bound
+
+        if upper_bound is not None:
+           data['upper_bound'] = upper_bound
+
+
         files = {'resources': open(resources, 'rb')}
 
         response = requests.post(f'http://{ti_hostname}:{ti_port}/{plugin_name}/configuration', data=data, files=files)
@@ -86,8 +118,6 @@ def configure(ti_hostname, policy_yaml, test_artifact_storage_path, sut_hostname
     else:
         current_app.logger.error(f'Test information incomplete to finalize configuration.')
         raise ValueError(f'Test information incomplete to finalize configuration.')
-
-
 
 
 def execute(ti_hostname, config_uuid, ti_port=5000):
@@ -110,5 +140,4 @@ def get_results(ti_hostname, execution_uuid, ti_port=5000):
             with open(temp_results.name, 'wb') as f:
                 shutil.copyfileobj(req.raw, f)
             return temp_results.name
-
 
