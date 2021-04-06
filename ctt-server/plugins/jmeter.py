@@ -67,7 +67,6 @@ def configure(ti_hostname, policy_yaml, test_artifact_storage_path, sut_hostname
         elif resources.endswith('.zip') and jmx_file_name:
             # No action needed, as a zip file is already provided by the user.
             current_app.logger.debug(f'ZIP file {resources} was provided.')
-            pass
         else:
             raise ValueError(f'{resources} is not of a valid file type. Needs to be .jmx or .zip.')
 

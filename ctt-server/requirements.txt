@@ -16,7 +16,7 @@ six == 1.15.0
 
 # Only needed for local execution
 docker == 4.4.1
-opera >= 0.6.2
+opera >= 0.6.5
 straight.plugin == 1.5.0
 waitress == 1.4.4
 
@@ -25,6 +25,7 @@ awscli >= 1.18.169
 
 # Google Cloud
 apache-libcloud >= 3.2.0
+gcloud
 
 # Azure
 azure-mgmt-compute >= 17.0.0

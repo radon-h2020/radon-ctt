@@ -8,7 +8,6 @@ DBFile: str = 'radon-ctt.db'
 SUTFile: str = 'sut_tosca.yaml'
 TIFile: str = 'ti_tosca.yaml'
 DropPolicies: bool = True
-FaasScenario: bool = False
 AutoUndeploy: bool = False
 
 
