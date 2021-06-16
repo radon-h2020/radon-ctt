@@ -15,12 +15,14 @@ on:
     - dev
 jobs:
   push_to_registry:
-    name: Push Docker image to multiple registries
+    name: Build and push Docker image to DockerHub
     runs-on: ubuntu-latest
     permissions:
       packages: write
       contents: read
     steps:
+      - name: Branch name
+        run: echo running on branch ${GITHUB_REF##*/}
       - name: Check out the repo
         uses: actions/checkout@v2
       - name: Log in to Docker Hub
