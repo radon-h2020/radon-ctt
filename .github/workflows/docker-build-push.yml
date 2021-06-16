@@ -19,7 +19,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Branch name
-        run: echo "GITHUB_BRANCH=${GITHUB_REF##*/}" >> $GITHUB_ENV
+        run: echo "BRANCH=${GITHUB_REF##*/}" >> $GITHUB_ENV
       - name: Check out the repo
         uses: actions/checkout@v2
       - name: Log in to Docker Hub
@@ -31,5 +31,7 @@ jobs:
         uses: docker/build-push-action@v2
         with:
           push: true
-          tags: radonconsortium/radon-ctt:${GITHUB_REF##*/}
+          tags: radonconsortium/radon-ctt:${{ env.BRANCH }}
           context: ./ctt-server
+          build-args: |
+            BRANCH=${{ env.BRANCH }}
