@@ -12,6 +12,8 @@ jobs:
     steps:
       - name: Branch name
         run: echo "BRANCH=${GITHUB_REF##*/}" >> $GITHUB_ENV
+      - name: Branch name
+        run: echo "RUNNER_TMP=${RUNNER_TEMP}" >> $GITHUB_ENV        
       - name: Check out the repo
         uses: actions/checkout@v2
       - name: Log in to Docker Hub
@@ -29,7 +31,7 @@ jobs:
         uses: addnab/docker-run-action@v3
         with: 
           image: radonconsortium/radon-ctt:${{ env.BRANCH }}
-          options: -e 'CTT_TEST_MODE=True' -v '$RUNNER_TEMP:/output' --entrypoint '/bin/sh'
+          options: -e 'CTT_TEST_MODE=True' -v '${{ env.RUNNER_TMP }}:/output' --entrypoint '/bin/sh'
           run: |
             coverage run -m xmlrunner discover openapi_server/test/ -o /output/unittest 
             coverage xml -o /output/coverage.xml
@@ -37,6 +39,6 @@ jobs:
       - name: Create cobertura report
         uses: 5monkeys/cobertura-action@master
         with:
-          path: $RUNNER_TEMP/coverage.xml
+          path: ${{ env.RUNNER_TMP }}/coverage.xml
           repo_token: ${{ secrets.GITHUB_TOKEN }}
           minimum_coverage: 70
