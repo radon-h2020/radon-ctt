@@ -28,7 +28,7 @@ jobs:
           tags: radonconsortium/radon-ctt:${{ env.BRANCH }}
           context: ./ctt-server
       - name: Run tests with coverage
-        run: docker run -e 'CTT_TEST_MODE=True' -v '/home/runner/work/_temp/_github_home:/output' --entrypoint '/bin/sh' radonconsortium/radon-ctt:${{ env.BRANCH }} -c 'coverage run -m xmlrunner discover openapi_server/test/ -o /output/unittest && coverage xml -o /output/coverage.xml'"
+        run: docker run -e 'CTT_TEST_MODE=True' -v '/home/runner/work/_temp/_github_home:/output' --entrypoint '/bin/sh' radonconsortium/radon-ctt:${{ env.BRANCH }} -c 'coverage run -m xmlrunner discover openapi_server/test/ -o /output/unittest && coverage xml -o /output/coverage.xml'
       - name: Upload test artifacts
         uses: actions/upload-artifact@v2
         with:
