@@ -6,35 +6,37 @@ on:
     - master
     - dev
 jobs:
-  build_docker_image:
-    name: Build Docker image
+  docker_image:
+    name: Build and push Docker image
     runs-on: ubuntu-latest
     steps:
       - name: Branch name
         run: echo "BRANCH=${GITHUB_REF##*/}" >> $GITHUB_ENV
       - name: Check out the repo
         uses: actions/checkout@v2
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v1
+        with:
+          username: ${{ secrets.docker_hub_user }}
+          password: ${{ secrets.docker_hub_pass }}
       - name: Push to Docker Hub
         uses: docker/build-push-action@v2
         with:
-          push: false
+          push: true
           tags: radonconsortium/radon-ctt:${{ env.BRANCH }}
           context: ./ctt-server
-  push_docker_image:
-    needs: build_docker_image
-    name: Push Docker image to DockerHub
-    runs-on: ubuntu-latest
-    steps:
-    - name: Branch name
-      run: echo "BRANCH=${GITHUB_REF##*/}" >> $GITHUB_ENV
-    - name: Log in to Docker Hub
-      uses: docker/login-action@v1
-      with:
-        username: ${{ secrets.docker_hub_user }}
-        password: ${{ secrets.docker_hub_pass }}
-    - name: Push to Docker Hub
-      uses: docker/build-push-action@v2
-      with:
-        push: true
-        tags: radonconsortium/radon-ctt:${{ env.BRANCH }}
-        context: ./ctt-server
+      - name: Run tests with coverage
+        uses: addnab/docker-run-action@v3
+        with: 
+          image: radonconsortium/radon-ctt:${{ env.BRANCH }}
+          options: -e 'CTT_TEST_MODE=True' -v '${RUNNER_TEMP}:/output' --entrypoint '/bin/sh'
+          run: |
+            coverage run -m xmlrunner discover openapi_server/test/ -o /output/unittest 
+            coverage xml -o /output/coverage.xml
+          
+      - name: Create cobertura report
+        uses: 5monkeys/cobertura-action@master
+        with:
+          path: ${RUNNER_TEMP}/coverage.xml
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          minimum_coverage: 70
