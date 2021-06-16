@@ -31,5 +31,5 @@ jobs:
         uses: docker/build-push-action@v2
         with:
           push: true
-          tags: radonconsortium/radon-ctt:$GITHUB_BRANCH
+          tags: radonconsortium/radon-ctt:${GITHUB_BRANCH}
           context: ./ctt-server
