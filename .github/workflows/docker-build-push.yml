@@ -6,7 +6,7 @@
 # separate terms of service, privacy policy, and support
 # documentation.
 
-name: Upload Python Package
+name: Build and push Docker image to DockerHub
 
 on:
   push:
@@ -17,12 +17,9 @@ jobs:
   push_to_registry:
     name: Build and push Docker image to DockerHub
     runs-on: ubuntu-latest
-    permissions:
-      packages: write
-      contents: read
     steps:
       - name: Branch name
-        run: echo running on branch ${{ GITHUB_REF##*/ }}
+        run: echo running on branch ${GITHUB_REF##*/}
       - name: Check out the repo
         uses: actions/checkout@v2
       - name: Log in to Docker Hub
@@ -34,5 +31,5 @@ jobs:
         uses: docker/build-push-action@v2
         with:
           push: true
-          tags: radonconsortium/radon-ctt:${{ GITHUB_REF##*/ }}
+          tags: radonconsortium/radon-ctt:${{ github.ref }}
           context: ./ctt-server
