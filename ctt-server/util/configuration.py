@@ -11,6 +11,15 @@ DropPolicies: bool = True
 AutoUndeploy: bool = False
 
 
+def git_credentials():
+    git_user = os.getenv('GIT_USERNAME')
+    git_pass = os.getenv('GIT_PASSWORD')
+    if git_user and git_pass:
+        return {'username': git_user, 'password': git_pass}
+    else:
+        return None
+
+
 def is_che_env() -> bool:
     ctt_che_env = os.getenv('CTT_CHE_ENV')
     if ctt_che_env and ctt_che_env == "True":
@@ -32,7 +41,7 @@ def is_test_mode() -> bool:
         return False
 
 
-def custom_dir_prefix() -> str:
+def custom_dir_prefix():
     custom_dir = os.getenv('CTT_BASE_DIR')
     if custom_dir and custom_dir.strip():
         return custom_dir

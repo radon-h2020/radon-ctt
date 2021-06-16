@@ -3,12 +3,15 @@ FROM python:3-alpine
 ENV OPERA_SSH_HOST_KEY_CHECKING=False
 ENV ANSIBLE_HOST_KEY_CHECKING=False
 
-ENV CLOUD_SDK_VERSION=334.0.0
-ENV PATH /google-cloud-sdk/bin:$PATH
+RUN echo -e "search home\nnameserver 8.8.8.8" > /etc/resolv.conf
+
+ENV CLOUD_SDK_VERSION=345.0.0
+ENV PATH=/google-cloud-sdk/bin:$PATH
 RUN wget https://dl.google.com/dl/cloudsdk/channels/rapid/downloads/google-cloud-sdk-${CLOUD_SDK_VERSION}-linux-x86_64.tar.gz && \
     tar xzf google-cloud-sdk-${CLOUD_SDK_VERSION}-linux-x86_64.tar.gz && \
     rm google-cloud-sdk-${CLOUD_SDK_VERSION}-linux-x86_64.tar.gz && \
     ln -s /lib /lib64 && \
+    gcloud components update && \
     gcloud config set core/disable_usage_reporting true && \
     gcloud --version
 

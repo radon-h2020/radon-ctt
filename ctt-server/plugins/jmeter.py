@@ -34,10 +34,12 @@ def configure(ti_hostname, policy_yaml, test_artifact_storage_path, sut_hostname
     jmx_file_name = ''
     if 'jmx_file_name' in policy_properties:
         jmx_file_name = policy_properties['jmx_file_name']
+        current_app.logger.debug(f'"jmx_file_name": {jmx_file_name}.')
 
     resources = ''
     if 'resources' in policy_properties:
         resources = os.path.join(test_artifact_storage_path, policy_properties['resources'])
+        current_app.logger.debug(f'"resources": {resources}.')
 
     if not sut_hostname and 'hostname' in policy_properties:
         sut_hostname = policy_properties['hostname']
@@ -55,6 +57,20 @@ def configure(ti_hostname, policy_yaml, test_artifact_storage_path, sut_hostname
         test_id = policy_properties['test_id']
 
     if sut_hostname and sut_port and resources and os.path.isfile(resources) and test_id:
+
+        data = {}
+        files = {}
+        user_properties_in_repo = True
+
+        if user_properties:
+            current_app.logger.info(f"User properties file name provided: {policy_properties['user.properties']}.")
+            if os.path.isfile(user_properties):
+                current_app.logger.info(f'User properties file name provided exists.')
+                files['properties'] = open(user_properties, 'rb')
+            else:
+                current_app.logger.info(f'User properties file name provided does NOT exist as standalone.')
+                user_properties_in_repo = False
+
         # Check if resources file is a jmx file. Then compress it and pass over the path to the zip file.
         if resources.endswith('.jmx'):
             jmx_file_name = os.path.basename(resources)
@@ -67,13 +83,21 @@ def configure(ti_hostname, policy_yaml, test_artifact_storage_path, sut_hostname
         elif resources.endswith('.zip') and jmx_file_name:
             # No action needed, as a zip file is already provided by the user.
             current_app.logger.debug(f'ZIP file {resources} was provided.')
+            if not user_properties_in_repo:
+                current_app.logger.info(f'Checking for user properties in ZIP file.')
+                resources_zip = ZipFile(resources)
+                if policy_properties['user.properties'] in resources_zip.namelist():
+                    files['properties'] = resources_zip.open(policy_properties['user.properties'])
+                    current_app.logger.info(f'Found and added user properties inside the ZIP file.')
+                else:
+                    current_app.logger.info(f'Could not find user properties inside the ZIP file, skipping it.')
         else:
             raise ValueError(f'{resources} is not of a valid file type. Needs to be .jmx or .zip.')
 
-        data = {'host': sut_hostname, 'port': sut_port, 'jmx_file_name': jmx_file_name}
-        files = {'resources': open(resources, 'rb')}
-        if os.path.isfile(user_properties):
-            files['properties'] = open(user_properties, 'rb')
+        data['host'] = sut_hostname
+        data['port'] = sut_port
+        data['jmx_file_name'] = jmx_file_name
+        files['resources'] = open(resources, 'rb')
 
         response = requests.post(f'http://{ti_hostname}:{ti_port}/{plugin_name}/configuration', data=data, files=files)
         json_response = response.json()

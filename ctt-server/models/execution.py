@@ -38,7 +38,7 @@ class Execution(Base, AbstractModel):
     def __init__(self, deployment):
         if deployment:
             self.uuid = str(uuid.uuid4())
-            self.deployment = deployment
+            self.deployment: Deployment = deployment
             self.deployment_uuid = deployment.uuid
             self.storage_path = os.path.join(get_path(), self.__tablename__, self.uuid)
             self.plugin = None
@@ -84,6 +84,11 @@ class Execution(Base, AbstractModel):
     def test_infrastructure_ip(self):
         return self.ti_ip_address
 
+    def undeploy(self):
+        linked_deployment: Deployment = Deployment.get_by_uuid(self.deployment_uuid)
+        if linked_deployment:
+            linked_deployment.undeploy()
+
     def configure(self):
         test_artifact_yaml_policy = self.test_artifact.policy_yaml
         test_artifact_storage_path = self.test_artifact.fq_storage_path
@@ -112,10 +117,10 @@ class Execution(Base, AbstractModel):
                 temp_results_file = self.plugin.get_results(self.deployment.hostname_ti, execution_uuid)
             else:
                 temp_results_file = tempfile.NamedTemporaryFile(prefix='ctt_', delete=False)
-                with zipfile.ZipFile(temp_results_file.name, 'w') as zip_f:
+                with zipfile.ZipFile(temp_results_file, 'w') as zip_f:
                     zip_f.writestr('dummy.txt',
                                    'This file was created in test mode. So this file does not contain real information.')
-            shutil.move(temp_results_file.name, self.fq_result_storage_path)
+            shutil.move(temp_results_file, self.fq_result_storage_path)
 
     @classmethod
     def get_parent_type(cls):
@@ -123,8 +128,8 @@ class Execution(Base, AbstractModel):
 
     @classmethod
     def create(cls, deployment_uuid):
-        linked_deployment = Deployment.get_by_uuid(deployment_uuid)
-        execution = Execution(linked_deployment)
+        linked_deployment: Deployment = Deployment.get_by_uuid(deployment_uuid)
+        execution: Execution = Execution(linked_deployment)
         config_uuid = execution.configure()
         if config_uuid:
             exec_uuid = execution.execute(config_uuid)
@@ -132,12 +137,6 @@ class Execution(Base, AbstractModel):
                 execution.get_results(exec_uuid)
                 db_session.add(execution)
                 db_session.commit()
-                # from models.testartifact import TestArtifact
-                # from models.project import Project
-                # test_artifact = TestArtifact.get_by_uuid(linked_deployment.uuid)
-                # project = Project.get_by_uuid(test_artifact.uuid)
-                # if project.auto_undeploy:
-                #     linked_deployment.undeploy()
         else:
             current_app.logger.info("Execution could not be triggered. No config_uuid provided.")
         return execution

@@ -39,7 +39,6 @@ class Deployment(Base, AbstractModel):
     def __init__(self, testartifact):
         self.uuid = str(uuid.uuid4())
         self.testartifact_uuid = testartifact.uuid
-        self.storage_path = os.path.join(get_path(), self.__tablename__, self.uuid)
         self.__test_artifact = testartifact
         self.sut_hostname = 'localhost'
         self.ti_hostname = 'localhost'
@@ -64,10 +63,15 @@ class Deployment(Base, AbstractModel):
     def hostname_ti(self):
         return self.ti_hostname
 
+    @property
+    def storage_path(self):
+        return os.path.join(get_path(), self.__tablename__, self.uuid)
+
     def deploy(self):
         test_artifact = TestArtifact.get_by_uuid(self.testartifact_uuid)
         sut_csar_path = os.path.join(test_artifact.fq_storage_path, test_artifact.sut_tosca_path)
         ti_csar_path = os.path.join(test_artifact.fq_storage_path, test_artifact.ti_tosca_path)
+        sut_success: bool = False
 
         if test_artifact.sut_inputs_path:
             sut_inputs_path = os.path.join(test_artifact.fq_storage_path, test_artifact.sut_inputs_path)
@@ -85,29 +89,40 @@ class Deployment(Base, AbstractModel):
                 sut_csar.drop_policies()
             entry_definition = sut_csar.tosca_entry_point
 
-            current_app.logger.\
-                info(f'Deploying SuT {str(entry_definition)} with opera in folder {str(self.sut_storage_path)}.')
-
             if not is_test_mode():
+                current_app.logger. \
+                    info(f'Deploying SuT {str(entry_definition)} with opera in folder {str(self.sut_storage_path)}.')
+
+                return_code: int
                 try:
                     if sut_inputs_path:
-                        subprocess.call(['opera', 'deploy',
-                                         '-p', self.sut_storage_path,
-                                         '-i', sut_inputs_path,
-                                         entry_definition],
-                                        cwd=self.sut_storage_path)
+                        return_code = subprocess.call(['opera', 'deploy',
+                                                       '-p', self.sut_storage_path,
+                                                       '-i', sut_inputs_path,
+                                                       entry_definition],
+                                                      cwd=self.sut_storage_path)
                     else:
-                        subprocess.call(['opera', 'deploy',
-                                         '-p', self.sut_storage_path,
-                                         entry_definition],
-                                        cwd=self.sut_storage_path)
-                    opera_outputs = subprocess.check_output(['opera', 'outputs',
-                                                             '-p', self.sut_storage_path],
-                                                            cwd=self.sut_storage_path)
-                    current_app.logger.info(f'Opera returned output {opera_outputs}.')
+                        return_code = subprocess.call(['opera', 'deploy',
+                                                       '-p', self.sut_storage_path,
+                                                       entry_definition],
+                                                      cwd=self.sut_storage_path)
+
+                    if return_code == 0:
+                        sut_success = True
+                        opera_outputs = subprocess.check_output(['opera', 'outputs',
+                                                                 '-p', self.sut_storage_path],
+                                                                cwd=self.sut_storage_path)
+                        current_app.logger.info(f'Opera returned output {opera_outputs}.')
+                        opera_yaml_outputs_sut = yaml.safe_load(opera_outputs)
+                    else:
+                        error_message: str = f'Deployment of SUT failed with Opera return code ${return_code}.'
+                        current_app.logger.info(error_message)
+                        raise OperationError(error_message)
                 except OperationError:
                     subprocess.call(['opera', 'undeploy',
                                      '-p', self.sut_storage_path])
+            else:
+                current_app.logger.info(f'Deployment of TI skipped due to test mode being enabled.')
 
         # Deployment of TI
         with Csar(ti_csar_path, extract_dir=self.ti_storage_path, keep=True) as ti_csar:
@@ -116,44 +131,67 @@ class Deployment(Base, AbstractModel):
             entry_definition = ti_csar.tosca_entry_point
 
             if entry_definition:
-                current_app.logger.\
+                current_app.logger. \
                     info(f'Deploying TI {str(entry_definition)} with opera in folder {str(self.ti_storage_path)}.')
 
-                if not is_test_mode():
+                if sut_success and (not is_test_mode()):
+                    return_code: int
+
                     try:
                         if ti_inputs_path:
-                            subprocess.call(['opera', 'deploy',
-                                             '-p', self.ti_storage_path,
-                                             '-i', ti_inputs_path,
-                                             entry_definition],
-                                            cwd=self.ti_storage_path)
+                            return_code = subprocess.call(['opera', 'deploy',
+                                                           '-p', self.ti_storage_path,
+                                                           '-i', ti_inputs_path,
+                                                           entry_definition],
+                                                          cwd=self.ti_storage_path)
                         else:
-                            subprocess.call(['opera', 'deploy',
-                                             '-p', self.ti_storage_path,
-                                             entry_definition],
-                                            cwd=self.ti_storage_path)
-                        opera_outputs = subprocess.check_output(['opera', 'outputs',
-                                                                 '-p', self.ti_storage_path],
-                                                                cwd=self.ti_storage_path)
-                        current_app.logger.info(f'Opera returned output {opera_outputs}.')
-                        opera_yaml_outputs = yaml.safe_load(opera_outputs)
-                        time.sleep(30)
+                            return_code = subprocess.call(['opera', 'deploy',
+                                                           '-p', self.ti_storage_path,
+                                                           entry_definition],
+                                                          cwd=self.ti_storage_path)
+
+                        if return_code == 0:
+                            opera_outputs = subprocess.check_output(['opera', 'outputs',
+                                                                     '-p', self.ti_storage_path],
+                                                                    cwd=self.ti_storage_path)
+                            current_app.logger.info(f'Opera returned output {opera_outputs}.')
+                            opera_yaml_outputs_ti = yaml.safe_load(opera_outputs)
+                            time.sleep(30)
+                        else:
+                            error_message: str = f'Deployment of TI failed with Opera return code ${return_code}.'
+                            current_app.logger.info(error_message)
+                            raise OperationError(error_message)
                     except OperationError:
                         subprocess.call(['opera', 'undeploy',
                                          '-p', self.ti_storage_path])
 
-                    self.sut_hostname = self.__test_artifact.policy_yaml['properties']['hostname']
+                    # Set SUT hostname to the value of the opera output of the SUT
+                    # with the name from the policy field for hostname
+                    policy_hostname: str = self.__test_artifact.policy_yaml['properties']['hostname']
+                    if policy_hostname in opera_yaml_outputs_sut and 'value' in opera_yaml_outputs_sut[policy_hostname]:
+                        self.sut_hostname = opera_yaml_outputs_sut[policy_hostname]['value']
+                    else:
+                        # Set hostname to field set in the policy field for hostname
+                        self.sut_hostname = policy_hostname
                     current_app.logger.info(f'SUT hostname {self.sut_hostname}.')
 
-                    self.ti_hostname = opera_yaml_outputs['public_address']['value']
+                    # Set TI hostname to the 'public_address' value of the opera output
+                    self.ti_hostname = opera_yaml_outputs_ti['public_address']['value']
                     current_app.logger.info(f'TI hostname {self.ti_hostname}.')
+
+                elif not sut_success:
+                    current_app.logger.warning(f'Deployment of TI skipped due to failure of SUT deployment.')
+                elif is_test_mode():
+                    current_app.logger.info(f'Deployment of TI skipped due to test mode being enabled.')
 
         db_session.add(self)
         db_session.commit()
 
     def undeploy(self):
         if not is_test_mode():
+            current_app.logger.info(f'Undeploying system under test (SUT).')
             subprocess.call(['opera', 'undeploy', '-p', self.sut_storage_path], cwd=self.sut_storage_path)
+            current_app.logger.info(f'Undeploying test infrastructure (TI).')
             subprocess.call(['opera', 'undeploy', '-p', self.ti_storage_path], cwd=self.ti_storage_path)
 
     def get_uuid(self):

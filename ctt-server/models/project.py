@@ -4,10 +4,11 @@ from flask import current_app
 from os import getenv, makedirs, path
 from shutil import copytree, rmtree
 from sqlalchemy import Boolean, Column, String
+from urllib.parse import urlparse
 
 from db_orm.database import Base, db_session
 from models.abstract_model import AbstractModel
-from util.configuration import is_che_env, get_dir_prefix, get_path, AutoUndeploy
+from util.configuration import is_che_env, get_dir_prefix, get_path, AutoUndeploy, git_credentials
 
 
 class Project(Base, AbstractModel):
@@ -53,7 +54,17 @@ class Project(Base, AbstractModel):
             copytree(src_path, self.fq_storage_path, dirs_exist_ok=True)
         else:
             current_app.logger.info(f'Cloning repository {self.repository_url} into {self.fq_storage_path}')
-            git.Git(self.fq_storage_path).clone(self.repository_url, self.fq_storage_path)
+
+            # If credentials are provided, we inject them into the URL
+            credentials = git_credentials()
+            repo_url = self.repository_url
+            if credentials:
+                current_app.logger.info(f"Using provided credentials with user '{credentials['username']}'")
+                parsed_url = urlparse(self.repository_url)
+                repo_url = f"{parsed_url.scheme}://{credentials['username']}:{credentials['password']}@" \
+                           f"{parsed_url.netloc}{parsed_url.path}"
+
+            git.Git(self.fq_storage_path).clone(repo_url, self.fq_storage_path)
 
         db_session.add(self)
         db_session.commit()
