@@ -3,7 +3,7 @@ FROM python:3-alpine
 ENV OPERA_SSH_HOST_KEY_CHECKING=False
 ENV ANSIBLE_HOST_KEY_CHECKING=False
 
-RUN echo -e "search home\nnameserver 8.8.8.8" > /etc/resolv.conf
+# RUN echo -e "search home\nnameserver 8.8.8.8" > /etc/resolv.conf
 
 ENV CLOUD_SDK_VERSION=345.0.0
 ENV PATH=/google-cloud-sdk/bin:$PATH
