@@ -33,5 +33,3 @@ jobs:
           push: true
           tags: radonconsortium/radon-ctt:${{ env.BRANCH }}
           context: ./ctt-server
-          build-args: |
-            BRANCH=${{ env.BRANCH }}
