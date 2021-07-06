@@ -1,8 +1,8 @@
 # RADON Continuous Testing Tool (CTT)
 
-![build (dev)](https://img.shields.io/jenkins/build?jobUrl=http%3A%2F%2F217.172.12.165%3A8080%2Fjob%2FCTT%2Fjob%2Fradon-ctt%2Fjob%2Fdev%2F&style=plastic)
-![tests (dev)](https://img.shields.io/jenkins/tests?compact_message&jobUrl=http%3A%2F%2F217.172.12.165%3A8080%2Fjob%2FCTT%2Fjob%2Fradon-ctt%2Fjob%2Fdev%2F&style=plastic)
-![coverage (dev)](https://img.shields.io/jenkins/coverage/cobertura?jobUrl=http%3A%2F%2F217.172.12.165%3A8080%2Fjob%2FCTT%2Fjob%2Fradon-ctt%2Fjob%2Fdev%2F&style=plastic)
+![build (master)](https://img.shields.io/jenkins/build?jobUrl=http%3A%2F%2F217.172.12.165%3A8080%2Fjob%2FCTT%2Fjob%2Fradon-ctt%2Fjob%2Fmaster%2F&style=plastic)
+![tests (master)](https://img.shields.io/jenkins/tests?compact_message&jobUrl=http%3A%2F%2F217.172.12.165%3A8080%2Fjob%2FCTT%2Fjob%2Fradon-ctt%2Fjob%2Fmaster%2F&style=plastic)
+![coverage (master)](https://img.shields.io/jenkins/coverage/cobertura?jobUrl=http%3A%2F%2F217.172.12.165%3A8080%2Fjob%2FCTT%2Fjob%2Fradon-ctt%2Fjob%2Fmaster%2F&style=plastic)
 
 | Items                    | Contents                                                     |
 | ------------------------ | ------------------------------------------------------------ |
