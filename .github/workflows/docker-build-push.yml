@@ -1,13 +1,10 @@
 name: Build and push Docker image to DockerHub
-
 on:
   push:
     branches:
     - master
     - dev
 jobs:
-  docker_image:
-    name: Build and push Docker image
     runs-on: ubuntu-latest
     steps:
       - name: Branch name
@@ -16,15 +13,10 @@ jobs:
         run: echo "RUNNER_TMP=${RUNNER_TEMP}" >> $GITHUB_ENV        
       - name: Check out the repo
         uses: actions/checkout@v2
-      - name: Log in to Docker Hub
-        uses: docker/login-action@v1
-        with:
-          username: ${{ secrets.docker_hub_user }}
-          password: ${{ secrets.docker_hub_pass }}
       - name: Push to Docker Hub
         uses: docker/build-push-action@v2
         with:
-          push: true
+          push: false
           tags: radonconsortium/radon-ctt:${{ env.BRANCH }}
           context: ./ctt-server
       - name: Run tests with coverage
@@ -36,3 +28,21 @@ jobs:
           path: |
             /home/runner/work/_temp/_github_home/coverage.xml
             /home/runner/work/_temp/_github_home/unittest
+  push_docker_image:
+    needs: build_docker_image
+    name: Push Docker image to DockerHub
+    runs-on: ubuntu-latest
+    steps:
+    - name: Branch name
+      run: echo "BRANCH=${GITHUB_REF##*/}" >> $GITHUB_ENV
+    - name: Log in to Docker Hub
+      uses: docker/login-action@v1
+      with:
+        username: ${{ secrets.docker_hub_user }}
+        password: ${{ secrets.docker_hub_pass }}
+    - name: Push to Docker Hub
+      uses: docker/build-push-action@v2
+      with:
+        push: true
+        tags: radonconsortium/radon-ctt:${{ env.BRANCH }}
+        context: ./ctt-server
