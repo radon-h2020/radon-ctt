@@ -1,11 +1,3 @@
-# This workflow will upload a Python Package using Twine when a release is created
-# For more information see: https://help.github.com/en/actions/language-and-framework-guides/using-python-with-github-actions#publishing-to-package-registries
-
-# This workflow uses actions that are not certified by GitHub.
-# They are provided by a third-party and are governed by
-# separate terms of service, privacy policy, and support
-# documentation.
-
 name: Build and push Docker image to DockerHub
 
 on:
@@ -14,12 +6,14 @@ on:
     - master
     - dev
 jobs:
-  push_to_registry:
-    name: Build and push Docker image to DockerHub
+  docker_image:
+    name: Build and push Docker image
     runs-on: ubuntu-latest
     steps:
       - name: Branch name
         run: echo "BRANCH=${GITHUB_REF##*/}" >> $GITHUB_ENV
+      - name: Branch name
+        run: echo "RUNNER_TMP=${RUNNER_TEMP}" >> $GITHUB_ENV        
       - name: Check out the repo
         uses: actions/checkout@v2
       - name: Log in to Docker Hub
@@ -33,3 +27,12 @@ jobs:
           push: true
           tags: radonconsortium/radon-ctt:${{ env.BRANCH }}
           context: ./ctt-server
+      - name: Run tests with coverage
+        run: docker run -e 'CTT_TEST_MODE=True' -v '/home/runner/work/_temp/_github_home:/output' --entrypoint '/bin/sh' radonconsortium/radon-ctt:${{ env.BRANCH }} -c 'coverage run -m xmlrunner discover openapi_server/test/ -o /output/unittest && coverage xml -o /output/coverage.xml'
+      - name: Upload test artifacts
+        uses: actions/upload-artifact@v2
+        with:
+          name: test-artifacts
+          path: |
+            /home/runner/work/_temp/_github_home/coverage.xml
+            /home/runner/work/_temp/_github_home/unittest
