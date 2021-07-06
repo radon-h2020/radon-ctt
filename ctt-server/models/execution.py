@@ -1,6 +1,8 @@
 import os
 import shutil
+import tempfile
 import uuid
+import zipfile
 
 from flask import current_app
 from sqlalchemy import Column, String, ForeignKey
@@ -9,7 +11,7 @@ from straight.plugin.loaders import ModuleLoader
 from db_orm.database import Base, db_session
 from models.abstract_model import AbstractModel
 from models.deployment import Deployment
-from util.configuration import get_path
+from util.configuration import get_path, is_test_mode
 
 
 class Execution(Base, AbstractModel):
@@ -36,7 +38,7 @@ class Execution(Base, AbstractModel):
     def __init__(self, deployment):
         if deployment:
             self.uuid = str(uuid.uuid4())
-            self.deployment = deployment
+            self.deployment: Deployment = deployment
             self.deployment_uuid = deployment.uuid
             self.storage_path = os.path.join(get_path(), self.__tablename__, self.uuid)
             self.plugin = None
@@ -82,27 +84,42 @@ class Execution(Base, AbstractModel):
     def test_infrastructure_ip(self):
         return self.ti_ip_address
 
+    def undeploy(self):
+        linked_deployment: Deployment = Deployment.get_by_uuid(self.deployment_uuid)
+        if linked_deployment:
+            linked_deployment.undeploy()
+
     def configure(self):
         test_artifact_yaml_policy = self.test_artifact.policy_yaml
         test_artifact_storage_path = self.test_artifact.fq_storage_path
 
-        config_uuid = self.plugin.configure(self.deployment.hostname_ti,
-                                            test_artifact_yaml_policy,
-                                            test_artifact_storage_path,
-                                            sut_hostname=self.deployment.hostname_sut)
+        if not is_test_mode():
+            config_uuid = self.plugin.configure(self.deployment.hostname_ti, test_artifact_yaml_policy,
+                                                test_artifact_storage_path, sut_hostname=self.deployment.hostname_sut)
+        else:
+            config_uuid = str(uuid.uuid4())
 
         self.agent_configuration_uuid = config_uuid
         return config_uuid
 
     def execute(self, config_uuid):
-        execution_uuid = self.plugin.execute(self.deployment.hostname_ti,
-                                             config_uuid)
+        if not is_test_mode():
+            execution_uuid = self.plugin.execute(self.deployment.hostname_ti, config_uuid)
+        else:
+            execution_uuid = str(uuid.uuid4())
+
         self.agent_execution_uuid = execution_uuid
         return execution_uuid
 
     def get_results(self, execution_uuid):
         if execution_uuid:
-            temp_results_file = self.plugin.get_results(self.deployment.hostname_ti, execution_uuid)
+            if not is_test_mode():
+                temp_results_file = self.plugin.get_results(self.deployment.hostname_ti, execution_uuid)
+            else:
+                temp_results_file = tempfile.NamedTemporaryFile(prefix='ctt_', delete=False)
+                with zipfile.ZipFile(temp_results_file, 'w') as zip_f:
+                    zip_f.writestr('dummy.txt',
+                                   'This file was created in test mode. So this file does not contain real information.')
             shutil.move(temp_results_file, self.fq_result_storage_path)
 
     @classmethod
@@ -111,8 +128,8 @@ class Execution(Base, AbstractModel):
 
     @classmethod
     def create(cls, deployment_uuid):
-        linked_deployment = Deployment.get_by_uuid(deployment_uuid)
-        execution = Execution(linked_deployment)
+        linked_deployment: Deployment = Deployment.get_by_uuid(deployment_uuid)
+        execution: Execution = Execution(linked_deployment)
         config_uuid = execution.configure()
         if config_uuid:
             exec_uuid = execution.execute(config_uuid)
@@ -130,7 +147,14 @@ class Execution(Base, AbstractModel):
 
     @classmethod
     def get_by_uuid(cls, get_uuid):
-        return Execution.query.filter_by(uuid=get_uuid).first()
+        result = Execution.query.filter_by(uuid=get_uuid).first()
+
+        if result:
+            return result
+        else:
+            error_msg = f'{cls.__name__} with UUID {get_uuid} could not be found.'
+            current_app.logger.error(error_msg)
+            raise LookupError(error_msg)
 
     @classmethod
     def delete_by_uuid(cls, del_uuid):

@@ -11,6 +11,9 @@ cd $SH_DIR/ctt-server
 virtualenv -p python3 $VENV_DIR
 source $VENV_DIR/bin/activate
 
+# Update pip
+pip install --upgrade pip
+
 # Install requirements
 pip install --no-cache -r requirements.txt
 

@@ -9,7 +9,8 @@ from sqlalchemy import Column, String, ForeignKey
 from db_orm.database import Base, db_session
 from models.execution import Execution
 from models.abstract_model import AbstractModel
-from util.configuration import get_path
+from openapi_server.models import Deployment
+from util.configuration import get_path, AutoUndeploy
 
 
 class Result(Base, AbstractModel):
@@ -40,6 +41,13 @@ class Result(Base, AbstractModel):
             shutil.copy2(execution.fq_result_storage_path, self.fq_result_storage_path)
             db_session.add(self)
             db_session.commit()
+            current_app.logger.info(f'AutoUndeploy is set to {AutoUndeploy}.')
+            if AutoUndeploy:
+                current_app.logger.info(f'Initiating undeployment.')
+                linked_execution: Execution = Execution.get_by_uuid(self.execution_uuid)
+                linked_execution.undeploy()
+            else:
+                current_app.logger.info(f'NOT initiating undeployment due to disabled AutoUndeploy.')
         else:
             raise Exception(f'Linked entities do not exist.')
 
@@ -74,7 +82,14 @@ class Result(Base, AbstractModel):
 
     @classmethod
     def get_by_uuid(cls, get_uuid):
-        return Result.query.filter_by(uuid=get_uuid).first()
+        result = Result.query.filter_by(uuid=get_uuid).first()
+
+        if result:
+            return result
+        else:
+            error_msg = f'{cls.__name__} with UUID {get_uuid} could not be found.'
+            current_app.logger.error(error_msg)
+            raise LookupError(error_msg)
 
     @classmethod
     def delete_by_uuid(cls, del_uuid):

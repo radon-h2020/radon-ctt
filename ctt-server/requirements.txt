@@ -4,26 +4,27 @@ connexion >= 2.3.0; python_version=="3.4"
 connexion == 2.4.0; python_version<="2.7"
 swagger-ui-bundle == 0.0.8
 python_dateutil == 2.8.1
-setuptools == 50.3.2
-gitpython == 3.1.11
-sqlalchemy == 1.3.20
-marshmallow == 3.9.0
-pyyaml == 5.4
+setuptools == 54.2.0
+gitpython == 3.1.14
+sqlalchemy == 1.4.6
+marshmallow == 3.11.1
+pyyaml == 5.4.1
 Flask == 1.1.2
-requests == 2.24.0
+requests == 2.25.1
 rfc3987 == 1.3.8
 six == 1.15.0
-# Only needed for local execution
-docker == 4.3.1
-opera >= 0.6.2
+
+docker == 5.0.0
+opera >= 0.6.5
 straight.plugin == 1.5.0
-waitress == 1.4.4
+waitress ==2.0.0
 
 # AWS CLI
 awscli >= 1.18.169
 
 # Google Cloud
 apache-libcloud >= 3.2.0
+gcloud
 
 # Azure
 azure-mgmt-compute >= 17.0.0

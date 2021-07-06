@@ -3,6 +3,7 @@ import shutil
 import tempfile
 
 from flask import current_app
+from urllib.parse import urlparse
 
 name = 'HTTP'
 plugin_name = 'http'
@@ -68,6 +69,10 @@ def configure(ti_hostname, policy_yaml, test_artifact_storage_path, sut_hostname
         test_header = policy_properties['test_header']
 
     if sut_hostname and port and method and path and expected_status and test_id:
+        sut_hostname_url = urlparse(sut_hostname)
+        if sut_hostname_url.scheme:
+            sut_hostname = sut_hostname_url.netloc
+            path = sut_hostname_url.path
 
         data = {'hostname': sut_hostname,
                 'port': port,
@@ -102,6 +107,7 @@ def execute(ti_hostname, config_uuid, ti_port=5000):
         data = {'config_uuid': config_uuid}
         response = requests.post(f'http://{ti_hostname}:{ti_port}/{plugin_name}/execution', data=data)
         json_response = response.json()
+
         if 'uuid' in json_response:
             execution_uuid = json_response['uuid']
             current_app.logger.info(f'Execution has ID {execution_uuid}.')
