@@ -163,7 +163,7 @@ In Listing 3, you can find an exemplary CTT configuration file named ctt_config.
           "result_destination_path": "serverless-test-results.zip"
       }
 
-**Listing 3**: Exemplary ``ctt_config.yaml file
+**Listing 3**: Exemplary ``ctt_config.yaml`` file
 
 Please note that the folder property is currently named repository_url
 for historical reasons. In the future, this property will be renamed.
