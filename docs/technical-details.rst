@@ -6,9 +6,12 @@ The following figure shows the workflow of the CTT tool.
 
 .. image:: imgs/ctt-workflow-1600x532.png
 
-The following video provides a 5-minute demo.
+The following videos provides an overview of CTT as well as a webinar.
 
 .. raw:: html
 
-   <iframe width="560" height="315" src="https://www.youtube.com/embed/35VN2edyvsc" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+   <iframe width="560" height="315" src="https://www.youtube.com/embed/WyLSG9rrpaA" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+
+  <iframe width="560" height="315" src="https://www.youtube.com/embed/DsShmfUih2c" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+
 
