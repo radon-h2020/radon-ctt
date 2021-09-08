@@ -79,7 +79,7 @@ part of the dialog. To provide test-specific details, select the newly
 created policy, which extends the dialog with the available
 properties, as seen in Figure 1.
 
-.. image:: img/87341b0de1de121342975dea76193a8292abec75.png
+.. image:: imgs/TestPolicyPropertyDialog.png
   :alt: Screenshot of Test Policy Property Dialog
 
 **Figure 1**: Screenshot of Test Policy Property Dialog
@@ -109,7 +109,7 @@ extend the policies for the component of your choice. The previously
 created policy is listed there and can be activated by checking the
 checkbox under the "Is Activated?" label as depicted in Figure 2.
 
-.. image:: img/789a3d824dc76aa14f6faad821cea06954db57d0.png
+.. image:: imgs/TestPolicyActivation.png
   :alt: Screenshot of Test Policy Activation
 
 **Figure 2**: Screenshot of Test Policy Activation
@@ -168,7 +168,7 @@ In Listing 3, you can find an exemplary CTT configuration file named ctt_config.
 Please note that the folder property is currently named repository_url
 for historical reasons. In the future, this property will be renamed.
 
-.. image:: img/08a65bbac9e037502c47530f04d207de766ccce9.png
+.. image:: imgs/ToDoListAPIScenario.png
   :alt: ServerlessToDoListAPI scenario in the RADON IDE
 
 **Figure 19**: ServerlessToDoListAPI scenario in the RADON IDE
@@ -180,7 +180,7 @@ After all preparations are finished, you can right-click on the
 ctt_config.yaml file and choose the option RadonCTT: Execute test
 configuration.
 
-.. image:: img/8623c23b82d4ec83a9b64647d1976d7a046d2e2b.png
+.. image:: imgs/IDEProgress.png
   :alt: Progress log in the output panel
 
 **Figure 20**: Progress log in the output panel
