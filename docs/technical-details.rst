@@ -6,7 +6,7 @@ The following figure shows the workflow of the CTT tool.
 
 .. image:: imgs/ctt-workflow-1600x532.png
 
-The following videos provides an overview of CTT as well as a webinar.
+The following videos provide a short overview of CTT as well as a whole webinar.
 
 .. raw:: html
 
