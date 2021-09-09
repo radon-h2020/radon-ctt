@@ -4,8 +4,7 @@ test (SUT), and a testing agent, the so-called test infrastructure (TI),
 that executes the defined tests against the SUT. After the deployment
 has succeeded, the defined test is executed and the results are
 obtained. Tests and test-related information are defined in the TOSCA
-models of the SUT and TI. The complete functionality of the tool is
-described in the  `CTT documentation <https://continuous-testing-tool.readthedocs.io/en/latest/>`_.
+models of the SUT and TI.
 
 In this usage description, we go through the test of the
 "ServerlessToDoListAPI" and an endpoint test that makes sure that the
