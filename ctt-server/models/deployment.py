@@ -225,7 +225,6 @@ class Deployment(Base, AbstractModel):
         deployment = Deployment(linked_testartifact)
         deployment.deploy()
 
-        # TODO: What to return here? Status of all deployments?
         return deployment
 
     @classmethod

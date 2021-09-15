@@ -1,16 +1,16 @@
 # RADON Continuous Testing Tool (CTT)
 
-![build (dev)](https://img.shields.io/jenkins/build?jobUrl=http%3A%2F%2F217.172.12.165%3A8080%2Fjob%2FCTT%2Fjob%2Fradon-ctt%2Fjob%2Fdev%2F&style=plastic)
-![tests (dev)](https://img.shields.io/jenkins/tests?compact_message&jobUrl=http%3A%2F%2F217.172.12.165%3A8080%2Fjob%2FCTT%2Fjob%2Fradon-ctt%2Fjob%2Fdev%2F&style=plastic)
-![coverage (dev)](https://img.shields.io/jenkins/coverage/cobertura?jobUrl=http%3A%2F%2F217.172.12.165%3A8080%2Fjob%2FCTT%2Fjob%2Fradon-ctt%2Fjob%2Fdev%2F&style=plastic)
+![build (master)](https://img.shields.io/jenkins/build?jobUrl=http%3A%2F%2F217.172.12.165%3A8080%2Fjob%2FCTT%2Fjob%2Fradon-ctt%2Fjob%2Fmaster%2F&style=plastic)
+![tests (master)](https://img.shields.io/jenkins/tests?compact_message&jobUrl=http%3A%2F%2F217.172.12.165%3A8080%2Fjob%2FCTT%2Fjob%2Fradon-ctt%2Fjob%2Fmaster%2F&style=plastic)
+![coverage (master)](https://img.shields.io/jenkins/coverage/cobertura?jobUrl=http%3A%2F%2F217.172.12.165%3A8080%2Fjob%2FCTT%2Fjob%2Fradon-ctt%2Fjob%2Fmaster%2F&style=plastic)
 
 | Items                    | Contents                                                     |
 | ------------------------ | ------------------------------------------------------------ |
 | **Short Description**    | The Continuous Testing Tool (CTT) provides the functionality for defining, generating, executing, and refining continuous tests of application functions, data pipelines and microservices, as well as for reporting test results. While targeting to provide a general framework for continuous quality testing in RADON, a particular focus of CTT is on testing workload-related quality attributes such as performance, elasticity, and resource/cost efficiency. |
-| **Documentation**        | <ul><li>*D3.4 – Continuous Testing Tool I*</li></li>*D3.5 – Continuous Testing Tool II*</li></ul> available at https://radon-h2020.eu/public-deliverables/ |
+| **Documentation** | [D3.4 – Continuous Testing Tool I](https://radon-h2020.eu/wp-content/uploads/2020/07/D3.4-Continuous-testing-tool-I.pdf) <br/> [D3.5 – Continuous Testing Tool II](https://radon-h2020.eu/wp-content/uploads/2021/09/D3.5-Continuous-testing-tool-II.pdf)|
 | **Stand-Alone Tutorial** | https://continuous-testing-tool.readthedocs.io/              |
-| **Video**                | https://youtu.be/35VN2edyvsc                                 |
-| **Source code**          | <ul><li>https://github.com/radon-h2020/radon-ctt (CTT Server)</li><li>https://github.com/radon-h2020/radon-ctt-agent (CTT Agent)</li><li>https://github.com/radon-h2020/radon-ctt-agent-plugins (CTT Agent Plugins)</li><li>https://github.com/radon-h2020/radon-particles (Includes CTT-related types)</li><li>https://github.com/radon-h2020/demo-ctt-sockshop (CTT SockShop Demo)</li><li>https://github.com/radon-h2020/demo-ctt-imageresize (CTT Thumbnail Demo)</li></ul> |
+| **Video**| <ul><li>[Overview](https://www.youtube.com/watch?v=WyLSG9rrpaA)</li><li> [Tutorial](https://www.youtube.com/watch?v=DsShmfUih2c)</li></ul> |
+| **Source code**          | <ul><li>https://github.com/radon-h2020/radon-ctt (CTT Server)</li><li>https://github.com/radon-h2020/radon-ctt-agent (CTT Agent)</li><li>https://github.com/radon-h2020/radon-ctt-cli (CTT CLI Tool)</li><li>https://github.com/radon-h2020/radon-ctt-agent-plugins (CTT Agent Plugins)</li><li>https://github.com/radon-h2020/radon-particles (Includes CTT-related types)</li><li>https://github.com/radon-h2020/demo-ctt-todolistapi (CTT ToDoList-API Demo)</li><li>https://github.com/radon-h2020/demo-ctt-sockshop (CTT SockShop Demo)</li><li>https://github.com/radon-h2020/demo-ctt-imageresize (CTT Thumbnail Demo)</li></ul> |
 | **Licence**              | [Apache License, Version 2.0](https://opensource.org/licenses/Apache-2.0) |
 | **Contact**              | <ul><li>Thomas F. Düllmann ([@duelle](https://github.com/duelle)) </li><li>Andre van Hoorn ([@avanhoorn](https://github.com/avanhoorn)) </li></ul> |
 
