@@ -16,7 +16,28 @@ tags:
   - name: Deployment
   - name: Execution
   - name: Result
+  - name: Workflow
 paths:
+  /workflow:
+    post:
+      operationId: create_workflow
+      requestBody:
+        content:
+          application/octet-stream:
+            # any media type is accepted, functionally equivalent to `*/*`
+            schema:
+              # a binary file of any type
+              type: string
+              format: base64
+      # requestBody:
+      #   $ref: '#/components/requestBodies/POSTWorkflow'
+      responses:
+        '201':
+          description: Successful operation
+      summary: Creates a workflow
+      tags:
+          - Workflow
+      x-openapi-router-controller: openapi_server.controllers.workflow_controller
   /deployment:
     get:
       operationId: get_deployments
@@ -466,6 +487,11 @@ components:
         application/json:
           schema:
             $ref: '#/components/schemas/POSTResult'
+    POSTWorkflow:
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/POSTWorkflow'
   schemas:
     Project:
       example:
@@ -551,6 +577,12 @@ components:
           readOnly: true
           type: string
       type: object
+    Workflow:
+      properties:
+        workflow_data:
+          readOnly: true
+          type: string
+      type: object
     POSTProject:
       example:
         name: SockShop
@@ -624,3 +656,9 @@ components:
       required:
         - execution_uuid
       type: object
+    POSTWorkflow:
+      properties:
+        workflow_data:
+          type: string
+      required:
+        - workflow_data

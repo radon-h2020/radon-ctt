@@ -1,9 +1,11 @@
 import base64
 import json
 import os
+import requests
 import subprocess
 import sys
-import requests
+import yaml
+
 
 from requests.cookies import RequestsCookieJar
 
@@ -140,7 +142,7 @@ class OperaSaas:
         param = {}
         if inputs_file and os.path.isfile(inputs_file):
             with open(inputs_file, 'r') as inputs:
-                param = json.loads(inputs)
+                param = yaml.load(inputs, yaml.SafeLoader)
         payload = json.dumps(param)
         response = self.__requests_session.post(url=f'{self.__api_url}/workspace/{workspace_id}'
                                                     f'/project/{project_id}/deploy',
@@ -150,7 +152,15 @@ class OperaSaas:
             return response.json()
         return None
 
-    def deploy_status_get(self):
+    def async_status_get(self, workspace_id: int, project_id: int, invocation_id: str):
+        """
+        Checks the status of async actions like deployment or undeployment.
+        """
+        response = self.__requests_session.get(url=f'{self.__api_url}/workspace/{workspace_id}'
+                                                   f'/project/{project_id}/status/{invocation_id}',
+                                               headers=default_headers)
+        if response.status_code == 200:
+            return response.json()
         return None
 
     def undeploy_post(self, workspace_id: int, project_id: int):
@@ -160,3 +170,31 @@ class OperaSaas:
         if response.status_code == 200:
             return response.json()
         return False
+
+
+def main():
+    import time
+
+    saas_user = ''
+    saas_password = ''
+    ops = OperaSaas(saas_user, saas_password)
+    print(f'Success: {ops.is_logged_in}')
+    print(ops.workspaces_get())
+    created_project = ops.project_create(91, '/home/user/tmp/deploytest/ti.csar', 'EC2 Test')
+    created_project_id = created_project['id']
+    print(f'''Project created with ID: {created_project_id}''')
+    deployed_project = ops.deploy_post(91, created_project_id, '/home/user/tmp/deploytest/inputs_saas.yaml')
+    deployment_invocation_id = deployed_project['id']
+    print(f'''Deploy started with ID: {deployment_invocation_id}''')
+    current_state = "in_progress"
+    while current_state == "in_progress":
+        time.sleep(5)
+        resp = ops.async_status_get(91,created_project_id, deployment_invocation_id)
+        print(resp)
+        current_state = resp['state']
+
+    ops.de_authenticate()
+
+
+if __name__ == "__main__":
+    main()

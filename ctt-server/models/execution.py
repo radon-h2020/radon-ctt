@@ -116,7 +116,7 @@ class Execution(Base, AbstractModel):
             if not is_test_mode():
                 temp_results_file = self.plugin.get_results(self.deployment.hostname_ti, execution_uuid)
             else:
-                temp_results_file = tempfile.NamedTemporaryFile(prefix='ctt_', delete=False)
+                temp_results_file = tempfile.NamedTemporaryFile(prefix='ctt_', delete=False).name
                 with zipfile.ZipFile(temp_results_file, 'w') as zip_f:
                     zip_f.writestr('dummy.txt',
                                    'This file was created in test mode. So this file does not contain real information.')

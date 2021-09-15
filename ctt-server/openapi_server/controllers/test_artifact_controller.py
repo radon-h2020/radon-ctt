@@ -6,7 +6,7 @@ from openapi_server.models.test_artifact import TestArtifact  # noqa: E501
 from openapi_server import util
 
 from models.testartifact import TestArtifact as TestArtifactImpl
-from util.marhsmallow_schemas import TestArtifactSchema
+from util.marshmallow_schemas import TestArtifactSchema
 
 testartifact_schema = TestArtifactSchema()
 testartifact_schema_many = TestArtifactSchema(many=True)

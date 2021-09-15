@@ -6,7 +6,7 @@ from openapi_server.models.post_deployment import POSTDeployment  # noqa: E501
 from openapi_server import util
 
 from models.deployment import Deployment as DeploymentImpl
-from util.marhsmallow_schemas import DeploymentSchema
+from util.marshmallow_schemas import DeploymentSchema
 
 deployment_schema = DeploymentSchema()
 deployment_schema_many = DeploymentSchema(many=True)

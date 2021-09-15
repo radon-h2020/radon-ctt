@@ -6,7 +6,7 @@ from openapi_server.models.project import Project  # noqa: E501
 from openapi_server import util
 
 from models.project import Project as ProjectImpl
-from util.marhsmallow_schemas import ProjectSchema
+from util.marshmallow_schemas import ProjectSchema
 
 project_schema = ProjectSchema()
 project_schema_many = ProjectSchema(many=True)
