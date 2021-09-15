@@ -122,7 +122,8 @@ class Deployment(Base, AbstractModel):
                     subprocess.call(['opera', 'undeploy',
                                      '-p', self.sut_storage_path])
             else:
-                current_app.logger.info(f'Deployment of TI skipped due to test mode being enabled.')
+                current_app.logger.info(f'Deployment of SUT skipped due to test mode being enabled.')
+                sut_success = True
 
         # Deployment of TI
         with Csar(ti_csar_path, extract_dir=self.ti_storage_path, keep=True) as ti_csar:
@@ -224,7 +225,6 @@ class Deployment(Base, AbstractModel):
         deployment = Deployment(linked_testartifact)
         deployment.deploy()
 
-        # TODO: What to return here? Status of all deployments?
         return deployment
 
     @classmethod

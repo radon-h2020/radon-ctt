@@ -31,3 +31,8 @@ class ResultSchema(Schema):
     uuid = fields.Str()
     execution_uuid = fields.Str()
     results_file = fields.Str()
+
+
+class WorkflowSchema(Schema):
+    logs = fields.Str()
+    results = fields.Str()

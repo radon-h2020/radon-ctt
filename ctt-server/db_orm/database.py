@@ -2,6 +2,7 @@ import os
 
 from sqlalchemy import create_engine, event
 from sqlalchemy.engine import Engine
+from sqlalchemy.pool import SingletonThreadPool
 from sqlalchemy.orm import scoped_session, sessionmaker
 from sqlalchemy.ext.declarative import declarative_base
 
@@ -10,7 +11,7 @@ from util.configuration import get_path, DBFile, DefaultDirectoryPrefix
 os.makedirs(get_path(), exist_ok=True)
 db_path = os.path.join(get_path(), DBFile)
 
-engine = create_engine('sqlite:///' + db_path, convert_unicode=True)
+engine = create_engine('sqlite:///' + db_path, convert_unicode=True, poolclass=SingletonThreadPool)
 db_session = scoped_session(sessionmaker(autocommit=False,
                                          autoflush=False,
                                          bind=engine))

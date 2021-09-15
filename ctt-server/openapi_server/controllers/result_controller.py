@@ -9,7 +9,7 @@ from openapi_server.models.result import Result  # noqa: E501
 from openapi_server import util
 
 from models.result import Result as ResultImpl
-from util.marhsmallow_schemas import ResultSchema
+from util.marshmallow_schemas import ResultSchema
 
 result_schema = ResultSchema()
 result_schema_many = ResultSchema(many=True)

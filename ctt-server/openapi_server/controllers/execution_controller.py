@@ -6,7 +6,7 @@ from openapi_server.models.post_execution import POSTExecution  # noqa: E501
 from openapi_server import util
 
 from models.execution import Execution as ExecutionImpl
-from util.marhsmallow_schemas import ExecutionSchema
+from util.marshmallow_schemas import ExecutionSchema
 
 execution_schema = ExecutionSchema()
 execution_schema_many = ExecutionSchema(many=True)
