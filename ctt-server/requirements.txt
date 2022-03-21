@@ -17,7 +17,7 @@ six == 1.15.0
 docker == 5.0.0
 opera >= 0.6.5
 straight.plugin == 1.5.0
-waitress ==2.0.0
+waitress ==2.1.1
 
 # AWS CLI
 awscli >= 1.18.169
